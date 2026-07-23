@@ -1,0 +1,17 @@
+{
+  "name": "hcld-bleed-tracker-server",
+  "version": "1.0.0",
+  "description": "Always-on background poller for the Hidden Cloud CW Live Tracker",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2",
+    "firebase": "^10.14.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
