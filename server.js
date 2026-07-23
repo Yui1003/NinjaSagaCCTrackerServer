@@ -166,18 +166,12 @@ function recordClanActivity(roundRolledOver) {
   }
 }
 
-// ─── Latest clan deduction change (for suspicion level calc) ──────────────────
-function getLatestClanDeductionChange(clanId) {
-  if (!currentData || !prevData) return null;
-  const curr = currentData.clans.find(c => c.id === clanId);
-  const prev = prevData.clans.find(c => c.id === clanId);
-  if (!curr || !prev) return null;
-  const change = (curr.deduction || 0) - (prev.deduction || 0);
-  return change > 0 ? change : null;
-}
-
-// ─── Member peak tracking + suspect detection ─────────────────────────────────
-async function recordMemberPeaks(roundRolledOver) {
+// ─── Member peak tracking — MEMORY ONLY, no Firestore writes ─────────────────
+// Tracks each member's highest rep seen this round and whether it later dropped.
+// The drop here is the ACP's initial "flag" — NOT the official deduction yet.
+// Suspects are only written to Firestore inside recordDeductionChanges() when
+// the clan's official deduction value actually changes in the API.
+function recordMemberPeaks(roundRolledOver) {
   if (!currentData) return;
   const now = Date.now();
 
@@ -189,21 +183,21 @@ async function recordMemberPeaks(roundRolledOver) {
       // Round rollover or first time seeing this member — set baseline
       if (roundRolledOver || !entry) {
         memberPeakRep[key] = {
-          peak:        m.reputation,
-          peakTs:      now,
-          dropAmount:  0,
-          dropTs:      null,
-          dropCount:   0,
+          peak:       m.reputation,
+          peakTs:     now,
+          dropAmount: 0,
+          dropTs:     null,
+          dropCount:  0,
         };
         continue;
       }
 
       if (m.reputation > entry.peak) {
-        // New peak (rep went up)
+        // New high — update peak
         memberPeakRep[key] = { ...entry, peak: m.reputation, peakTs: now };
 
       } else if (entry.peak > 0 && m.reputation < entry.peak) {
-        // Rep fell below peak — anti-cheat reversal
+        // Rep fell below peak — ACP flagged this member (store in memory only)
         const dropAmount   = entry.peak - m.reputation;
         const newDropCount = (entry.dropCount || 0) + 1;
         memberPeakRep[key] = {
@@ -212,49 +206,20 @@ async function recordMemberPeaks(roundRolledOver) {
           dropTs:    now,
           dropCount: newDropCount,
         };
-
-        const dedupKey = `${clan.id}_${m.id}_${entry.peak}`;
-        if (!suspectKeysSeen.has(dedupKey)) {
-          suspectKeysSeen.add(dedupKey);
-
-          const dedChange  = getLatestClanDeductionChange(clan.id);
-          const suspLvl    = (dedChange !== null && dedChange > 0 && dropAmount === dedChange) ? 'HIGH' : 'LOW';
-
-          const suspectEntry = {
-            dedupKey,
-            ts:              now,
-            clanId:          clan.id,
-            clanName:        clan.name,
-            clanRank:        clan.rank,
-            clanDeduction:   clan.deduction || 0,
-            memberId:        m.id,
-            memberName:      m.name,
-            memberLevel:     m.level,
-            memberRep:       m.reputation,
-            peakRep:         entry.peak,
-            dropAmount,
-            dropCount:       newDropCount,
-            confidence:      suspLvl === 'HIGH' ? 'HIGH' : 'MEDIUM',
-            suspicionLevel:  suspLvl,
-            detectionSource: 'live',
-            reason:          `Session peak was ${fmtNum(entry.peak)} — rep dropped by ${fmtNum(dropAmount)} — anti-cheat reversed a cheated win mid-session`,
-            capturedBy:      'server-poller',
-          };
-
-          try {
-            await setDoc(doc(collection(db, 'suspectLog'), dedupKey), suspectEntry);
-            totalSuspectsWritten++;
-            console.log(`[${ts()}] 🚨 SUSPECT  ${clan.name} · ${m.name} (Lv${m.level}) | peak ${fmtNum(entry.peak)} → ${fmtNum(m.reputation)} | drop -${fmtNum(dropAmount)} | ${suspLvl}`);
-          } catch (e) {
-            console.error(`[${ts()}] Firestore suspect write error:`, e.message);
-          }
-        }
+        // No Firestore write here — we wait for the official clan deduction event
       }
     }
   }
 }
 
-// ─── Deduction change tracking ────────────────────────────────────────────────
+// ─── Deduction change tracking + official suspect capture ────────────────────
+// This is the ONLY place Firestore writes happen.
+// When clan.deduction changes in the API, that is the "official" ACP event —
+// both the clan penalty and the individual member penalty are now confirmed.
+// At that exact moment we:
+//   1. Write the deduction entry to deductionLog
+//   2. Look at every member of that clan in memory — anyone with a dropAmount > 0
+//      is a confirmed suspect for this event — write them to suspectLog
 async function recordDeductionChanges() {
   if (!currentData || !prevData) return;
   const now = Date.now();
@@ -267,28 +232,75 @@ async function recordDeductionChanges() {
     const currDed = clan.deduction || 0;
     if (currDed === prevDed) continue;
 
-    const docKey = `${clan.id}_${now}`;
+    const deductionChange = currDed - prevDed; // positive = penalty grew
+    const docKey          = `${clan.id}_${now}`;
     if (deductionKeysSeen.has(docKey)) continue;
     deductionKeysSeen.add(docKey);
 
-    const entry = {
+    // ── 1. Write deduction entry ──────────────────────────────────────────────
+    const deductionEntry = {
       clanId:        clan.id,
       clanName:      clan.name,
       clanRank:      clan.rank,
       deduction:     currDed,
       prevDeduction: prevDed,
-      change:        currDed - prevDed,
+      change:        deductionChange,
       ts:            now,
       capturedBy:    'server-poller',
     };
 
     try {
-      await setDoc(doc(collection(db, 'deductionLog'), docKey), entry);
+      await setDoc(doc(collection(db, 'deductionLog'), docKey), deductionEntry);
       totalDeductionsWritten++;
-      const sign = entry.change > 0 ? '+' : '';
-      console.log(`[${ts()}] 📊 DEDUCTION ${clan.name} (rank ${clan.rank}) | ${fmtNum(prevDed)} → ${fmtNum(currDed)} (${sign}${fmtNum(entry.change)})`);
+      const sign = deductionChange > 0 ? '+' : '';
+      console.log(`[${ts()}] 📊 DEDUCTION ${clan.name} (rank ${clan.rank}) | ${fmtNum(prevDed)} → ${fmtNum(currDed)} (${sign}${fmtNum(deductionChange)})`);
     } catch (e) {
       console.error(`[${ts()}] Firestore deduction write error:`, e.message);
+    }
+
+    // ── 2. Capture suspects from memory at the moment of official deduction ───
+    // Find all members of this clan who have a flagged drop in memory.
+    // These are the confirmed cheaters — their individual penalty is now official.
+    for (const m of clan.member_list) {
+      const key   = `${clan.id}_${m.id}`;
+      const entry = memberPeakRep[key];
+      if (!entry || entry.dropAmount <= 0) continue; // no drop recorded for this member
+
+      const dedupKey = `${clan.id}_${m.id}_${entry.peak}`;
+      if (suspectKeysSeen.has(dedupKey)) continue; // already written from a previous deduction
+      suspectKeysSeen.add(dedupKey);
+
+      // HIGH if this member's drop amount exactly matches the clan deduction change
+      const suspLvl = (deductionChange > 0 && entry.dropAmount === deductionChange) ? 'HIGH' : 'MEDIUM';
+
+      const suspectEntry = {
+        dedupKey,
+        ts:              now,          // timestamp of the OFFICIAL deduction event
+        clanId:          clan.id,
+        clanName:        clan.name,
+        clanRank:        clan.rank,
+        clanDeduction:   currDed,
+        memberId:        m.id,
+        memberName:      m.name,
+        memberLevel:     m.level,
+        memberRep:       m.reputation,
+        peakRep:         entry.peak,
+        dropAmount:      entry.dropAmount,
+        dropCount:       entry.dropCount,
+        confidence:      suspLvl,
+        suspicionLevel:  suspLvl,
+        detectionSource: 'live',
+        reason:          `Official clan deduction confirmed — member peak was ${fmtNum(entry.peak)}, rep dropped by ${fmtNum(entry.dropAmount)} — captured at deduction event`,
+        capturedBy:      'server-poller',
+      };
+
+      try {
+        await setDoc(doc(collection(db, 'suspectLog'), dedupKey), suspectEntry);
+        totalSuspectsWritten++;
+        console.log(`[${ts()}] 🚨 SUSPECT  ${clan.name} · ${m.name} (Lv${m.level}) | peak ${fmtNum(entry.peak)} → drop -${fmtNum(entry.dropAmount)} | ${suspLvl}`);
+      } catch (e) {
+        console.error(`[${ts()}] Firestore suspect write error:`, e.message);
+      }
     }
   }
 }
@@ -315,7 +327,7 @@ async function poll() {
     const roundRolledOver = updateRoundTracking();
     recordClanActivity(roundRolledOver);
     recordMemberGainEvents(roundRolledOver);
-    await recordMemberPeaks(roundRolledOver);
+    recordMemberPeaks(roundRolledOver);
     await recordDeductionChanges();
 
     const newGeneratedAt = json.generated_at;
