@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "sq1xYOymLF6Vh9bTXMXVp"
+uri = "file://HCLD_BLEED_TRACKER.html"
+type = "unspecified"
+title = "HCLD_BLEED_TRACKER.html"

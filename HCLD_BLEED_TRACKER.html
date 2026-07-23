@@ -1,0 +1,3199 @@
+<!-- Hidden Cloud Clan Live Tracker v3 - Standalone Single HTML File | ninjasaga.cc -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Hidden Cloud CW Live Tracker | ninjasaga.cc</title>
+<style>
+:root {
+  --bg: #0d0d14;
+  --bg2: #13131e;
+  --bg3: #1a1a28;
+  --card: #181825;
+  --card2: #1e1e2e;
+  --border: #2a2a3e;
+  --border2: #363650;
+  --text: #cdd6f4;
+  --text2: #a6adc8;
+  --text3: #6c7086;
+  --primary: #f38ba8;
+  --amber: #f9e2af;
+  --green: #a6e3a1;
+  --blue: #89b4fa;
+  --red: #f38ba8;
+  --orange: #fab387;
+  --yellow: #f9e2af;
+  --mauve: #cba6f7;
+  --safe: #a6e3a1;
+  --low: #f9e2af;
+  --med: #fab387;
+  --high: #f38ba8;
+  --bleed: #f38ba8;
+  --header-h: 56px;
+  --tab-h: 60px;
+}
+@keyframes flash-green{0%{background:rgba(166,227,161,0.25)}100%{background:transparent}}
+@keyframes flash-red{0%{background:rgba(243,139,168,0.25)}100%{background:transparent}}
+.flash-up{animation:flash-green 1.4s ease-out}
+.flash-down{animation:flash-red 1.4s ease-out}
+.live-pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;animation:pulse 2s infinite}
+.live-pulse.stale{background:var(--amber)}
+.live-pulse.error{background:var(--red);animation:none}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:14px}
+#app{display:flex;flex-direction:column;height:100%;overflow:hidden}
+/* HEADER */
+#header{height:var(--header-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0;z-index:10}
+#header-logo{width:32px;height:32px;background:linear-gradient(135deg,#f38ba8,#cba6f7);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#1e1e2e;flex-shrink:0}
+#header-title{flex:1;min-width:0}
+#header-title h1{font-size:15px;font-weight:700;color:var(--text);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#header-title p{font-size:11px;color:var(--text3);margin-top:1px}
+#header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#refresh-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px;transition:all .2s}
+#refresh-btn:hover{border-color:var(--mauve);color:var(--mauve)}
+#refresh-btn.spinning svg{animation:spin 1s linear infinite}
+#last-updated{font-size:10px;color:var(--text3)}
+/* TAB BAR */
+#tabs{display:flex;background:var(--bg2);border-top:1px solid var(--border);height:var(--tab-h);flex-shrink:0}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--text3);transition:all .2s;border-top:2px solid transparent;padding:8px 4px}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--mauve);border-top-color:var(--mauve)}
+.tab svg{width:18px;height:18px}
+.tab span{font-size:10px;font-weight:500;letter-spacing:0.3px}
+/* MAIN CONTENT */
+#content{flex:1;overflow:hidden;position:relative}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column}
+.screen.active{display:flex}
+/* SEASON BAR */
+#season-bar{background:linear-gradient(90deg,#1e1e2e,#181825);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#season-info{display:flex;align-items:center;gap:8px}
+#season-badge{background:var(--mauve);color:#1e1e2e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;letter-spacing:0.5px}
+#season-name{font-size:12px;color:var(--text2);font-weight:600}
+#season-countdown{font-size:11px;color:var(--amber);font-weight:600;font-variant-numeric:tabular-nums}
+/* SEARCH */
+.search-wrap{padding:10px 12px;flex-shrink:0}
+.search-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px 8px 36px;border-radius:10px;font-size:13px;outline:none;transition:border-color .2s;position:relative}
+.search-input:focus{border-color:var(--mauve)}
+.search-wrap{position:relative}
+.search-wrap svg{position:absolute;left:22px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+/* YOUR CLAN BANNER */
+#your-clan-banner{margin:0 12px 8px;background:linear-gradient(135deg,#1e1e2e,#181825);border:1px solid var(--mauve);border-radius:12px;padding:10px 12px;cursor:pointer;transition:all .2s;display:none}
+#your-clan-banner.visible{display:block}
+#your-clan-banner:hover{border-color:var(--primary)}
+#ycb-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+#ycb-badge{background:var(--mauve);color:#1e1e2e;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:0.5px}
+#ycb-name{font-size:14px;font-weight:700;color:var(--text);flex:1}
+#ycb-rank{font-size:12px;color:var(--mauve);font-weight:600}
+#ycb-stats{display:flex;gap:12px}
+.ycb-stat{display:flex;flex-direction:column;gap:1px}
+.ycb-stat-label{font-size:10px;color:var(--text3)}
+.ycb-stat-value{font-size:13px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+#ycb-stamina-bar{height:4px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden}
+#ycb-stamina-fill{height:100%;border-radius:2px;transition:width .5s,background .3s}
+/* BLEEDING ALERT */
+.bleed-alert{margin:0 12px 8px;background:linear-gradient(135deg,rgba(243,139,168,0.12),rgba(243,139,168,0.05));border:1px solid rgba(243,139,168,0.4);border-radius:12px;padding:10px 12px;display:none;align-items:center;gap:10px}
+.bleed-alert.visible{display:flex}
+.bleed-alert-icon{font-size:18px;flex-shrink:0;animation:pulse 1.5s ease-in-out infinite}
+.bleed-alert-text h3{font-size:13px;font-weight:700;color:var(--red)}
+.bleed-alert-text p{font-size:11px;color:var(--text2);margin-top:1px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+/* CLAN CARDS */
+.clans-list{padding:0 12px 80px;display:flex;flex-direction:column;gap:6px}
+.clan-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.clan-card:hover{border-color:var(--border2);background:var(--card2)}
+.clan-card.your-clan{border-color:var(--mauve)}
+.clan-card.bleeding{border-color:rgba(243,139,168,0.5);background:linear-gradient(135deg,rgba(243,139,168,0.06),var(--card))}
+.clan-card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.clan-rank{font-size:13px;font-weight:800;color:var(--text3);min-width:28px;font-variant-numeric:tabular-nums}
+.clan-rank.gold{color:#f9e2af}
+.clan-rank.silver{color:#cdd6f4}
+.clan-rank.bronze{color:#fab387}
+.clan-name{flex:1;font-size:14px;font-weight:700;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clan-badges{display:flex;gap:4px;flex-shrink:0;align-items:center}
+.badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.4px;white-space:nowrap}
+.badge-your{background:var(--mauve);color:#1e1e2e}
+.badge-safe{background:rgba(166,227,161,0.15);color:var(--safe);border:1px solid rgba(166,227,161,0.3)}
+.badge-low{background:rgba(249,226,175,0.15);color:var(--low);border:1px solid rgba(249,226,175,0.3)}
+.badge-med{background:rgba(250,179,135,0.15);color:var(--med);border:1px solid rgba(250,179,135,0.3)}
+.badge-high{background:rgba(243,139,168,0.15);color:var(--high);border:1px solid rgba(243,139,168,0.3)}
+.badge-bleed{background:rgba(243,139,168,0.2);color:var(--bleed);border:1px solid rgba(243,139,168,0.5);animation:pulse 1.5s infinite}
+.badge-gaining-bleed{background:rgba(166,227,161,0.2);color:var(--safe);border:1px solid rgba(166,227,161,0.5);animation:pulse 1.5s infinite}
+.badge-gaining-manual{background:rgba(166,227,161,0.15);color:var(--safe);border:1px solid rgba(166,227,161,0.3)}
+.clan-card-bottom{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.clan-stat{display:flex;flex-direction:column;gap:1px}
+.clan-stat-label{font-size:10px;color:var(--text3)}
+.clan-stat-value{font-size:12px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
+.clan-delta{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+.clan-delta.pos{color:var(--green)}
+.clan-delta.neg{color:var(--red)}
+.clan-delta.neu{color:var(--text3)}
+.clan-delta-ago{display:block;font-size:9px;font-weight:500;color:var(--text3);margin-top:1px;font-variant-numeric:tabular-nums}
+.clan-master{font-size:11px;color:var(--text3);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* CLAN DETAIL SCREEN */
+#detail-header{padding:12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
+#detail-back{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:4px}
+#detail-back:hover{border-color:var(--mauve);color:var(--mauve)}
+#detail-title{flex:1;min-width:0}
+#detail-clan-name{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#detail-clan-sub{font-size:11px;color:var(--text3);margin-top:1px}
+#detail-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#set-your-clan-btn{background:var(--mauve);color:#1e1e2e;border:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+#set-your-clan-btn:hover{opacity:0.85}
+#detail-stats-row{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
+.detail-stat-box{flex:1;padding:10px 12px;border-right:1px solid var(--border);text-align:center}
+.detail-stat-box:last-child{border-right:none}
+.detail-stat-box .val{font-size:16px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.detail-stat-box .lbl{font-size:10px;color:var(--text3);margin-top:2px}
+#detail-stamina-section{padding:12px;border-bottom:1px solid var(--border);flex-shrink:0}
+#detail-stamina-section h3{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px}
+#detail-stamina-section .section-subtext{font-size:10px;color:var(--text3);opacity:0.75;margin-bottom:8px}
+.stamina-bar-wrap{display:flex;align-items:center;gap:10px}
+.stamina-bar-bg{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.stamina-bar-fill{height:100%;border-radius:4px;transition:width .6s,background .3s}
+.stamina-pct{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;min-width:40px;text-align:right}
+#detail-bleed-alert{margin:12px;background:linear-gradient(135deg,rgba(243,139,168,0.12),transparent);border:1px solid rgba(243,139,168,0.4);border-radius:10px;padding:10px 12px;display:none}
+#detail-bleed-alert.visible{display:block}
+#detail-bleed-alert h3{font-size:12px;font-weight:700;color:var(--red);margin-bottom:2px}
+#detail-bleed-alert p{font-size:11px;color:var(--text2)}
+#members-list{padding:0 12px 80px;display:flex;flex-direction:column;gap:4px}
+#members-list-header{display:flex;align-items:center;padding:6px 12px;gap:0;flex-shrink:0}
+.mh-col{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px}
+.mh-name{flex:1}
+.mh-level{width:44px;text-align:center}
+.mh-rep{width:80px;text-align:right}
+.mh-delta{width:68px;text-align:right}
+
+.member-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:0;transition:border-color .2s}
+.member-row.bleeding{border-color:rgba(243,139,168,0.4);background:linear-gradient(90deg,rgba(243,139,168,0.05),var(--card))}
+.member-row.high-risk{border-color:rgba(243,139,168,0.25)}
+.member-row.med-risk{border-color:rgba(250,179,135,0.25)}
+.member-row.low-risk{border-color:rgba(249,226,175,0.2)}
+.m-name{flex:1;font-size:13px;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px}
+.m-level{width:44px;text-align:center;font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums}
+.m-rep{width:80px;text-align:right;font-size:12px;font-weight:600;color:var(--text2);font-variant-numeric:tabular-nums}
+.m-delta{width:68px;text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.risk-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.risk-label{font-size:10px;font-weight:700}
+/* BLEEDING SCREEN */
+.section-header{padding:10px 12px 6px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;flex-shrink:0}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:12px;flex:1}
+.empty-state svg{width:48px;height:48px;color:var(--text3);opacity:0.4}
+.empty-state h3{font-size:15px;font-weight:600;color:var(--text3)}
+.empty-state p{font-size:12px;color:var(--text3);opacity:0.7;text-align:center}
+.bleed-clan-card{background:var(--card);border:1px solid rgba(243,139,168,0.35);border-radius:12px;padding:10px 12px;margin:0 12px 6px;cursor:pointer;transition:all .2s}
+.bleed-clan-card:hover{border-color:var(--red)}
+.bleed-clan-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.bleed-clan-card h3{font-size:14px;font-weight:700;color:var(--text)}
+.bleed-clan-delta-big{font-size:16px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
+.bleed-members-list{display:flex;flex-direction:column;gap:3px}
+.bleed-member-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0}
+.bm-name{font-size:12px;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px}
+.bm-delta{font-size:12px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.bm-risk{font-size:10px;font-weight:700}
+/* HISTORY SCREEN */
+.history-snapshot-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin:0 12px 6px;transition:all .2s}
+.history-snapshot-card.bleeding{border-color:rgba(243,139,168,0.5);background:linear-gradient(135deg,rgba(243,139,168,0.08),var(--card))}
+.history-snapshot-card:hover{border-color:var(--border2)}
+.hsc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.hsc-time{font-size:12px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.hsc-ago{font-size:11px;color:var(--text3)}
+.hsc-stats{display:flex;gap:16px}
+.hsc-stat{font-size:11px;color:var(--text2)}
+.hsc-stat span{color:var(--text);font-weight:600}
+/* SETTINGS SCREEN */
+.settings-section{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:10px 12px 0;overflow:hidden}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-row-label{font-size:13px;color:var(--text);font-weight:500}
+.settings-row-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.settings-row-right{display:flex;align-items:center;gap:8px}
+.settings-select{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:8px;font-size:12px;outline:none;cursor:pointer}
+.settings-select:focus{border-color:var(--mauve)}
+.settings-toggle{width:42px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;cursor:pointer;position:relative;transition:all .3s}
+.settings-toggle.on{background:var(--mauve);border-color:var(--mauve)}
+.settings-toggle::after{content:'';width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .3s}
+.settings-toggle.on::after{transform:translateX(18px)}
+.settings-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:8px;font-size:12px;outline:none;width:80px;text-align:center}
+.settings-input:focus{border-color:var(--mauve)}
+.settings-section-title{padding:14px 14px 6px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px}
+.btn-primary{background:var(--mauve);color:#1e1e2e;border:none;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;width:100%}
+.btn-primary:hover{opacity:0.85}
+.btn-danger{background:rgba(243,139,168,0.15);color:var(--red);border:1px solid rgba(243,139,168,0.3);padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;width:100%}
+.btn-danger:hover{background:rgba(243,139,168,0.25)}
+.settings-btn-row{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.tracked-clans-list{display:flex;flex-direction:column;gap:4px;padding:0 14px 10px}
+.tracked-clan-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.tracked-clan-row:last-child{border-bottom:none}
+.tc-name{font-size:13px;color:var(--text)}
+.tc-rank{font-size:11px;color:var(--text3)}
+.tc-remove{background:rgba(243,139,168,0.15);border:none;color:var(--red);padding:3px 8px;border-radius:6px;font-size:11px;cursor:pointer}
+/* LOADING */
+#loading{display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;height:200px}
+#loading.visible{display:flex}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--mauve);border-radius:50%;animation:spin 0.8s linear infinite}
+.loading-text{font-size:13px;color:var(--text3)}
+/* ERROR */
+.error-bar{margin:8px 12px;background:rgba(243,139,168,0.1);border:1px solid rgba(243,139,168,0.3);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--red);display:none}
+.error-bar.visible{display:block}
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.visible{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text);transition:all .2s}
+.modal-btn.confirm{background:var(--mauve);border-color:var(--mauve);color:#1e1e2e}
+.modal-btn:hover{opacity:0.85}
+/* PASSWORD MODAL */
+.pw-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.pw-modal-overlay.visible{display:flex}
+.pw-modal{background:var(--bg2);border:1px solid rgba(243,139,168,0.4);border-radius:16px;padding:22px 20px;width:100%;max-width:360px}
+.pw-modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.pw-modal-sub{font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.5}
+.pw-input-wrap{position:relative;margin-bottom:6px}
+.pw-input{width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 40px 10px 12px;font-size:14px;color:var(--text);outline:none;transition:border-color .2s}
+.pw-input:focus{border-color:rgba(243,139,168,0.6)}
+.pw-input.error{border-color:var(--red);animation:pw-shake .35s ease}
+.pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:2px;font-size:14px;line-height:1}
+.pw-error-msg{font-size:11px;color:var(--red);min-height:16px;margin-bottom:8px}
+.pw-modal-actions{display:flex;gap:8px;margin-top:4px}
+.pw-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text);transition:all .2s}
+.pw-btn.confirm{background:rgba(243,139,168,0.2);border-color:rgba(243,139,168,0.5);color:var(--red)}
+.pw-btn.confirm:hover{background:rgba(243,139,168,0.35)}
+.pw-btn:hover{opacity:0.85}
+@keyframes pw-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+/* LIVE INDICATOR */
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;animation:pulse 2s infinite}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+/* TRACKED CLANS WATCH */
+.tracked-indicator{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+/* responsive */
+@media(min-width:500px){
+  .screen{max-width:480px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+  #header{max-width:480px;margin:0 auto;width:100%}
+  #tabs{max-width:480px;margin:0 auto;width:100%}
+}
+.rank-change{font-size:10px;margin-left:4px}
+.rank-change.up{color:var(--green)}
+.rank-change.down{color:var(--red)}
+/* DEDUCTION LOG */
+.ded-entry{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;margin:0 12px 5px;cursor:pointer;transition:border-color .2s;display:flex;flex-direction:column;gap:0}
+.ded-top-row{display:flex;align-items:center;gap:10px}
+.ded-entry:hover{border-color:var(--border2)}
+.ded-entry.new{border-color:rgba(243,139,168,0.5);background:linear-gradient(90deg,rgba(243,139,168,0.07),var(--card))}
+.ded-time{font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:52px}
+.ded-clan{flex:1;min-width:0}
+.ded-clan-name{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ded-clan-rank{font-size:10px;color:var(--text3);margin-top:1px}
+.ded-amounts{text-align:right;flex-shrink:0}
+.ded-total{font-size:13px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.ded-change{font-size:11px;font-weight:700;color:var(--orange);font-variant-numeric:tabular-nums;margin-top:1px}
+.ded-date-header{padding:8px 12px 4px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px}
+.ded-filter-bar{display:flex;gap:6px;padding:8px 12px;flex-shrink:0;overflow-x:auto}
+.ded-filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;transition:all .2s}
+.ded-filter-btn.active{background:rgba(243,139,168,0.15);border-color:rgba(243,139,168,0.5);color:var(--red)}
+.rank-filter-bar{display:flex;gap:6px;padding:6px 12px 2px;flex-wrap:wrap}
+.rank-filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;transition:all .2s}
+.rank-filter-btn.active{background:rgba(203,166,247,0.15);border-color:rgba(203,166,247,0.5);color:var(--mauve)}
+.rank-filter-btn.bleed.active{background:rgba(243,139,168,0.15);border-color:rgba(243,139,168,0.5);color:var(--red)}
+.rank-filter-btn.manual.active{background:rgba(166,227,161,0.15);border-color:rgba(166,227,161,0.5);color:#a6e3a1}
+.rank-filter-btn.risk.active{background:rgba(250,179,135,0.15);border-color:rgba(250,179,135,0.5);color:#fab387}
+/* SUSPECT / CHEATER DETECTION */
+.badge-suspect-high{background:rgba(243,139,168,0.25);color:#f38ba8;border:1px solid rgba(243,139,168,0.6);animation:pulse 1.5s infinite}
+.badge-suspect-low{background:rgba(249,226,175,0.2);color:#f9e2af;border:1px solid rgba(249,226,175,0.5)}
+.badge-suspect-med{background:rgba(250,179,135,0.2);color:#fab387;border:1px solid rgba(250,179,135,0.5)}
+.badge-src-live{background:rgba(166,227,161,0.15);color:#a6e3a1;border:1px solid rgba(166,227,161,0.4);font-size:9px;padding:2px 6px;border-radius:6px;display:inline-flex;align-items:center;gap:3px}
+.badge-src-api{background:rgba(137,180,250,0.12);color:#89b4fa;border:1px solid rgba(137,180,250,0.35);font-size:9px;padding:2px 6px;border-radius:6px;display:inline-flex;align-items:center;gap:3px}
+.member-row.suspect-high{border-color:rgba(243,139,168,0.55);background:linear-gradient(90deg,rgba(243,139,168,0.09),var(--card))}
+.member-row.suspect-low{border-color:rgba(249,226,175,0.35);background:linear-gradient(90deg,rgba(249,226,175,0.05),var(--card))}
+.member-row.suspect-med{border-color:rgba(250,179,135,0.4);background:linear-gradient(90deg,rgba(250,179,135,0.06),var(--card))}
+.suspect-filter-bar{display:flex;gap:6px;padding:6px 12px 4px;overflow-x:auto;flex-shrink:0}
+.suspect-filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;transition:all .2s}
+.suspect-filter-btn.active{background:rgba(203,166,247,0.15);border-color:rgba(203,166,247,0.5);color:var(--mauve)}
+.suspect-filter-btn.high.active{background:rgba(243,139,168,0.15);border-color:rgba(243,139,168,0.5);color:var(--red)}
+.suspect-clan-no-member{font-size:11px;color:var(--text3);padding:4px 0;font-style:italic}
+.suspect-reason{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.3}
+.suspect-clan-card{background:var(--card);border:1px solid rgba(243,139,168,0.35);border-radius:12px;padding:10px 12px;margin:0 12px 8px;cursor:pointer;transition:all .2s}
+.suspect-clan-card:hover{border-color:var(--red)}
+.suspect-clan-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.suspect-clan-card-top h3{font-size:14px;font-weight:700;color:var(--text)}
+.suspect-member-row{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+.suspect-member-row:last-child{border-bottom:none}
+.sm-icon{font-size:14px;flex-shrink:0;padding-top:1px}
+.sm-info{flex:1;min-width:0}
+.sm-name{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sm-reason{font-size:11px;color:var(--text2);margin-top:1px}
+.sm-badge{flex-shrink:0}
+.how-it-works{margin:8px 12px 0;background:rgba(137,180,250,0.08);border:1px solid rgba(137,180,250,0.25);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--text2);line-height:1.6}
+.how-it-works strong{color:var(--blue)}
+/* EXPORT BUTTON */
+.export-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(137,180,250,0.12);border:1px solid rgba(137,180,250,0.35);color:var(--blue);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;transition:all .2s;white-space:nowrap}
+.export-btn:hover{background:rgba(137,180,250,0.22);border-color:rgba(137,180,250,0.6)}
+/* FIREBASE STATUS */
+#fb-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;border:1px solid var(--border);white-space:nowrap;transition:all .3s}
+#fb-status.connected{color:#a6e3a1;border-color:rgba(166,227,161,0.4);background:rgba(166,227,161,0.08)}
+#fb-status.disconnected{color:var(--text3);border-color:var(--border);background:transparent}
+#fb-status.error{color:#f38ba8;border-color:rgba(243,139,168,0.4);background:rgba(243,139,168,0.08)}
+/* DEDUCTION MEMBER LIST */
+.ded-members{margin-top:8px;border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:4px}
+.ded-member-row{display:flex;align-items:flex-start;gap:7px;font-size:11px;padding:3px 0}
+.ded-member-icon{flex-shrink:0;font-size:12px;padding-top:1px}
+.ded-member-info{flex:1;min-width:0}
+.ded-member-name{font-weight:600;color:var(--text);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ded-member-reason{color:var(--text3);font-size:10px;margin-top:1px;line-height:1.35}
+.ded-member-badge{flex-shrink:0;margin-top:1px}
+/* SUSPECT HISTORY */
+.suspect-history-header{padding:10px 12px 4px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;border-top:1px solid var(--border);margin-top:8px}
+.suspect-hist-card{background:var(--card);border:1px solid rgba(243,139,168,0.25);border-radius:10px;padding:9px 11px;margin:0 12px 7px}
+.suspect-hist-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:5px}
+.suspect-hist-clan{font-size:12px;font-weight:700;color:var(--text)}
+.suspect-hist-ts{font-size:10px;color:var(--text3);text-align:right;flex-shrink:0;margin-left:8px}
+.suspect-hist-member{display:flex;align-items:flex-start;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.suspect-hist-member:last-child{border-bottom:none}
+/* ACCUMULATED CHEAT HISTORY (detail view) */
+.detail-cheat-section-header{padding:10px 12px 4px;font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.8px;border-top:1px solid var(--border);margin-top:4px}
+.member-cheat-row{background:var(--card);border:1px solid rgba(250,179,135,0.3);border-radius:8px;padding:7px 12px;margin:0 12px 5px}
+.mch-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mch-name{font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mch-total{font-size:13px;font-weight:700;color:var(--red);white-space:nowrap}
+.mch-meta{font-size:10px;color:var(--text3);margin-top:3px}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-logo">HC</div>
+    <div id="header-title">
+      <h1 id="header-clan-title">Clan Live Tracker</h1>
+      <p><span class="live-dot"></span><span id="header-sub">ninjasaga.cc</span></p>
+    </div>
+    <div id="header-right">
+      <span id="fb-status" class="disconnected" title="Firebase sync status">⬤ Firebase</span>
+      <div id="live-status" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)">
+        <span class="live-pulse" id="live-dot"></span>
+        <span id="live-label">Connecting…</span>
+      </div>
+      <button id="refresh-btn" onclick="fetchData(true)" title="Force refresh">
+        <svg id="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT AREA -->
+  <div id="content">
+    <!-- RANKINGS SCREEN -->
+    <div id="screen-rankings" class="screen active">
+      <div id="season-bar">
+        <div id="season-info">
+          <div id="season-badge">S6</div>
+          <div id="season-name">Season 6</div>
+        </div>
+        <div id="season-countdown">Loading...</div>
+      </div>
+      <div id="your-clan-banner" onclick="viewClan(state.yourClanId)">
+        <div id="ycb-top">
+          <div id="ycb-badge">YOUR CLAN</div>
+          <div id="ycb-name">—</div>
+          <div id="ycb-rank">—</div>
+        </div>
+        <div id="ycb-stats">
+          <div class="ycb-stat">
+            <div class="ycb-stat-label">Reputation</div>
+            <div class="ycb-stat-value" id="ycb-rep">—</div>
+          </div>
+          <div class="ycb-stat">
+            <div class="ycb-stat-label">Change</div>
+            <div class="ycb-stat-value" id="ycb-delta">—</div>
+          </div>
+          <div class="ycb-stat">
+            <div class="ycb-stat-label">Status</div>
+            <div class="ycb-stat-value" id="ycb-stamina">—</div>
+          </div>
+          <div class="ycb-stat">
+            <div class="ycb-stat-label">Members</div>
+            <div class="ycb-stat-value" id="ycb-members">—</div>
+          </div>
+        </div>
+        <div id="ycb-stamina-bar"><div id="ycb-stamina-fill"></div></div>
+      </div>
+      <div class="bleed-alert" id="home-bleed-alert">
+        <div class="bleed-alert-icon">⚠️</div>
+        <div class="bleed-alert-text">
+          <h3 id="home-bleed-title">RISK BLEED</h3>
+          <p id="home-bleed-sub">No reputation gained this round</p>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" class="search-input" id="search-input" placeholder="Search clans..." oninput="renderRankings()">
+      </div>
+      <div id="rank-filter-bar" class="rank-filter-bar">
+        <button class="rank-filter-btn active" onclick="setRankingsFilter('all',this)">All</button>
+        <button class="rank-filter-btn bleed" onclick="setRankingsFilter('gaining-bleed',this)">🔴 Gaining (Bleed)</button>
+        <button class="rank-filter-btn manual" onclick="setRankingsFilter('gaining-manual',this)">🟢 Gaining (Manual)</button>
+        <button class="rank-filter-btn risk" onclick="setRankingsFilter('risk',this)">⚠️ Risk Bleed</button>
+      </div>
+      <div id="error-bar" class="error-bar"></div>
+      <div id="loading" class="loading-text">
+        <div class="spinner"></div>
+        <div class="loading-text">Fetching clan data...</div>
+      </div>
+      <div id="clans-list" class="clans-list"></div>
+    </div>
+
+    <!-- CLAN DETAIL SCREEN -->
+    <div id="screen-detail" class="screen">
+      <div id="detail-header">
+        <button id="detail-back" onclick="goBack()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><path d="M15 18l-6-6 6-6"/></svg>
+          Back
+        </button>
+        <div id="detail-title">
+          <div id="detail-clan-name">Clan Name</div>
+          <div id="detail-clan-sub">Rank #— · Master: —</div>
+        </div>
+        <div id="detail-actions">
+          <button id="set-your-clan-btn">Set as Yours</button>
+        </div>
+      </div>
+      <div id="detail-stats-row">
+        <div class="detail-stat-box">
+          <div class="val" id="ds-rep">—</div>
+          <div class="lbl">Reputation</div>
+        </div>
+        <div class="detail-stat-box">
+          <div class="val" id="ds-delta">—</div>
+          <div class="lbl">Change</div>
+        </div>
+        <div class="detail-stat-box">
+          <div class="val" id="ds-members">—</div>
+          <div class="lbl">Members</div>
+        </div>
+        <div class="detail-stat-box">
+          <div class="val" id="ds-bleed">—</div>
+          <div class="lbl">Bleeding</div>
+        </div>
+      </div>
+      <div id="detail-stamina-section">
+        <h3>REPUTATION STATUS — THIS ROUND</h3>
+        <div class="section-subtext">Gaining (Bleed) = rep gained by 2+ members within 5s of each other, OR a single member gained rep twice within 10s (too fast for manual). Gaining (Manual) = rep gained but pattern looks like a single slow manual attack. Risk Bleed = this clan is flat and a confirmed bleed is happening nearby — it may be the target. Flat = no rep gained and no bleed detected.</div>
+        <div class="stamina-bar-wrap">
+          <div class="stamina-bar-bg"><div class="stamina-bar-fill" id="detail-stamina-fill"></div></div>
+          <div class="stamina-pct" id="detail-stamina-pct">—</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text3)">
+          <span>Round: <span id="detail-round-window">—</span></span>
+          <span>Gained: <span id="detail-round-gain" style="color:var(--text2);font-weight:600">—</span></span>
+        </div>
+      </div>
+      <div id="detail-bleed-alert">
+        <h3 id="detail-bleed-alert-title">⚠ RISK BLEED</h3>
+        <p id="detail-bleed-msg">No reputation gained this round</p>
+      </div>
+      <div id="members-list-header">
+        <div class="mh-col mh-name">Member</div>
+        <div class="mh-col mh-level">Lvl</div>
+        <div class="mh-col mh-rep">Rep</div>
+        <div class="mh-col mh-delta">This Round</div>
+      </div>
+      <div id="members-list"></div>
+      <div id="detail-cheat-history" style="padding-bottom:12px"></div>
+    </div>
+
+    <!-- BLEEDING TRACKER SCREEN -->
+    <div id="screen-bleed" class="screen">
+      <div class="section-header">Bleed Tracker</div>
+      <div id="bleed-list"></div>
+    </div>
+
+    <!-- HISTORY SCREEN -->
+    <div id="screen-history" class="screen">
+      <div class="section-header">Round History</div>
+      <div id="history-list"></div>
+    </div>
+
+    <!-- DEDUCTION HISTORY SCREEN -->
+    <div id="screen-deductions" class="screen">
+      <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;padding-right:12px">
+        <span>Clan Deduction History</span>
+        <button class="export-btn" onclick="downloadDeductions()" title="Export as .xlsx">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export .xlsx
+        </button>
+      </div>
+      <div class="ded-filter-bar" id="ded-filter-bar">
+        <button class="ded-filter-btn active" onclick="setDedFilter('all',this)">All Clans</button>
+      </div>
+      <div id="deductions-list"></div>
+    </div>
+
+    <!-- SUSPECTS SCREEN -->
+    <div id="screen-suspects" class="screen">
+      <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;padding-right:12px">
+        <span>Cheater Suspects</span>
+        <button class="export-btn" onclick="downloadSuspects()" title="Export as .xlsx">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export .xlsx
+        </button>
+      </div>
+      <div class="how-it-works">
+        <strong>Confirmed suspect detection:</strong> A player is listed here only when their individual rep drop is caught live AND aligns exactly with their clan's anti-cheat deduction change — confirming they are the cheater.<br>
+        <strong style="color:var(--red)">🚨 HIGH Suspicion</strong> = rep gain→drop caught live AND the total drop matches the clan's deduction change exactly.<br>
+        <span style="color:var(--text3)">Clan-level deduction history is shown in the <strong style="color:var(--mauve)">Deductions</strong> tab.</span>
+      </div>
+
+      <div id="suspects-list" style="margin-top:4px"></div>
+    </div>
+
+    <!-- SETTINGS SCREEN -->
+    <div id="screen-settings" class="screen">
+      <div style="padding:0 0 80px">
+        <div class="section-header">Configuration</div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Clan Settings</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Your Clan</div>
+              <div class="settings-row-sub" id="setting-your-clan-name">Not set — go to Rankings to pick</div>
+            </div>
+            <button class="tc-remove" onclick="clearYourClan()">Clear</button>
+          </div>
+        </div>
+
+        <div class="settings-section" style="margin-top:10px">
+          <div class="settings-section-title">Tracking</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Bleeding Notifications</div>
+              <div class="settings-row-sub">Browser alert when more than 5 clans gain reputation in a round</div>
+            </div>
+            <div id="notif-toggle" class="settings-toggle" onclick="toggleNotif()"></div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Live Polling</div>
+              <div class="settings-row-sub" id="next-refresh-label">—</div>
+            </div>
+            <button class="tc-remove" onclick="fetchData(true)" style="color:var(--mauve);background:rgba(203,166,247,0.1);border-color:rgba(203,166,247,0.3)">Refresh Now</button>
+          </div>
+        </div>
+
+        <div class="settings-section" style="margin-top:10px">
+          <div class="settings-section-title">Data</div>
+          <div class="settings-btn-row">
+            <button class="btn-primary" onclick="exportData()">Export Data (JSON)</button>
+            <button class="btn-danger" onclick="confirmClearHistory()">Clear Round History</button>
+            <button class="btn-danger" onclick="confirmReset()">Reset All Settings</button>
+          </div>
+        </div>
+
+        <div class="settings-section" style="margin-top:10px">
+          <div class="settings-section-title">Records</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Local Records</div>
+              <div class="settings-row-sub">Clears all suspect &amp; deduction logs stored on this device</div>
+            </div>
+            <button class="btn-danger" onclick="confirmDeleteLocalRecords()">Delete Local Records</button>
+          </div>
+          <div class="settings-row" id="settings-firebase-row">
+            <div>
+              <div class="settings-row-label">Firebase Records</div>
+              <div class="settings-row-sub">Permanently deletes all suspect &amp; deduction logs from Firebase (affects all devices)</div>
+            </div>
+            <button class="btn-danger" onclick="confirmDeleteFirebaseRecords()">Delete Firebase Records</button>
+          </div>
+        </div>
+
+                <div class="settings-section" style="margin-top:10px" id="settings-access-section">
+          <div class="settings-section-title">Access Level</div>
+          <div class="settings-btn-row">
+            <button class="btn-primary" id="btn-admin-access" onclick="showAdminAccessModal()"
+              style="background:rgba(203,166,247,0.15);border:1px solid rgba(203,166,247,0.4);color:var(--mauve)">
+              🔒 Admin Level Access
+            </button>
+            <button class="btn-danger" id="btn-exit-admin" onclick="exitAdminLevel()"
+              style="display:none;background:rgba(243,139,168,0.12);border:1px solid rgba(243,139,168,0.35);color:var(--red)">
+              🔓 Exit Admin Level
+            </button>
+          </div>
+        </div>
+
+        <div style="padding:16px 12px;text-align:center;font-size:11px;color:var(--text3)">
+          Clan Bleed x Cheater Tracker · ninjasaga.cc · Hidden Cloud Village
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div id="tabs">
+    <div class="tab active" id="tab-rankings" onclick="showTab('rankings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+      <span>Rankings</span>
+    </div>
+    <div class="tab" id="tab-bleed" onclick="showTab('bleed')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+      <span>Risk Bleed</span>
+    </div>
+    <div class="tab" id="tab-history" onclick="showTab('history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+      <span>History</span>
+    </div>
+    <div class="tab" id="tab-deductions" onclick="showTab('deductions')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Deductions</span>
+    </div>
+    <div class="tab" id="tab-suspects" onclick="showTab('suspects')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v3"/><path d="M11 14h.01"/></svg>
+      <span>Suspects</span>
+    </div>
+    <div class="tab" id="tab-settings" onclick="showTab('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title">Confirm</div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn confirm" id="modal-confirm-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL — Firebase delete protection -->
+<div class="pw-modal-overlay" id="pw-modal-overlay" onclick="closePwModal(event)">
+  <div class="pw-modal" onclick="event.stopPropagation()">
+    <div class="pw-modal-title" id="pw-modal-title">🔒 Admin Verification Required</div>
+    <div class="pw-modal-sub" id="pw-modal-sub">Enter the admin password to permanently delete all Firebase records. This action cannot be undone.</div>
+    <div class="pw-input-wrap">
+      <input class="pw-input" id="pw-input" type="password" placeholder="Enter password…" autocomplete="off"
+        onkeydown="if(event.key==='Enter')submitPwModal()"
+        oninput="document.getElementById('pw-input').classList.remove('error');document.getElementById('pw-error').textContent=''"
+      />
+      <button class="pw-toggle" onclick="togglePwVisibility()" id="pw-toggle-btn" title="Show/hide">👁</button>
+    </div>
+    <div class="pw-error-msg" id="pw-error"></div>
+    <div class="pw-modal-actions">
+      <button class="pw-btn" onclick="closePwModal()">Cancel</button>
+      <button class="pw-btn confirm" onclick="submitPwModal()" id="pw-confirm-btn">Delete Firebase Records</button>
+    </div>
+  </div>
+</div>
+
+<!-- SheetJS — Excel export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<!-- Firebase compat SDK (works with regular non-module scripts) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+(function () {
+// ============================================================
+// STATE & STORAGE
+// ============================================================
+const API_URL = 'https://static.ninjasaga.cc/data/clan_rankings.json';
+const STORAGE_KEY = 'clan_live_tracker';
+
+// In-memory dedup set for suspectLog — rebuilt from storage on load
+// Prevents the same drop event being recorded twice across polls
+let suspectLogKeysSeen = new Set();
+
+// ── Access level ────────────────────────────────────────────
+// 'normal' = default (Rankings, Risk Bleed, History, Settings only)
+// 'admin'  = full view (all tabs + Delete Firebase Records visible)
+let accessLevel = 'normal';
+
+// Controls which action the shared password modal performs
+let pwModalMode = 'delete'; // 'delete' | 'access'
+
+let state = {
+  data: null,            // latest API response
+  prevData: null,        // previous API response for delta calc
+  lastFetch: null,
+  currentTab: 'rankings',
+  currentDetailClanId: null,
+  settings: {
+    notificationsEnabled: false,
+    yourClanId: null,
+  },
+  // Current in-progress 30-min round (aligned to game's fixed HH:00 / HH:30 marks)
+  round: {
+    id: null,            // ISO string of round start
+    startTs: null,
+    startSnap: null,     // {clanId: {name, rep}} reputation at round start
+  },
+  // Finalized rounds, oldest first, capped at 100
+  roundHistory: [],       // [{id, startTs, endTs, clans: [{clanId, name, startRep, endRep, gain}]}]
+  // Last actual reputation change per clan, reset to 0/null every round start.
+  // {clanId: {amount, ts}} — ts is ms epoch of when that change was detected, or null if no change yet this round.
+  clanActivity: {},
+  // Rolling log of per-poll rep deltas per clan — NOT persisted, ephemeral only.
+  // Key: clanId → [{amount, ts}, ...] — entries older than 5s are trimmed on write.
+  // Used to compute the 5s accumulated change display during gaining-bleed status.
+  clanRepEvents: {},
+  // Per-member peak reputation seen across ALL polls this round.
+  // Key: `${clanId}_${memberId}` → {peak, peakTs, dropAmount, dropTs, dropCount}
+  // dropAmount > 0 means the rep fell below its peak at some point — strong cheat signal.
+  // Reset to current rep at every round boundary so peaks don't bleed across rounds.
+  memberPeakRep: {},
+  // Per-member rolling log of rep-gain event timestamps — reset each round.
+  // Key: `${clanId}_${memberId}` → [ts, ts, ...] — ms epoch of each poll where rep went up.
+  // Entries older than 15s are trimmed on every write. Drives bleed vs manual detection.
+  memberGainEvents: {},
+  // Deduction change log — newest first, capped at 500 entries.
+  // Each entry: {clanId, clanName, clanRank, deduction, prevDeduction, change, ts, members:[]}
+  deductionLog: [],
+  // Persistent suspect event log — survives round rollovers — newest first, capped at 1000 entries.
+  // Each entry: {dedupKey, ts, clanId, clanName, clanRank, clanDeduction,
+  //              memberId, memberName, memberLevel, memberRep, peakRep,
+  //              dropAmount, dropCount, confidence, reason}
+  suspectLog: [],
+};
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved.settings) state.settings = {...state.settings, ...saved.settings};
+    if (saved.round) state.round = saved.round;
+    if (saved.roundHistory) state.roundHistory = saved.roundHistory.slice(-100);
+    if (saved.clanActivity) state.clanActivity = saved.clanActivity;
+    if (saved.memberPeakRep) state.memberPeakRep = saved.memberPeakRep;
+    if (saved.memberGainEvents) state.memberGainEvents = saved.memberGainEvents;
+    if (saved.deductionLog) state.deductionLog = saved.deductionLog;
+    if (saved.suspectLog) {
+      state.suspectLog = saved.suspectLog;
+      for (const e of state.suspectLog) { suspectLogKeysSeen.add(e.dedupKey); }
+    }
+  } catch(e) { console.warn('Storage load error', e); }
+}
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      settings: state.settings,
+      round: state.round,
+      roundHistory: state.roundHistory,
+      clanActivity: state.clanActivity,
+      memberPeakRep: state.memberPeakRep,
+      memberGainEvents: state.memberGainEvents,
+      deductionLog: state.deductionLog,
+      suspectLog: state.suspectLog,
+    }));
+  } catch(e) { console.warn('Storage save error', e); }
+}
+
+function saveSetting(key, val) {
+  state.settings[key] = val;
+  saveToStorage();
+  applySettings();
+}
+
+function applySettings() {
+  const tog = document.getElementById('notif-toggle');
+  if(tog) tog.className = 'settings-toggle' + (state.settings.notificationsEnabled ? ' on' : '');
+  const ycn = document.getElementById('setting-your-clan-name');
+  if(ycn) {
+    if(state.settings.yourClanId && state.data) {
+      const c = getClanById(state.settings.yourClanId);
+      ycn.textContent = c ? c.name : 'ID: ' + state.settings.yourClanId;
+    } else { ycn.textContent = 'Not set — go to Rankings to pick'; }
+  }
+  const detailScreen = document.getElementById('screen-detail');
+  if (detailScreen && detailScreen.classList.contains('active') && state.currentDetailClanId) {
+    renderDetail(state.currentDetailClanId);
+  }
+}
+
+// ============================================================
+// API & DATA
+// ============================================================
+let fetchInProgress = false;
+
+async function fetchData(manual = false) {
+  if (fetchInProgress) return;
+  fetchInProgress = true;
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+
+  try {
+    const res = await fetch(API_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+
+    // Store previous for delta calc (must happen before state.data is overwritten)
+    if (state.data) {
+      state.prevData = state.data;
+    }
+    const prevGeneratedAt = state.data ? state.data.generated_at : null;
+    state.data = json;
+    state.lastFetch = new Date();
+
+    // Advance/finalize the 30-min round tracker on every successful poll,
+    // regardless of whether reputation actually changed this tick.
+    const roundRolledOver = updateRoundTracking();
+    recordClanActivity(roundRolledOver);
+    recordMemberPeaks(roundRolledOver);
+    recordMemberGainEvents(roundRolledOver);
+    recordDeductionChanges();
+
+    lastPollAt = Date.now();
+
+    // Timestamp updates on every successful poll, even if data unchanged
+    document.getElementById('header-sub').textContent = json.clans.length + ' clans · ' + fmtTime(state.lastFetch);
+
+    // Only re-render if data actually changed (generated_at comparison)
+    const newGeneratedAt = json.generated_at;
+    const dataChanged = newGeneratedAt !== prevGeneratedAt;
+
+    if (dataChanged) {
+      state.lastGeneratedAt = newGeneratedAt;
+      lastDataChangeAt = Date.now();
+
+      saveToStorage();
+
+      // Update season bar once
+      updateSeasonBar(json.season);
+      document.getElementById('error-bar').classList.remove('visible');
+      document.getElementById('loading').classList.remove('visible');
+
+      // Render and flash changed values
+      renderCurrentView();
+      flashChangedReps();
+
+      if (state.settings.notificationsEnabled) checkBleedingNotifications();
+    } else {
+      // Data unchanged — just update loading state silently
+      document.getElementById('loading').classList.remove('visible');
+      document.getElementById('error-bar').classList.remove('visible');
+      // A round can still roll over even when nobody's reputation changed —
+      // re-render so "Risk Bleed" clans reset onto the new round's clock.
+      if (roundRolledOver) { renderCurrentView(); saveToStorage(); }
+    }
+
+    updateLiveStatus();
+  } catch(e) {
+    lastPollAt = Date.now(); // still mark poll attempt
+    const eb = document.getElementById('error-bar');
+    eb.textContent = '⚠ ' + e.message;
+    eb.classList.add('visible');
+    document.getElementById('loading').classList.remove('visible');
+    const dot = document.getElementById('live-dot');
+    if (dot) dot.className = 'live-pulse error';
+    console.error(e);
+  } finally {
+    fetchInProgress = false;
+    btn.classList.remove('spinning');
+  }
+}
+
+// Flash clan cards whose rep changed since last render
+function flashChangedReps() {
+  if (!state.prevData || !state.data) return;
+  for (const clan of state.data.clans) {
+    const delta = getClanDelta(clan.id);
+    if (delta === null || delta === 0) continue;
+    // Find the card in DOM by onclick attribute
+    const cards = document.querySelectorAll(`[onclick="viewClan(${clan.id})"]`);
+    cards.forEach(card => {
+      card.classList.remove('flash-up', 'flash-down');
+      void card.offsetWidth; // reflow to restart animation
+      card.classList.add(delta > 0 ? 'flash-up' : 'flash-down');
+    });
+  }
+}
+
+function repSnapshot(json) {
+  const snap = {};
+  for (const clan of json.clans) {
+    const members = {};
+    for (const m of clan.member_list) {
+      members[m.id] = m.reputation;
+    }
+    snap[clan.id] = { name: clan.name, rep: clan.reputation, members };
+  }
+  return snap;
+}
+
+// Rounds are aligned to the game's fixed :00/:30 half-hour marks — every
+// round starts at HH:00 or HH:30 and runs for 30 minutes, regardless of
+// when a clan's stamina actually crosses the bleed threshold inside it.
+function getRoundStart(d) {
+  const r = new Date(d);
+  r.setSeconds(0, 0);
+  if (r.getMinutes() < 30) r.setMinutes(0);
+  else r.setMinutes(30);
+  return r;
+}
+
+// Last-second attacks right at HH:00/HH:30 sometimes land in the API just
+// as we cross the boundary, which would otherwise get baked into the new
+// round's starting snapshot (showing up as 0 gain instead of being counted
+// where it belongs, in the round that was closing). Waiting this many ms
+// past the real boundary before switching rounds gives that data time to
+// settle, so the tracker still LABELS rounds at the true HH:00/HH:30 mark —
+// it just delays *detecting* the switch until HH:00:10 / HH:30:10.
+const ROUND_SWITCH_GRACE_MS = 15000;
+
+// Advances the round tracker. Returns true if a round boundary was crossed
+// (i.e. the previous round was finalized into history and a new one began).
+function updateRoundTracking() {
+  if (!state.data) return false;
+  const now = new Date();
+  const roundStart = getRoundStart(new Date(now.getTime() - ROUND_SWITCH_GRACE_MS));
+  const roundId = roundStart.toISOString();
+
+  if (!state.round.id) {
+    // First run ever — just open the current round, nothing to finalize.
+    state.round = { id: roundId, startTs: roundStart.toISOString(), startSnap: repSnapshot(state.data) };
+    return false;
+  }
+
+  if (roundId === state.round.id) return false; // still the same round
+
+  // Boundary crossed since the last poll. Use the last data we saw *before*
+  // this poll (state.prevData) as the closing snapshot for the round that
+  // just ended — it's the closest thing we have to "reputation at HH:30".
+  finalizeRound(state.round, state.prevData || state.data);
+  state.round = { id: roundId, startTs: roundStart.toISOString(), startSnap: repSnapshot(state.data) };
+  return true;
+}
+
+function finalizeRound(round, dataAtEnd) {
+  if (!round || !round.startSnap || !dataAtEnd) return;
+  const clans = dataAtEnd.clans.map(clan => {
+    const startEntry = round.startSnap[clan.id];
+    const startRep = startEntry ? startEntry.rep : clan.reputation;
+    return { clanId: clan.id, name: clan.name, rank: clan.rank, startRep, endRep: clan.reputation, gain: clan.reputation - startRep };
+  }).sort((a, b) => b.gain - a.gain);
+
+  state.roundHistory.push({ id: round.id, startTs: round.startTs, endTs: new Date().toISOString(), clans });
+  if (state.roundHistory.length > 100) state.roundHistory.shift();
+}
+
+// Reputation gained by a clan so far in the current (in-progress) round.
+function getClanRoundGain(clanId) {
+  if (!state.round.startSnap || !state.data) return null;
+  const startEntry = state.round.startSnap[clanId];
+  const curr = state.data.clans.find(c => c.id === clanId);
+  if (!curr || !startEntry) return null;
+  return curr.reputation - startEntry.rep;
+}
+
+// Only clans inside the top N are realistic war targets, so a flat clan
+// there is worth flagging as "might be bleeding". Outside that range, a
+// flat clan is just... flat — not worth raising an alarm over.
+const RISK_BLEED_RANK_THRESHOLD = 20;
+
+// Time windows for bleed-pattern detection
+const BLEED_MULTI_MEMBER_WINDOW_MS = 5000;  // 2+ different members gaining within 5s → bleed
+const BLEED_SINGLE_MEMBER_WINDOW_MS = 10000; // 1 member gaining 2+ times within 10s → bleed
+
+// Has ANY clan gained reputation yet in the current round? Kept for UI notes.
+function isRoundActive() {
+  if (!state.data) return false;
+  return state.data.clans.some(c => getClanRoundGain(c.id) > 0);
+}
+
+// Analyses the recent rep-gain timing pattern for a clan to distinguish
+// bleed (auto-attack) from a manual attack.
+//
+// A manual attack is slow — the player physically controls their character,
+// fights, and queues the next fight. This takes well over 10 seconds per cycle.
+//
+// When a clan IS bleeding, attackers gain rep from auto-battle, which is
+// much faster — the same player can gain rep multiple times within 10s, or
+// several players all gain rep within a 5s window because the target is
+// auto-assigning fights to whoever is available.
+//
+// Returns true (bleed pattern detected) if EITHER:
+//   A) A single member gained rep 2+ times within 10s — too fast for manual.
+//   B) 2+ different members each gained rep within 5s of each other —
+//      coordinated auto-battle pattern. Condition A acting as a confirmation
+//      guard: the 10s single-member check above catches the edge case where
+//      two players coincidentally won manual attacks within 5s of each other
+//      (both conditions would need to be true for a genuine bleed).
+function isClanBleeding(clanId) {
+  if (!state.memberGainEvents || !state.data) return false;
+  const clan = getClanById(clanId);
+  if (!clan) return false;
+  const now = Date.now();
+
+  // Collect all recent gain events for this clan's members
+  const allEvents = []; // { memberId, ts }
+  for (const m of clan.member_list) {
+    const events = (state.memberGainEvents[`${clanId}_${m.id}`] || [])
+      .filter(t => now - t <= BLEED_EVENT_TTL_MS);
+    for (const ts of events) allEvents.push({ memberId: m.id, ts });
+  }
+  if (allEvents.length === 0) return false;
+
+  // Condition A: single member gained rep 2+ times within 10s
+  const byMember = {};
+  for (const ev of allEvents) {
+    (byMember[ev.memberId] = byMember[ev.memberId] || []).push(ev.ts);
+  }
+  for (const timestamps of Object.values(byMember)) {
+    if (timestamps.length < 2) continue;
+    timestamps.sort((a, b) => a - b);
+    for (let i = 1; i < timestamps.length; i++) {
+      if (timestamps[i] - timestamps[i - 1] <= BLEED_SINGLE_MEMBER_WINDOW_MS) return true;
+    }
+  }
+
+  // Condition B: 2+ different members each gained rep within 5s of each other
+  allEvents.sort((a, b) => a.ts - b.ts);
+  for (let i = 0; i < allEvents.length; i++) {
+    for (let j = i + 1; j < allEvents.length; j++) {
+      if (allEvents[j].ts - allEvents[i].ts > BLEED_MULTI_MEMBER_WINDOW_MS) break;
+      if (allEvents[j].memberId !== allEvents[i].memberId) return true;
+    }
+  }
+
+  return false;
+}
+
+// Returns true if any clan is currently showing a confirmed bleed-gain pattern.
+// Used to decide whether flat top-20 clans should flip to 'Risk Bleed'.
+function isAnyBleedDetected() {
+  if (!state.data) return false;
+  return state.data.clans.some(c => {
+    const gain = getClanRoundGain(c.id);
+    return gain !== null && gain > 0 && isClanBleeding(c.id);
+  });
+}
+
+// Status values:
+// 'gaining-bleed'  = clan's rep-gain timing matches auto-battle / bleed pattern.
+// 'gaining-manual' = clan gained rep, but pattern looks like a single manual attack.
+// 'risk'           = flat, top-20, AND at least one other clan is confirmed bleeding.
+// 'flat'           = flat, either outside top-20 or no bleed confirmed yet this round.
+// 'unknown'        = not enough data (e.g. right after round just rolled over).
+function getClanRepStatus(clanId) {
+  const gain = getClanRoundGain(clanId);
+  if (gain === null) return 'unknown';
+  if (gain > 0) {
+    return isClanBleeding(clanId) ? 'gaining-bleed' : 'gaining-manual';
+  }
+  // Flat — only show Risk Bleed when a confirmed bleed is actually happening
+  if (!isAnyBleedDetected()) return 'flat';
+  const clan = getClanById(clanId);
+  const rank = clan ? clan.rank : Infinity;
+  return rank <= RISK_BLEED_RANK_THRESHOLD ? 'risk' : 'flat';
+}
+
+function getClanById(id) {
+  if (!state.data) return null;
+  return state.data.clans.find(c => c.id === id) || null;
+}
+
+// Delta: current rep vs previous snapshot
+function getClanDelta(clanId) {
+  if (!state.prevData) return null;
+  const curr = state.data?.clans.find(c => c.id === clanId);
+  const prev = state.prevData?.clans.find(c => c.id === clanId);
+  if (!curr || !prev) return null;
+  return curr.reputation - prev.reputation;
+}
+
+// Tracks, per clan, the most recent ACTUAL reputation change and when it
+// happened — separate from getClanDelta, which only ever reflects the very
+// last poll-to-poll diff. This is what "as of Xs/Xm ago" is built from.
+// Reset to {amount:0, ts:null} at the start of every round, so every clan
+// reads 0 the moment a round begins, then updates in place each time it
+// actually gains (or loses) reputation, without waiting for anything else.
+const BLEED_CHANGE_WINDOW_MS = 5000; // rolling window for accumulated change display
+
+function recordClanActivity(roundJustRolledOver) {
+  if (!state.data) return;
+  if (!state.clanActivity)   state.clanActivity   = {};
+  if (!state.clanRepEvents)  state.clanRepEvents  = {};
+  const now = Date.now();
+
+  for (const clan of state.data.clans) {
+    if (roundJustRolledOver || !state.clanActivity[clan.id]) {
+      state.clanActivity[clan.id]  = { amount: 0, ts: null };
+      state.clanRepEvents[clan.id] = [];
+      continue;
+    }
+    if (!state.prevData) continue;
+    const prev = state.prevData.clans.find(c => c.id === clan.id);
+    if (!prev) continue;
+    const delta = clan.reputation - prev.reputation;
+    if (delta !== 0) {
+      state.clanActivity[clan.id] = { amount: delta, ts: now };
+      // Also push into the rolling 5s events log
+      if (!state.clanRepEvents[clan.id]) state.clanRepEvents[clan.id] = [];
+      state.clanRepEvents[clan.id].push({ amount: delta, ts: now });
+    }
+    // Trim events outside the 5s window
+    if (state.clanRepEvents[clan.id]) {
+      state.clanRepEvents[clan.id] = state.clanRepEvents[clan.id].filter(e => now - e.ts <= BLEED_CHANGE_WINDOW_MS);
+    }
+  }
+}
+
+function getClanActivity(clanId) {
+  return (state.clanActivity && state.clanActivity[clanId]) || { amount: 0, ts: null };
+}
+
+// Returns the activity object to display in the "Change" column.
+// For gaining-bleed clans: sums all rep changes within the last 5s so the user
+// sees the bleed speed rather than a tiny per-poll delta.
+// For all other statuses: returns the normal last-poll-delta activity.
+function getClanDisplayActivity(clanId) {
+  const status = getClanRepStatus(clanId);
+  if (status === 'gaining-bleed') {
+    const now = Date.now();
+    const events = (state.clanRepEvents && state.clanRepEvents[clanId]) || [];
+    const recent = events.filter(e => now - e.ts <= BLEED_CHANGE_WINDOW_MS);
+    if (recent.length > 0) {
+      const total = recent.reduce((sum, e) => sum + e.amount, 0);
+      const latestTs = Math.max(...recent.map(e => e.ts));
+      return { amount: total, ts: latestTs };
+    }
+  }
+  return getClanActivity(clanId);
+}
+
+// Per-member session peak tracking — MEMORY ONLY, no Firestore writes here.
+// The ACP first flags a member with a rep drop (preliminary signal) before the
+// official clan deduction is confirmed in the API. Writing to Firestore at flag
+// time wastes writes on unconfirmed events and records the wrong timestamp.
+// Suspects are only written to Firestore inside recordDeductionChanges() at the
+// exact moment the clan's official deduction value changes.
+function recordMemberPeaks(roundJustRolledOver) {
+  if (!state.data) return;
+  if (!state.memberPeakRep) state.memberPeakRep = {};
+
+  for (const clan of state.data.clans) {
+    for (const m of clan.member_list) {
+      const key = `${clan.id}_${m.id}`;
+      const entry = state.memberPeakRep[key];
+
+      if (roundJustRolledOver || !entry) {
+        // Start of a new round — reset baseline to current rep
+        state.memberPeakRep[key] = {
+          peak: m.reputation,
+          peakTs: Date.now(),
+          dropAmount: 0,
+          dropTs: null,
+          dropCount: 0,
+        };
+        continue;
+      }
+
+      if (m.reputation > entry.peak) {
+        // New high — update peak
+        state.memberPeakRep[key] = { ...entry, peak: m.reputation, peakTs: Date.now() };
+      } else if (entry.peak > 0 && m.reputation < entry.peak) {
+        // Rep fell below peak — ACP preliminary flag, stored in memory only.
+        // Firestore write happens in recordDeductionChanges() when official.
+        const dropAmount = entry.peak - m.reputation;
+        const newDropCount = (entry.dropCount || 0) + 1;
+        state.memberPeakRep[key] = {
+          ...entry,
+          dropAmount,
+          dropTs: Date.now(),
+          dropCount: newDropCount,
+        };
+      }
+    }
+  }
+}
+
+// Tracks, per member, the timestamps of every poll where their rep increased.
+// Reset at round start. Entries older than 15s are trimmed on write.
+// Drives the bleed-vs-manual detection logic in isClanBleeding().
+const BLEED_EVENT_TTL_MS = 15000; // keep events for 15s (covers both detection windows)
+
+function recordMemberGainEvents(roundJustRolledOver) {
+  if (!state.data) return;
+  if (!state.memberGainEvents) state.memberGainEvents = {};
+  const now = Date.now();
+
+  for (const clan of state.data.clans) {
+    for (const m of clan.member_list) {
+      const key = `${clan.id}_${m.id}`;
+
+      if (roundJustRolledOver || !state.memberGainEvents[key]) {
+        state.memberGainEvents[key] = [];
+        continue;
+      }
+
+      if (state.prevData) {
+        const prevClan = state.prevData.clans.find(c => c.id === clan.id);
+        const prevMember = prevClan?.member_list.find(mm => mm.id === m.id);
+        if (prevMember && m.reputation > prevMember.reputation) {
+          // Rep went up since last poll — log the event timestamp
+          state.memberGainEvents[key].push(now);
+        }
+      }
+
+      // Trim events outside the TTL window
+      state.memberGainEvents[key] = state.memberGainEvents[key].filter(t => now - t <= BLEED_EVENT_TTL_MS);
+    }
+  }
+}
+
+// Returns the peak-rep record for a specific member this round, or null.
+function getMemberPeak(clanId, memberId) {
+  if (!state.memberPeakRep) return null;
+  return state.memberPeakRep[`${clanId}_${memberId}`] || null;
+}
+
+// ============================================================
+// DEDUCTION CHANGE TRACKING
+// ============================================================
+// Called every poll when data changes. Compares each clan's deduction
+// value against the previous snapshot and logs any change with a timestamp.
+function recordDeductionChanges() {
+  if (!state.data || !state.prevData) return;
+  if (!state.deductionLog) state.deductionLog = [];
+  const now = Date.now();
+  for (const clan of state.data.clans) {
+    const prev = state.prevData.clans.find(c => c.id === clan.id);
+    if (!prev) continue;
+    const prevDed = prev.deduction || 0;
+    const currDed = clan.deduction || 0;
+    if (currDed === prevDed) continue;
+    state.deductionLog.unshift({
+      clanId:        clan.id,
+      clanName:      clan.name,
+      clanRank:      clan.rank,
+      deduction:     currDed,
+      prevDeduction: prevDed,
+      change:        currDed - prevDed,   // positive = deduction grew, negative = reduced
+      ts:            now,
+      // Snapshot of suspected cheater members at the exact moment this deduction was detected
+      members: getSuspectedCheaters(clan.id).map(s => ({
+        id: s.id, name: s.name, level: s.level, reputation: s.reputation,
+        confidence: s.confidence, dropAmount: s.dropAmount, dropCount: s.dropCount, reason: s.reason,
+      })),
+    });
+    // Push to Firebase so all devices see this deduction immediately
+    pushDeductionToFirestore(state.deductionLog[0]);
+
+    // Capture confirmed suspects at the official deduction moment.
+    // getSuspectedCheaters() uses all 5 detection signals (peak tracker, poll
+    // delta, round gain, rep reset) and returns suspects with suspicion levels
+    // already computed against the deduction change we just logged.
+    if (!state.suspectLog) state.suspectLog = [];
+    const confirmedSuspects = getSuspectedCheaters(clan.id);
+    for (const s of confirmedSuspects) {
+      const peak = getMemberPeak(clan.id, s.id);
+      // Key aligns with the server-poller's dedupKey so both write to the same
+      // Firestore document (setDoc overwrites, no duplicates).
+      const dedupKey = (peak && peak.peak > 0)
+        ? `${clan.id}_${s.id}_${peak.peak}`
+        : `${clan.id}_${s.id}_ded${now}`;
+      if (suspectLogKeysSeen.has(dedupKey)) continue;
+      suspectLogKeysSeen.add(dedupKey);
+      const suspEntry = {
+        dedupKey,
+        ts:              now,   // timestamp of the OFFICIAL deduction event
+        clanId:          clan.id,
+        clanName:        clan.name,
+        clanRank:        clan.rank,
+        clanDeduction:   currDed,
+        memberId:        s.id,
+        memberName:      s.name,
+        memberLevel:     s.level,
+        memberRep:       s.reputation,
+        peakRep:         peak?.peak ?? s.reputation,
+        dropAmount:      s.dropAmount || 0,
+        dropCount:       s.dropCount  || 1,
+        confidence:      s.suspicionLevel === 'HIGH' ? 'HIGH' : 'MEDIUM',
+        suspicionLevel:  s.suspicionLevel  || 'LOW',
+        detectionSource: s.detectionSource || 'live',
+        reason:          s.reason,
+      };
+      state.suspectLog.unshift(suspEntry);
+      pushSuspectToFirestore(suspEntry);
+    }
+    if (state.suspectLog.length > 1000) state.suspectLog = state.suspectLog.slice(0, 1000);
+  }
+  // Cap log at 500 entries (newest first)
+  if (state.deductionLog.length > 500) state.deductionLog = state.deductionLog.slice(0, 500);
+}
+
+// Exact timestamp string: "07/21/2026 · 08:07:06 PM"
+function fmtDateTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  const date = d.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: 'numeric' });
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return `${date} · ${time}`;
+}
+
+// "5s ago" / "3m ago" / "2h ago" — null ts means no change yet this round.
+function fmtAgo(ts) {
+  if (!ts) return null;
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  return `${h}h ago`;
+}
+
+// Builds the "Change" markup: the amount plus a live "as of ... ago" sub-label.
+// data-change-ts lets tickChangeAgo() refresh just the "ago" text every second
+// without a full re-render.
+function changeDeltaHtml(activity) {
+  const cls = activity.amount > 0 ? 'pos' : activity.amount < 0 ? 'neg' : 'neu';
+  const amountStr = (activity.amount > 0 ? '+' : '') + fmtNum(activity.amount);
+  const agoStr = fmtAgo(activity.ts);
+  return `<span class="clan-delta ${cls}"${activity.ts ? ` data-change-ts="${activity.ts}"` : ''}>${amountStr}${agoStr ? `<span class="clan-delta-ago">as of ${agoStr}</span>` : ''}</span>`;
+}
+
+// Keeps "as of Xs/Xm ago" ticking live without waiting for the next poll/render.
+function tickChangeAgo() {
+  document.querySelectorAll('[data-change-ts]').forEach(el => {
+    const ts = parseInt(el.getAttribute('data-change-ts'), 10);
+    const agoEl = el.querySelector('.clan-delta-ago');
+    if (agoEl) agoEl.textContent = 'as of ' + fmtAgo(ts);
+  });
+}
+
+function getMemberDelta(clanId, memberId) {
+  if (!state.prevData) return null;
+  const currClan = state.data?.clans.find(c => c.id === clanId);
+  const prevClan = state.prevData?.clans.find(c => c.id === clanId);
+  if (!currClan || !prevClan) return null;
+  const curr = currClan.member_list.find(m => m.id === memberId);
+  const prev = prevClan.member_list.find(m => m.id === memberId);
+  if (!curr || !prev) return null;
+  return curr.reputation - prev.reputation;
+}
+
+// Reputation gained by a specific member so far in the current (in-progress)
+// round — mirrors getClanRoundGain, but per member. Since it's computed
+// straight off the round-start snapshot vs whatever the latest poll says,
+// it's live by construction: it updates on every poll, no separate tracking
+// needed. Returns null if a member truly has no baseline yet (e.g. they
+// joined mid-round). If the round itself predates per-member tracking
+// (an old startSnap saved before this feature existed, or one carried over
+// from localStorage), we can't recover the true round-start values — so we
+// seed the baseline from right now instead of showing "—" for the rest of
+// the round. Gains accumulate live from that point on.
+function getMemberRoundGain(clanId, memberId) {
+  if (!state.round.startSnap || !state.data) return null;
+  const startEntry = state.round.startSnap[clanId];
+  if (!startEntry) return null;
+  const currClan = state.data.clans.find(c => c.id === clanId);
+  if (!currClan) return null;
+  if (!startEntry.members) {
+    const members = {};
+    for (const m of currClan.member_list) members[m.id] = m.reputation;
+    startEntry.members = members;
+    saveToStorage();
+  }
+  const startRep = startEntry.members[memberId];
+  if (startRep === undefined) return null;
+  const curr = currClan.member_list.find(m => m.id === memberId);
+  if (!curr) return null;
+  return curr.reputation - startRep;
+}
+
+// ============================================================
+// RENDERING
+// ============================================================
+function renderCurrentView() {
+  const t = state.currentTab;
+  if (t === 'rankings') {
+    renderRankings();
+    renderYourClanBanner();
+  } else if (t === 'bleed') {
+    renderBleeding();
+  } else if (t === 'history') {
+    renderHistory();
+  } else if (t === 'deductions') {
+    renderDeductions();
+  } else if (t === 'suspects') {
+    renderSuspects();
+  } else if (t === 'settings') {
+    applySettings();
+  }
+  if (state.currentDetailClanId !== null) {
+    renderDetail(state.currentDetailClanId);
+  }
+  updateSuspectsTabBadge();
+}
+
+function updateSuspectsTabBadge() {
+  const tab = document.getElementById('tab-suspects');
+  if (!tab || !state.data) return;
+
+  // Badge = individual players caught live THIS round only (not all-time history, not API clan counts)
+  const roundStartTs = state.round && state.round.startTs ? new Date(state.round.startTs).getTime() : 0;
+  const log = state.suspectLog || [];
+  const thisRound = log.filter(e => e.ts >= roundStartTs);
+  const caught = thisRound.length;
+  const highCount = thisRound.filter(e => (e.suspicionLevel || (e.confidence === 'HIGH' ? 'HIGH' : 'LOW')) === 'HIGH').length;
+
+  let badge = tab.querySelector('.tab-badge');
+  if (caught > 0) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'tab-badge';
+      badge.style.cssText = 'position:absolute;top:6px;right:calc(50% - 14px);font-size:8px;font-weight:900;padding:1px 5px;border-radius:8px;min-width:14px;text-align:center';
+      tab.style.position = 'relative';
+      tab.appendChild(badge);
+    }
+    badge.textContent = caught;
+    badge.style.background = highCount > 0 ? 'var(--red)' : 'var(--green)';
+    badge.style.color = '#1e1e2e';
+  } else if (badge) {
+    badge.remove();
+  }
+}
+
+function renderRankings() {
+  if (!state.data) {
+    document.getElementById('loading').classList.add('visible');
+    return;
+  }
+  const query = document.getElementById('search-input').value.toLowerCase().trim();
+  const list = document.getElementById('clans-list');
+  let clans = state.data.clans.filter(c =>
+    !query || c.name.toLowerCase().includes(query) || c.master.toLowerCase().includes(query)
+  );
+
+  // Apply status filter (Gaining Bleed / Gaining Manual)
+  if (rankingsFilter !== 'all') {
+    clans = clans.filter(c => getClanRepStatus(c.id) === rankingsFilter);
+  }
+
+  // Always float Gaining (Bleed) clans to the top; preserve rank order within each group
+  clans = clans.slice().sort((a, b) => {
+    const aBleed = getClanRepStatus(a.id) === 'gaining-bleed' ? 0 : 1;
+    const bBleed = getClanRepStatus(b.id) === 'gaining-bleed' ? 0 : 1;
+    if (aBleed !== bBleed) return aBleed - bBleed;
+    return a.rank - b.rank;
+  });
+
+  if (clans.length === 0) {
+    const msg = rankingsFilter !== 'all'
+      ? 'No clans currently match this filter.'
+      : 'No clans match your search.';
+    list.innerHTML = `<div style="padding:30px;text-align:center;color:var(--text3)">${msg}</div>`;
+    return;
+  }
+
+  list.innerHTML = clans.map(clan => {
+    const isYours = clan.id === state.settings.yourClanId;
+    const status = getClanRepStatus(clan.id);
+    const activity = getClanDisplayActivity(clan.id);
+    const roundGain = getClanRoundGain(clan.id);
+
+    let rankClass = '';
+    if (clan.rank === 1) rankClass = 'gold';
+    else if (clan.rank === 2) rankClass = 'silver';
+    else if (clan.rank === 3) rankClass = 'bronze';
+
+    let cardClass = 'clan-card';
+    if (isYours) cardClass += ' your-clan';
+    if (status === 'risk' || status === 'gaining-bleed') cardClass += ' bleeding';
+
+    const badgeHtml = isYours ? '<span class="badge badge-your">YOUR CLAN</span>' : '';
+    const statusBadge = statusBadgeHtml(status);
+
+    const deltaStr = changeDeltaHtml(activity);
+
+    const repStr = fmtNum(clan.reputation);
+    const deductStr = (accessLevel === 'admin' && clan.deduction > 0) ? ` <span style="color:var(--red);font-size:10px">-${fmtNum(clan.deduction)}</span>` : '';
+
+    return `<div class="${cardClass}" onclick="viewClan(${clan.id})">
+      <div class="clan-card-top">
+        <div class="clan-rank ${rankClass}">#${clan.rank}</div>
+        <div class="clan-name">${esc(clan.name)}</div>
+        <div class="clan-badges">${statusBadge}${badgeHtml}</div>
+      </div>
+      <div class="clan-card-bottom">
+        <div class="clan-stat">
+          <div class="clan-stat-label">Reputation</div>
+          <div class="clan-stat-value">${repStr}${deductStr}</div>
+        </div>
+        <div class="clan-stat">
+          <div class="clan-stat-label">Change</div>
+          <div class="clan-stat-value">${deltaStr}</div>
+        </div>
+        <div class="clan-stat">
+          <div class="clan-stat-label">Members</div>
+          <div class="clan-stat-value">${clan.members}</div>
+        </div>
+        <div class="clan-stat">
+          <div class="clan-stat-label">This Round</div>
+          <div class="clan-stat-value" style="color:${statusColor(status)}">${roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '—'}</div>
+        </div>
+        <div class="clan-master" style="margin-left:auto">⚔ ${esc(clan.master)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderYourClanBanner();
+}
+
+function renderYourClanBanner() {
+  const banner = document.getElementById('your-clan-banner');
+  const alertDiv = document.getElementById('home-bleed-alert');
+  const id = state.settings.yourClanId;
+  if (!id || !state.data) {
+    banner.classList.remove('visible');
+    alertDiv.classList.remove('visible');
+    return;
+  }
+  const clan = getClanById(id);
+  if (!clan) return;
+  const status = getClanRepStatus(id);
+  const activity = getClanDisplayActivity(id);
+  const roundGain = getClanRoundGain(id);
+
+  banner.classList.add('visible');
+  document.getElementById('ycb-name').textContent = clan.name;
+  document.getElementById('ycb-rank').textContent = '#' + clan.rank;
+  document.getElementById('ycb-rep').textContent = fmtNum(clan.reputation);
+  document.getElementById('ycb-delta').innerHTML = changeDeltaHtml(activity);
+  document.getElementById('ycb-delta').style.color = activity.amount > 0 ? 'var(--green)' : activity.amount < 0 ? 'var(--red)' : 'var(--text3)';
+  document.getElementById('ycb-stamina').textContent = statusLabel(status);
+  document.getElementById('ycb-stamina').style.color = statusColor(status);
+  document.getElementById('ycb-members').textContent = clan.members;
+
+  const fill = document.getElementById('ycb-stamina-fill');
+  const isGaining = status === 'gaining-bleed' || status === 'gaining-manual' || status === 'gaining';
+  const fillPct = isGaining ? 100 : status === 'risk' ? 25 : 0;
+  fill.style.width = fillPct + '%';
+  fill.style.background = statusColor(status);
+
+  if (status === 'risk') {
+    alertDiv.classList.add('visible');
+    document.getElementById('home-bleed-title').textContent = '⚠ ' + clan.name + ' — RISK BLEED';
+    document.getElementById('home-bleed-sub').textContent =
+      `No reputation gained this round (${roundGain !== null ? fmtNum(roundGain) : '—'}) — a confirmed bleed is happening nearby; this clan may be the target`;
+  } else {
+    alertDiv.classList.remove('visible');
+  }
+}
+
+function renderDetail(clanId) {
+  if (!state.data) return;
+  const clan = getClanById(clanId);
+  if (!clan) return;
+
+  const isYours = clan.id === state.settings.yourClanId;
+  const status = getClanRepStatus(clan.id);
+  const activity = getClanDisplayActivity(clan.id);
+  const roundGain = getClanRoundGain(clan.id);
+
+  document.getElementById('detail-clan-name').textContent = clan.name;
+  document.getElementById('detail-clan-sub').textContent = `Rank #${clan.rank} · Master: ${clan.master}`;
+  document.getElementById('ds-rep').textContent = fmtNum(clan.reputation);
+  document.getElementById('ds-delta').innerHTML = changeDeltaHtml(activity);
+  document.getElementById('ds-delta').style.color = activity.amount > 0 ? 'var(--green)' : activity.amount < 0 ? 'var(--red)' : 'var(--text3)';
+  document.getElementById('ds-members').textContent = clan.members;
+  document.getElementById('ds-bleed').textContent = statusLabel(status);
+  document.getElementById('ds-bleed').style.color = statusColor(status);
+
+  // This-round reputation gain bar (a rough visual, not a real stamina meter)
+  const fill = document.getElementById('detail-stamina-fill');
+  const isGaining = status === 'gaining-bleed' || status === 'gaining-manual' || status === 'gaining';
+  const fillPct = isGaining ? 100 : status === 'risk' ? 25 : 0;
+  fill.style.width = fillPct + '%';
+  fill.style.background = statusColor(status);
+  document.getElementById('detail-stamina-pct').textContent = statusLabel(status);
+  document.getElementById('detail-stamina-pct').style.color = statusColor(status);
+  document.getElementById('detail-round-window').textContent = roundWindowLabel(state.round.startTs);
+  document.getElementById('detail-round-gain').textContent = roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '—';
+
+  // Bleed alerts
+  const ba = document.getElementById('detail-bleed-alert');
+  if (status === 'gaining-bleed') {
+    ba.classList.add('visible');
+    document.getElementById('detail-bleed-alert-title').textContent = '🔴 GAINING (BLEED)';
+    document.getElementById('detail-bleed-msg').textContent =
+      `Bleed pattern detected — 2+ members gained rep within 5s of each other, or a single member gained rep consecutively within 10s. This clan is likely farming a bleeding target.`;
+  } else if (status === 'risk') {
+    ba.classList.add('visible');
+    document.getElementById('detail-bleed-alert-title').textContent = '⚠ RISK BLEED';
+    document.getElementById('detail-bleed-msg').textContent =
+      `No reputation gained this round and a confirmed bleed is occurring nearby — this clan may be the bleeding target, or simply hasn't attacked yet.`;
+  } else {
+    ba.classList.remove('visible');
+  }
+
+  // Set Your Clan button
+  const sycBtn = document.getElementById('set-your-clan-btn');
+  if (isYours) {
+    sycBtn.textContent = '✓ Your Clan (tap to unset)';
+    sycBtn.style.background = 'rgba(203,166,247,0.15)';
+    sycBtn.style.color = 'var(--mauve)';
+  } else {
+    sycBtn.textContent = 'Set as Yours';
+    sycBtn.style.background = 'var(--mauve)';
+    sycBtn.style.color = '#1e1e2e';
+  }
+
+  // Render member list — sorted by biggest gainers first (most active attackers)
+  const membersSorted = [...clan.member_list].sort((a, b) => {
+    const da = getMemberRoundGain(clan.id, a.id) ?? 0;
+    const db = getMemberRoundGain(clan.id, b.id) ?? 0;
+    return db - da;
+  });
+
+  // Build suspect map for this clan (admin only)
+  const suspectMap = {};
+  if (accessLevel === 'admin' && clan.deduction > 0) {
+    for (const s of getSuspectedCheaters(clan.id)) {
+      suspectMap[s.id] = s;
+    }
+  }
+
+  document.getElementById('members-list').innerHTML = membersSorted.map(m => {
+    const d     = getMemberRoundGain(clan.id, m.id);
+    const peak  = getMemberPeak(clan.id, m.id);
+    const deltaHtml = d !== null
+      ? `<span class="clan-delta ${d > 0 ? 'pos' : d < 0 ? 'neg' : 'neu'}">${d >= 0 ? '+' : ''}${fmtNum(d)}</span>`
+      : '<span class="clan-delta neu">—</span>';
+
+    // Peak indicator: show peak rep and drop amount if different from current
+    let peakHtml = '';
+    if (peak && peak.peak > m.reputation && peak.dropAmount > 0) {
+      peakHtml = `<div style="font-size:10px;color:var(--red);margin-top:1px">` +
+                 `peak ${fmtNum(peak.peak)} → -${fmtNum(peak.dropAmount)}` +
+                 (peak.dropCount > 1 ? ` (${peak.dropCount}×)` : '') +
+                 `</div>`;
+    }
+
+    const suspect = suspectMap[m.id];
+    let rowClass = 'member-row';
+    let suspectBadge = '';
+    let suspectReason = '';
+    if (suspect) {
+      rowClass += suspect.confidence === 'HIGH' ? ' suspect-high' : ' suspect-med';
+      const badgeCls   = suspect.confidence === 'HIGH' ? 'badge-suspect-high' : 'badge-suspect-med';
+      const badgeLabel = suspect.confidence === 'HIGH'  ? '🚨 SUSPECT' : '⚠ SUSPECT?';
+      suspectBadge  = `<span class="badge ${badgeCls}" style="margin-left:6px;font-size:9px">${badgeLabel}</span>`;
+      suspectReason = `<div class="suspect-reason">${esc(suspect.reason)}</div>`;
+    }
+    return `<div class="${rowClass}">
+      <div class="m-name" style="display:flex;flex-direction:column">
+        <span>${esc(m.name)}${suspectBadge}</span>
+        ${suspectReason}
+        ${peakHtml}
+      </div>
+      <div class="m-level">${m.level}</div>
+      <div class="m-rep">${fmtNum(m.reputation)}</div>
+      <div class="m-delta">${deltaHtml}</div>
+    </div>`;
+  }).join('');
+
+  // ── Accumulated anti-cheat history from suspect log (admin only) ──
+  const cheatHistEl = document.getElementById('detail-cheat-history');
+  if (accessLevel !== 'admin') { cheatHistEl.innerHTML = ''; }
+  else {
+  const clanSuspectHistory = (state.suspectLog || []).filter(s => s.clanId === clan.id);
+  if (clanSuspectHistory.length > 0) {
+    // Aggregate per member: sum all unique drop events (dedupKey guarantees no duplicates)
+    const memberTotals = {};
+    for (const s of clanSuspectHistory) {
+      const key = String(s.memberId);
+      if (!memberTotals[key]) {
+        memberTotals[key] = {
+          id: s.memberId, name: s.memberName, level: s.memberLevel,
+          totalDrop: 0, events: 0, firstTs: s.ts, lastTs: s.ts
+        };
+      }
+      memberTotals[key].totalDrop += s.dropAmount || 0;
+      memberTotals[key].events++;
+      if (s.ts < memberTotals[key].firstTs) memberTotals[key].firstTs = s.ts;
+      if (s.ts > memberTotals[key].lastTs)  memberTotals[key].lastTs  = s.ts;
+    }
+    const sorted = Object.values(memberTotals).sort((a, b) => b.totalDrop - a.totalDrop);
+    const totalDeducted = sorted.reduce((n, m) => n + m.totalDrop, 0);
+
+    let histHtml = `<div class="detail-cheat-section-header">
+      ⚠ ANTI-CHEAT HISTORY — SEASON TO DATE
+      <span style="font-weight:400;color:var(--text3);margin-left:6px;text-transform:none;letter-spacing:0;font-size:10px">
+        ${sorted.length} member${sorted.length !== 1 ? 's' : ''} caught · ${fmtNum(clanSuspectHistory.length)} total event${clanSuspectHistory.length !== 1 ? 's' : ''}
+      </span>
+    </div>
+    <div style="margin:0 12px 6px;font-size:11px;color:var(--text3)">
+      Accumulated deductions tracked this session — stays until records are cleared. Persists across polls but resets if session data is wiped.
+    </div>`;
+
+    for (const m of sorted) {
+      const firstStr = new Date(m.firstTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const lastStr  = new Date(m.lastTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const sameTime = m.firstTs === m.lastTs;
+      histHtml += `<div class="member-cheat-row">
+        <div class="mch-top">
+          <div class="mch-name">${esc(m.name)} <span style="font-size:10px;font-weight:400;color:var(--text3)">Lv ${m.level}</span></div>
+          <div class="mch-total">-${fmtNum(m.totalDrop)}</div>
+        </div>
+        <div class="mch-meta">
+          ${m.events} reversal${m.events !== 1 ? 's' : ''} caught
+          · <span style="color:var(--text2)">first: ${firstStr}</span>
+          ${!sameTime ? `· <span style="color:var(--text2)">last: ${lastStr}</span>` : ''}
+        </div>
+      </div>`;
+    }
+    cheatHistEl.innerHTML = histHtml;
+  } else {
+    // No history: only show a note if the clan has any deductions at all
+    if (clan.deduction > 0) {
+      cheatHistEl.innerHTML = `<div class="detail-cheat-section-header">⚠ ANTI-CHEAT HISTORY</div>
+        <div style="margin:0 12px 8px;font-size:11px;color:var(--text3)">
+          No individual member events recorded yet this session. History builds up as the tracker catches reversals live.
+        </div>`;
+    } else {
+      cheatHistEl.innerHTML = '';
+    }
+  } // end clanSuspectHistory block
+  } // end admin-only anti-cheat block
+}
+
+// ============================================================
+// CHEATER DETECTION
+// ============================================================
+// Returns the most recent clan deduction CHANGE (not the total) for a given clan.
+// Example: if clan went from -244 to -268, this returns +24.
+// Returns null if no deduction change has been logged.
+function getLatestClanDeductionChange(clanId) {
+  const clanDedLog = (state.deductionLog || []).filter(e => e.clanId === clanId);
+  if (clanDedLog.length === 0) return null;
+  return clanDedLog[0].change; // most recent change (positive = deduction grew)
+}
+
+// Returns array of suspected cheater members for a given clan.
+// Works for ANY clan with clan.deduction > 0 — from API data alone if needed.
+//
+// Detection signals (all caught "live" via the tracker's 5s polling):
+//   SIGNAL 1 — session peak tracker caught a rep spike that was later reversed
+//   SIGNAL 2 — rep dropped between the two most recent polls
+//   SIGNAL 3 — net round gain is negative (reversal within the round window)
+//   SIGNAL 4 — rep was >0 at round start, now exactly 0 (hard reset)
+//   SIGNAL 5 — rep lower than round start but drop not caught live (API-inferred)
+//
+// Suspicion levels (new, replacing old HIGH/MEDIUM confidence):
+//   HIGH — individual member rep drop was caught live AND the TOTAL drops for
+//           all caught members exactly match the clan's latest deduction change.
+//           e.g. clan went from -244 → -268 (change = 24), member drops sum to 24 → HIGH.
+//   LOW  — rep gain→drop detected live but total doesn't align with clan deduction change,
+//           OR the drop was inferred from API alone (not caught live).
+//
+// detectionSource:
+//   'live' — tracker's polling directly observed the rep gain and subsequent drop
+//   'api'  — only inferred from clan.deduction > 0 with no live member event caught
+function getSuspectedCheaters(clanId) {
+  const clan = getClanById(clanId);
+  if (!clan || !clan.deduction || clan.deduction <= 0) return [];
+
+  const latestChange = getLatestClanDeductionChange(clanId); // e.g. 24
+  const suspects = [];
+  const startEntry = state.round.startSnap ? state.round.startSnap[clanId] : null;
+  const seen = new Set();
+
+  for (const m of clan.member_list) {
+    const startRep  = startEntry?.members ? startEntry.members[m.id] : undefined;
+    const roundGain = getMemberRoundGain(clanId, m.id);
+    const pollDelta = getMemberDelta(clanId, m.id);
+    const peak      = getMemberPeak(clanId, m.id);
+
+    let detectionSource = null;
+    let dropAmount = 0;
+    let dropCount  = 0;
+    let dropTs     = null;
+    let reason     = '';
+
+    // ── SIGNAL 1: peak tracker caught a transient rep spike that later dropped ──
+    if (peak && peak.dropAmount > 0 && peak.dropTs !== null && !seen.has(m.id)) {
+      detectionSource = 'live';
+      dropAmount = peak.dropAmount;
+      dropCount  = peak.dropCount;
+      dropTs     = peak.dropTs;
+      reason     = `Session peak was ${fmtNum(peak.peak)} — rep dropped by ${fmtNum(peak.dropAmount)} — anti-cheat reversed a cheated win mid-session`;
+
+    // ── SIGNAL 2: rep dropped between the two most recent polls ──
+    } else if (pollDelta !== null && pollDelta < 0 && !seen.has(m.id)) {
+      detectionSource = 'live';
+      dropAmount = Math.abs(pollDelta);
+      dropCount  = 1;
+      reason     = `Rep just dropped ${fmtNum(pollDelta)} between the last two polls — caught the anti-cheat reversal live`;
+
+    // ── SIGNAL 3: net round gain is negative ──
+    } else if (roundGain !== null && roundGain < 0 && !seen.has(m.id)) {
+      detectionSource = 'live';
+      dropAmount = Math.abs(roundGain);
+      dropCount  = 1;
+      reason     = `Rep is down ${fmtNum(roundGain)} since round start — cheated win flagged and gain reversed within this round`;
+
+    // ── SIGNAL 4: was >0 at round start, now exactly 0 — hard reset ──
+    } else if (startRep !== undefined && startRep > 0 && m.reputation === 0 && !seen.has(m.id)) {
+      detectionSource = 'live';
+      dropAmount = startRep;
+      dropCount  = 1;
+      reason     = `Rep reset from ${fmtNum(startRep)} → 0 this round while clan took a ${fmtNum(clan.deduction)} anti-cheat deduction`;
+
+    } else {
+      continue; // no signal for this member
+    }
+
+    seen.add(m.id);
+    suspects.push({ ...m, detectionSource, dropAmount, dropCount, dropTs, reason,
+                    suspicionLevel: null /* assigned below */ });
+  }
+
+  // ── Assign suspicion levels ──────────────────────────────────────────────
+  // HIGH: sum of all live-caught drops == latest clan deduction change (lined up exactly).
+  // LOW:  live catch but not aligned, or only API-inferred.
+  const totalLiveDrops = suspects
+    .filter(s => s.detectionSource === 'live')
+    .reduce((n, s) => n + (s.dropAmount || 0), 0);
+  const isAligned = latestChange !== null && latestChange > 0 && totalLiveDrops === latestChange;
+
+  for (const s of suspects) {
+    if (s.detectionSource === 'live' && isAligned) {
+      s.suspicionLevel = 'HIGH';
+    } else {
+      s.suspicionLevel = 'LOW';
+    }
+    // Keep legacy confidence field for backward-compat with suspectLog rendering
+    s.confidence = s.suspicionLevel === 'HIGH' ? 'HIGH' : 'MEDIUM';
+  }
+
+  // Sort: HIGH first, then by largest drop
+  suspects.sort((a, b) => {
+    if (a.suspicionLevel !== b.suspicionLevel) return a.suspicionLevel === 'HIGH' ? -1 : 1;
+    return (b.dropAmount || 0) - (a.dropAmount || 0);
+  });
+
+  return suspects;
+}
+
+// Returns ALL clans with API deductions (with or without live member catches).
+// Used by the suspects tab so every deducted clan appears, classified by source.
+function getAllClanDeductions() {
+  if (!state.data) return [];
+  const results = [];
+  for (const clan of state.data.clans) {
+    if (!clan.deduction || clan.deduction <= 0) continue;
+    const suspects = getSuspectedCheaters(clan.id);
+    // Determine the overall source for the clan card
+    const hasLive = suspects.some(s => s.detectionSource === 'live');
+    const clanSource = hasLive ? 'live' : 'api';
+    results.push({ clan, suspects, clanSource });
+  }
+  return results;
+}
+
+// All clans that have at least one detected suspect (used for tab badge)
+function getAllSuspects() {
+  if (!state.data) return [];
+  const results = [];
+  for (const clan of state.data.clans) {
+    if (!clan.deduction || clan.deduction <= 0) continue;
+    const suspects = getSuspectedCheaters(clan.id);
+    if (suspects.length > 0) {
+      results.push({ clan, suspects });
+    }
+  }
+  return results;
+}
+
+function downloadSuspects() {
+  if (accessLevel !== 'admin') return;
+  const now = new Date();
+  const stamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+  const generatedAt = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                    + ' · ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  function legacyToSuspicion(e) {
+    return e.suspicionLevel || (e.confidence === 'HIGH' ? 'HIGH' : 'LOW');
+  }
+
+  const wb = XLSX.utils.book_new();
+  const log = state.suspectLog || [];
+  const rows = [];
+
+  rows.push(['INDIVIDUAL CHEATER SUSPECTS — History (All Rounds)', '', '', '', '', '', '', '', '', '', '', '', '']);
+  rows.push([`Generated: ${generatedAt}`, '', '', '', '', '', '', '', '', '', '', '', '']);
+  rows.push(['Suspicion Level: HIGH = rep drop caught live AND aligned exactly with clan deduction change — confirmed cheater', '', '', '', '', '', '', '', '', '', '', '', '']);
+  rows.push(['Detection Source: Caught Live = tracker observed rep gain→drop | API Based = inferred from API', '', '', '', '', '', '', '', '', '', '', '', '']);
+  rows.push([]);
+
+  if (log.length === 0) {
+    rows.push(['No individual suspect events recorded yet.']);
+  } else {
+    rows.push([
+      'Date', 'Time', 'Clan Name', 'Clan Rank', 'Clan Deduction at Event',
+      'Member Name', 'Level', 'Rep at Event', 'Session Peak Rep',
+      'Rep Drop', 'Drop Count', 'Suspicion Level', 'Detection Source', 'Detection Reason'
+    ]);
+    for (const e of log) {
+      const d = new Date(e.ts);
+      rows.push([
+        d.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' }),
+        d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        e.clanName, e.clanRank, e.clanDeduction,
+        e.memberName, e.memberLevel, e.memberRep, e.peakRep || '',
+        e.dropAmount || 0, e.dropCount || 1,
+        legacyToSuspicion(e),
+        (e.detectionSource || 'live') === 'live' ? 'Caught Live' : 'API Based',
+        e.reason,
+      ]);
+    }
+  }
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [14, 12, 28, 10, 24, 22, 8, 14, 16, 10, 12, 16, 14, 60].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws, 'Suspect History');
+  XLSX.writeFile(wb, `suspects_${stamp}.xlsx`);
+}
+
+function downloadDeductions() {
+  if (accessLevel !== 'admin') return;
+  const now    = new Date();
+  const stamp  = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+  const generatedAt = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                    + ' · ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  function fmtTs(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' })
+         + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
+  const wb = XLSX.utils.book_new();
+  const suspectLog = state.suspectLog || [];
+  const dedLog     = state.deductionLog || [];
+
+  // ── Sheet 1 (default): Current API Deduction State ───────────────────────
+  const apiRows = [];
+  apiRows.push(['CLAN DEDUCTION — Current API State', '', '', '', '', '', '', '', '', '', '', '', '']);
+  apiRows.push([`Generated: ${generatedAt}`, '', '', '', '', '', '', '', '', '', '', '', '']);
+  apiRows.push(['Clan Source: Caught Live = tracker observed rep drop | API Based = only from API', '', '', '', '', '', '', '', '', '', '', '', '']);
+  apiRows.push(['Alignment: individual live rep drops == clan deduction change → lined up', '', '', '', '', '', '', '', '', '', '', '', '']);
+  apiRows.push([]);
+
+  if (state.data) {
+    const allDed = getAllClanDeductions();
+    if (allDed.length === 0) {
+      apiRows.push(['No clans currently have anti-cheat deductions.']);
+    } else {
+      apiRows.push([
+        'Clan Name', 'Clan Rank', 'API Deduction Total', 'Deduction Change', 'Previous Deduction',
+        'Clan Source', 'Member Name', 'Level', 'Current Rep',
+        'Suspicion Level', 'Member Source', 'Rep Drop', 'Aligned?', 'Detection Reason'
+      ]);
+      for (const { clan, suspects, clanSource } of allDed) {
+        const clanDedLog = dedLog.filter(e => e.clanId === clan.id);
+        const latestDed  = clanDedLog[0] || null;
+        const latestChange = latestDed ? latestDed.change : '';
+        const prevDedVal   = latestDed ? latestDed.prevDeduction : '';
+        const liveMemberDrops = suspects.filter(s => s.detectionSource === 'live').reduce((n, s) => n + (s.dropAmount || 0), 0);
+        const isAligned = latestChange !== '' && latestChange > 0 && liveMemberDrops === latestChange;
+        if (suspects.length === 0) {
+          apiRows.push([
+            clan.name, clan.rank, clan.deduction, latestChange || '', prevDedVal || '',
+            'API Based', '(no member events caught)', '', '', '', '', '', '', ''
+          ]);
+        } else {
+          for (const s of suspects) {
+            apiRows.push([
+              clan.name, clan.rank, clan.deduction, latestChange || '', prevDedVal || '',
+              clanSource === 'live' ? 'Caught Live' : 'API Based',
+              s.name, s.level, s.reputation,
+              s.suspicionLevel || 'LOW',
+              s.detectionSource === 'live' ? 'Caught Live' : 'API Based',
+              s.dropAmount || 0,
+              isAligned ? 'YES' : 'NO',
+              s.reason,
+            ]);
+          }
+        }
+      }
+    }
+  } else {
+    apiRows.push(['No API data loaded yet.']);
+  }
+  const wsApi = XLSX.utils.aoa_to_sheet(apiRows);
+  wsApi['!cols'] = [28, 10, 22, 16, 18, 14, 22, 8, 12, 16, 14, 10, 10, 60].map(w => ({ wch: w }));
+
+  // ── Sheet 2: Deduction Change Log (timestamped events) ───────────────────
+  const logRows = [];
+  logRows.push(['CLAN DEDUCTION — Change Log (timestamped events)', '', '', '', '']);
+  logRows.push([`Generated: ${generatedAt}`, '', '', '', '']);
+  logRows.push([]);
+
+  if (dedLog.length === 0 && suspectLog.length === 0) {
+    logRows.push(['No deduction history recorded yet.']);
+  } else {
+    const clanMeta = {};
+    for (const e of dedLog) {
+      if (!clanMeta[e.clanId] || e.deduction > clanMeta[e.clanId].currentDeduction) {
+        clanMeta[e.clanId] = { name: e.clanName, rank: e.clanRank, currentDeduction: e.deduction };
+      }
+    }
+    const suspectByClan = {};
+    for (const s of suspectLog) {
+      const key = String(s.clanId);
+      if (!suspectByClan[key]) suspectByClan[key] = [];
+      suspectByClan[key].push(s);
+    }
+    for (const e of dedLog) {
+      const key = String(e.clanId);
+      if (!suspectByClan[key]) suspectByClan[key] = [];
+    }
+    const sortedClanIds = Object.keys(clanMeta).sort(
+      (a, b) => (clanMeta[b]?.currentDeduction || 0) - (clanMeta[a]?.currentDeduction || 0)
+    );
+    for (const clanId of sortedClanIds) {
+      const meta    = clanMeta[clanId];
+      const entries = suspectByClan[clanId] || [];
+      let firstTs = null, lastTs = null;
+      for (const s of entries) {
+        if (firstTs === null || s.ts < firstTs) firstTs = s.ts;
+        if (lastTs  === null || s.ts > lastTs)  lastTs  = s.ts;
+      }
+      if (firstTs === null) {
+        const cde = dedLog.filter(e => String(e.clanId) === clanId);
+        for (const e of cde) {
+          if (firstTs === null || e.ts < firstTs) firstTs = e.ts;
+          if (lastTs  === null || e.ts > lastTs)  lastTs  = e.ts;
+        }
+      }
+      const dateRange = firstTs
+        ? (firstTs === lastTs ? fmtTs(firstTs) : `${fmtTs(firstTs)}  –  ${fmtTs(lastTs)}`)
+        : '—';
+      logRows.push([`${meta.name}  ·  Rank #${meta.rank}`, '', dateRange, '', '']);
+      if (entries.length === 0) {
+        logRows.push(['', 'Cheating Clan Members', '(no individual events recorded yet)', '', '']);
+        logRows.push(['', 'Total Reputation Deducted', '', `-${fmtNum(meta.currentDeduction)}`, '']);
+        logRows.push([]);
+        continue;
+      }
+      const memberMap = {};
+      for (const s of entries) {
+        const key = String(s.memberId);
+        if (!memberMap[key]) memberMap[key] = { name: s.memberName, level: s.memberLevel, events: [] };
+        memberMap[key].events.push({ drop: s.dropAmount || 0, ts: s.ts });
+      }
+      for (const m of Object.values(memberMap)) m.events.sort((a, b) => a.ts - b.ts);
+      const sortedMembers = Object.values(memberMap).sort((a, b) => {
+        const totA = a.events.reduce((n, e) => n + e.drop, 0);
+        const totB = b.events.reduce((n, e) => n + e.drop, 0);
+        return totB - totA;
+      });
+      logRows.push(['', 'Cheating Clan Members', '', '', '']);
+      for (const m of sortedMembers) {
+        for (let i = 0; i < m.events.length; i++) {
+          const ev = m.events[i];
+          logRows.push([
+            '', i === 0 ? m.name : '', `Lv ${m.level}`,
+            ev.drop > 0 ? `-${fmtNum(ev.drop)} rep deducted` : '(no rep drop recorded)',
+            fmtTs(ev.ts)
+          ]);
+        }
+      }
+      logRows.push(['', 'Total Reputation Deducted', '', `-${fmtNum(meta.currentDeduction)}`, '']);
+      logRows.push([]); logRows.push([]);
+    }
+  }
+  const wsLog = XLSX.utils.aoa_to_sheet(logRows);
+  wsLog['!cols'] = [{ wch: 2 }, { wch: 28 }, { wch: 10 }, { wch: 24 }, { wch: 26 }];
+
+  XLSX.utils.book_append_sheet(wb, wsApi, 'Current API State');  // opens first
+  XLSX.utils.book_append_sheet(wb, wsLog, 'Deduction History');
+  XLSX.writeFile(wb, `deductions_${stamp}.xlsx`);
+}
+
+function renderSuspects() {
+  const container = document.getElementById('suspects-list');
+  if (!state.data) {
+    container.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <h3>No data yet</h3><p>Waiting for the first fetch to complete.</p></div>`;
+    return;
+  }
+
+  // Only show HIGH suspects: live rep drop that aligns exactly with clan deduction change
+  const log = (state.suspectLog || []).filter(e =>
+    (e.suspicionLevel || (e.confidence === 'HIGH' ? 'HIGH' : '')) === 'HIGH'
+  );
+
+  if (log.length === 0) {
+    const deductedClans = state.data.clans.filter(c => c.deduction > 0).length;
+    const msg = deductedClans > 0
+      ? `${deductedClans} clan${deductedClans !== 1 ? 's have' : ' has'} anti-cheat deductions but no confirmed suspects yet. A suspect is confirmed when a live rep drop exactly matches the clan\xe2\x80\x99s deduction change. Keep the tracker open \xe2\x80\x94 events are caught automatically.`
+      : 'No clans have anti-cheat deductions. Nothing to investigate.';
+    container.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <h3>No Confirmed Suspects Yet</h3><p>${msg}</p></div>`;
+    return;
+  }
+
+  let html = `<div style="margin:0 12px 10px;font-size:11px;color:var(--text3)">
+    <span style="color:var(--red);font-weight:700">${log.length} HIGH</span> confirmed suspect${log.length !== 1 ? 's' : ''} \xe2\x80\x94 rep drop caught live and aligned exactly with clan deduction change
+  </div>`;
+
+  // Group by date
+  const groups = [];
+  let lastDate = null;
+  for (const e of log) {
+    const d = new Date(e.ts);
+    const dateLabel = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    if (dateLabel !== lastDate) { groups.push({ date: dateLabel, entries: [] }); lastDate = dateLabel; }
+    groups[groups.length - 1].entries.push(e);
+  }
+
+  for (const grp of groups) {
+    html += `<div class="ded-date-header">${esc(grp.date)}</div>`;
+    for (const e of grp.entries) {
+      const srcTag   = `<span style="font-size:9px;color:#a6e3a1;background:rgba(166,227,161,0.12);border:1px solid rgba(166,227,161,0.3);padding:1px 5px;border-radius:5px">\xf0\x9f\x9f\xa2 Live</span>`;
+      const dropLine = e.dropAmount > 0
+        ? `<span style="color:var(--red);font-size:10px;margin-left:4px">\xe2\x88\x92${fmtNum(e.dropAmount)}${e.dropCount > 1 ? ` (${e.dropCount}\xc3\x97)` : ''}</span>` : '';
+      const detectedAt = e.dropTs
+        ? new Date(e.dropTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        : new Date(e.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      html += `<div class="suspect-hist-card">
+          <div class="suspect-hist-top">
+            <div style="flex:1;min-width:0">
+              <div class="suspect-hist-clan">${esc(e.clanName)} <span style="font-size:11px;color:var(--text3)">#${e.clanRank}</span></div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px">
+                Clan deduction at event: <span style="color:var(--red);font-weight:700">-${fmtNum(e.clanDeduction)}</span>
+                &nbsp;\xc2\xb7&nbsp; ${srcTag}
+              </div>
+            </div>
+            <div class="suspect-hist-ts" style="flex-shrink:0;margin-left:8px">
+              <div style="font-size:11px;font-weight:600;color:var(--text2)">${detectedAt}</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:1px">${fmtAgo(e.ts)}</div>
+            </div>
+          </div>
+          <div class="suspect-hist-member">
+            <div class="sm-icon">\xf0\x9f\x9a\xa8</div>
+            <div class="sm-info">
+              <div class="sm-name">${esc(e.memberName)}
+                <span style="font-size:10px;color:var(--text3)">Lv ${e.memberLevel} \xc2\xb7 Rep ${fmtNum(e.memberRep)}${dropLine}</span>
+              </div>
+              <div class="sm-reason">${esc(e.reason)}</div>
+            </div>
+            <div class="sm-badge"><span class="badge badge-suspect-high" style="font-size:9px">HIGH</span></div>
+          </div>
+        </div>`;
+    }
+  }
+
+  container.innerHTML = html;
+}
+
+
+let rankingsFilter  = 'all'; // 'all' | 'gaining-bleed' | 'gaining-manual' | 'risk'
+let dedFilterClanId = 'all'; // 'all' or a specific clanId (number)
+let suspectFilter   = 'all'; // 'all' | 'high'
+
+function setRankingsFilter(filter, btn) {
+  rankingsFilter = filter;
+  document.querySelectorAll('.rank-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRankings();
+}
+
+function setDedFilter(clanId, btn) {
+  dedFilterClanId = clanId;
+  document.querySelectorAll('.ded-filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderDeductions();
+}
+
+function setSuspectFilter(filter, btn) {
+  suspectFilter = filter;
+  renderSuspects();
+}
+
+function renderDeductions() {
+  const container = document.getElementById('deductions-list');
+  const log = state.deductionLog || [];
+
+  // Build filter bar from unique clans in the log
+  const filterBar = document.getElementById('ded-filter-bar');
+  if (filterBar) {
+    const seen = new Set();
+    const uniqueClans = [];
+    for (const e of log) {
+      if (!seen.has(e.clanId)) { seen.add(e.clanId); uniqueClans.push({ id: e.clanId, name: e.clanName }); }
+    }
+    filterBar.innerHTML = `<button class="ded-filter-btn${dedFilterClanId === 'all' ? ' active' : ''}" onclick="setDedFilter('all',this)">All Clans</button>` +
+      uniqueClans.map(c =>
+        `<button class="ded-filter-btn${dedFilterClanId === c.id ? ' active' : ''}" onclick="setDedFilter(${c.id},this)">${esc(c.name)}</button>`
+      ).join('');
+  }
+
+  // ── SECTION 1: Current API Deduction State ───────────────────────────────
+  let html = '';
+  if (state.data) {
+    const allDed = getAllClanDeductions();
+    if (allDed.length > 0) {
+      html += `<div class="section-header" style="padding-top:10px">📡 Current API Deduction State</div>`;
+      html += `<div style="margin:0 12px 8px;font-size:11px;color:var(--text3)">
+        ${allDed.length} clan${allDed.length !== 1 ? 's' : ''} with active deductions —
+        <span class="badge-src-live" style="font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(166,227,161,0.12);color:#a6e3a1;border:1px solid rgba(166,227,161,0.3)">🟢 Caught Live</span>
+        = tracker observed rep drop live &nbsp;
+        <span class="badge-src-api" style="font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(137,180,250,0.1);color:#89b4fa;border:1px solid rgba(137,180,250,0.3)">📡 API Based</span>
+        = from API only
+      </div>`;
+
+      for (const { clan, suspects, clanSource } of allDed) {
+        const clanDedLog  = log.filter(e => e.clanId === clan.id);
+        const latestDed   = clanDedLog[0] || null;
+        const latestChange = latestDed ? latestDed.change : null;
+        const prevDedVal  = latestDed ? latestDed.prevDeduction : null;
+        const dedTs = latestDed
+          ? new Date(latestDed.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          : null;
+
+        const liveMemberDrops = suspects.filter(s => s.detectionSource === 'live')
+                                         .reduce((n, s) => n + (s.dropAmount || 0), 0);
+        const isAligned = latestChange !== null && latestChange > 0 && liveMemberDrops === latestChange;
+        const highCount = suspects.filter(s => s.suspicionLevel === 'HIGH').length;
+
+        const srcBadge = clanSource === 'live'
+          ? `<span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(166,227,161,0.12);color:#a6e3a1;border:1px solid rgba(166,227,161,0.3)">🟢 Caught Live</span>`
+          : `<span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(137,180,250,0.1);color:#89b4fa;border:1px solid rgba(137,180,250,0.3)">📡 API Based</span>`;
+
+        let alignHtml = '';
+        if (latestChange !== null && latestChange > 0) {
+          const alignColor = isAligned ? 'var(--green)' : '#f9e2af';
+          const alignIcon  = isAligned ? '✅' : '⚠️';
+          alignHtml = `<div style="font-size:10px;color:var(--text3);margin-top:3px">
+            Deduction change: <span style="color:var(--red);font-weight:700">+${fmtNum(latestChange)}</span>
+            (${fmtNum(prevDedVal)} → ${fmtNum(clan.deduction)})${dedTs ? ` at ${dedTs}` : ''}
+            &nbsp;·&nbsp; Members' live drop total: <span style="color:${alignColor};font-weight:700">${fmtNum(liveMemberDrops)}</span>
+            &nbsp;${alignIcon} ${isAligned ? '<span style="color:var(--green)">Aligned</span>' : '<span style="color:#f9e2af">Not aligned</span>'}
+          </div>`;
+        } else {
+          alignHtml = `<div style="font-size:10px;color:var(--blue);margin-top:3px">
+            Total cumulative deduction: <span style="color:var(--red);font-weight:700">-${fmtNum(clan.deduction)}</span>
+            &nbsp;·&nbsp; Detected from API only — no live change logged this session
+          </div>`;
+        }
+
+        html += `<div class="bleed-clan-card" style="border-color:rgba(243,139,168,0.3);margin-bottom:6px" onclick="viewClan(${clan.id})">
+          <div class="bleed-clan-card-top" style="margin-bottom:4px">
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <span style="font-size:14px;font-weight:700;color:var(--text)">${esc(clan.name)}</span>
+                <span style="font-size:11px;color:var(--text3)">#${clan.rank}</span>
+                ${srcBadge}
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">
+                Anti-cheat deduction: <span style="color:var(--red);font-weight:700">-${fmtNum(clan.deduction)}</span>
+              </div>
+              ${alignHtml}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0;margin-left:8px">
+              ${highCount > 0 ? `<span class="badge badge-suspect-high">🚨 ${highCount} HIGH</span>` : ''}
+              ${suspects.length === 0 ? `<span style="font-size:9px;color:var(--text3)">No members caught</span>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }
+    }
+  }
+
+  // ── SECTION 2: Deduction Change Log (timestamped events) ────────────────
+  html += `<div class="section-header" style="padding-top:${state.data && getAllClanDeductions().length > 0 ? '14' : '10'}px">⏱ Deduction Change Log</div>`;
+
+  if (log.length === 0) {
+    html += `<div class="empty-state" style="padding:24px 20px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.4"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <h3 style="font-size:13px">No Deduction Changes Logged Yet</h3>
+      <p style="font-size:11px">The tracker logs a new entry every time any clan's anti-cheat deduction value changes. Keep it running and entries will appear here automatically.</p>
+    </div>`;
+    container.innerHTML = html;
+    return;
+  }
+
+  const filtered = dedFilterClanId === 'all' ? log : log.filter(e => e.clanId === dedFilterClanId);
+
+  if (filtered.length === 0) {
+    html += `<div style="padding:16px 12px;font-size:12px;color:var(--text3)">No deduction changes for this clan yet.</div>`;
+    container.innerHTML = html;
+    return;
+  }
+
+  // Group by date
+  const groups = [];
+  let lastDate = null;
+  for (const entry of filtered) {
+    const d = new Date(entry.ts);
+    const dateLabel = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    if (dateLabel !== lastDate) { groups.push({ date: dateLabel, entries: [] }); lastDate = dateLabel; }
+    groups[groups.length - 1].entries.push(entry);
+  }
+
+  const nowMs = Date.now();
+  html += `<div style="padding:0 12px 4px;font-size:11px;color:var(--text3)">${filtered.length} event${filtered.length !== 1 ? 's' : ''} recorded</div>`;
+
+  for (const group of groups) {
+    html += `<div class="ded-date-header">${esc(group.date)}</div>`;
+    for (const e of group.entries) {
+      const d = new Date(e.ts);
+      const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const secAgo = Math.floor((nowMs - e.ts) / 1000);
+      const agoStr = secAgo < 60 ? `${secAgo}s ago` : secAgo < 3600 ? `${Math.floor(secAgo/60)}m ago` : `${Math.floor(secAgo/3600)}h ago`;
+      const changeSign = e.change >= 0 ? '+' : '';
+      const changeColor = e.change > 0 ? 'var(--red)' : 'var(--green)';
+      const isNew = secAgo < 30;
+
+      const membersHtml = (e.members && e.members.length > 0)
+        ? `<div class="ded-members">
+            ${e.members.map(m => {
+              const icon = '🚨';
+              const badgeCls = 'badge-suspect-high';
+              const dropLine = m.dropAmount > 0
+                ? ` <span style="color:var(--red);font-size:9px">−${fmtNum(m.dropAmount)}${m.dropCount > 1 ? ` (${m.dropCount}×)` : ''}</span>`
+                : '';
+              return `<div class="ded-member-row">
+                <div class="ded-member-icon">${icon}</div>
+                <div class="ded-member-info">
+                  <div class="ded-member-name">${esc(m.name)} <span style="font-size:10px;color:var(--text3)">Lv ${m.level} · Rep ${fmtNum(m.reputation)}${dropLine}</span></div>
+                  <div class="ded-member-reason">${esc(m.reason)}</div>
+                </div>
+                <div class="ded-member-badge"><span class="badge badge-suspect-high" style="font-size:9px">HIGH</span></div>
+              </div>`;
+            }).join('')}
+          </div>`
+        : '';
+
+      html += `<div class="ded-entry${isNew ? ' new' : ''}" onclick="viewClan(${e.clanId})">
+        <div class="ded-top-row">
+          <div class="ded-time">
+            <div style="font-size:12px;font-weight:600;color:var(--text2)">${esc(timeStr)}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:1px">${esc(agoStr)}</div>
+          </div>
+          <div class="ded-clan">
+            <div class="ded-clan-name">${esc(e.clanName)}</div>
+            <div class="ded-clan-rank">Rank #${e.clanRank} · ${fmtNum(e.prevDeduction)} → ${fmtNum(e.deduction)}</div>
+          </div>
+          <div class="ded-amounts">
+            <div class="ded-total">-${fmtNum(e.deduction)}</div>
+            <div class="ded-change" style="color:${changeColor}">${changeSign}${fmtNum(e.change)}</div>
+          </div>
+        </div>
+        ${membersHtml}
+      </div>`;
+    }
+  }
+
+  container.innerHTML = html;
+}
+
+function renderBleeding() {
+  const container = document.getElementById('bleed-list');
+  if (!state.data) {
+    container.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+      <h3>No data yet</h3>
+      <p>Waiting for the first fetch to complete.</p>
+    </div>`;
+    return;
+  }
+
+  const windowLabel = roundWindowLabel(state.round.startTs);
+  const bleedDetected = isAnyBleedDetected();
+
+  // Clans whose gain pattern matches a bleed (auto-battle timing)
+  const bleedingGainerClans = state.data.clans
+    .filter(c => getClanRepStatus(c.id) === 'gaining-bleed')
+    .sort((a, b) => a.rank - b.rank);
+
+  // Flat top-20 clans — only shown when a confirmed bleed is happening
+  const riskClans = state.data.clans
+    .filter(c => getClanRepStatus(c.id) === 'risk')
+    .sort((a, b) => a.rank - b.rank);
+
+  const activeNote = isRoundActive()
+    ? ''
+    : ' · no rep movement yet this round — everyone shows Flat until someone attacks';
+  let html = `<div style="margin:0 12px 10px;font-size:11px;color:var(--text3)">Current round: ${windowLabel}${activeNote}</div>`;
+
+  const yourClan = state.settings.yourClanId ? getClanById(state.settings.yourClanId) : null;
+  if (yourClan) {
+    html += `<div class="section-header" style="color:var(--mauve)">YOUR CLAN</div>`;
+    html += repStatusCardHtml(yourClan);
+  }
+
+  // ── RISK BLEED section — only shown when a confirmed bleed is active ───────
+  const otherRisk = riskClans.filter(c => !yourClan || c.id !== yourClan.id);
+  html += `<div class="section-header">⚠ RISK BLEED — FLAT TOP ${RISK_BLEED_RANK_THRESHOLD} (${otherRisk.length})</div>`;
+  if (!bleedDetected) {
+    html += `<div class="empty-state" style="padding:16px 12px">
+      <p style="font-size:12px">No confirmed bleed this round — Risk Bleed only shows when a bleed pattern is active.</p>
+    </div>`;
+  } else if (otherRisk.length > 0) {
+    html += `<div style="margin:0 12px 8px;font-size:11px;color:var(--text3)">These top-${RISK_BLEED_RANK_THRESHOLD} clans haven't gained rep while a bleed is confirmed. They may be the bleeding target — or just haven't attacked yet.</div>`;
+    html += otherRisk.map(c => repStatusCardHtml(c)).join('');
+  } else {
+    html += `<div class="empty-state" style="padding:16px 12px">
+      <p style="font-size:12px">All top-${RISK_BLEED_RANK_THRESHOLD} clans have gained reputation this round.</p>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function repStatusCardHtml(clan) {
+  const roundGain = getClanRoundGain(clan.id);
+  const status = getClanRepStatus(clan.id);
+  return `<div class="bleed-clan-card" onclick="viewClan(${clan.id})">
+    <div class="bleed-clan-card-top">
+      <div>
+        <h3>${esc(clan.name)} <span style="font-size:11px;color:var(--text3)">#${clan.rank}</span></h3>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${statusBadgeHtml(status)}</div>
+      </div>
+      <div class="bleed-clan-delta-big" style="color:${statusColor(status)}">${roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '—'}</div>
+    </div>
+  </div>`;
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-list');
+  if (state.roundHistory.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+      <h3>No Rounds Recorded Yet</h3>
+      <p>A round finalizes every time the game's HH:00 / HH:30 clock rolls over. Check back after the current round ends.</p>
+    </div>`;
+    return;
+  }
+
+  const rounds = [...state.roundHistory].reverse();
+  container.innerHTML = rounds.map(rnd => {
+    const start = new Date(rnd.startTs);
+    const end = new Date(rnd.endTs);
+    const gainers = rnd.clans.filter(c => c.gain > 0);
+    const topGainers = gainers.slice(0, 3);
+    const riskClans = rnd.clans.filter(c => c.gain <= 0 && c.rank <= RISK_BLEED_RANK_THRESHOLD);
+    const flatClans = rnd.clans.filter(c => c.gain <= 0 && c.rank > RISK_BLEED_RANK_THRESHOLD);
+
+    return `<div class="history-snapshot-card">
+      <div class="hsc-top">
+        <div class="hsc-time">${fmtHM(start)} – ${fmtHM(end)}</div>
+        <span class="badge" style="background:rgba(166,227,161,0.15);color:var(--safe);border:1px solid rgba(166,227,161,0.3)">${gainers.length} GAINING</span>
+        <span class="badge badge-med" style="margin-left:4px">${riskClans.length} RISK BLEED</span>
+        <span class="badge" style="margin-left:4px;background:rgba(108,112,134,0.15);color:var(--text3);border:1px solid rgba(108,112,134,0.3)">${flatClans.length} FLAT</span>
+      </div>
+      <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px">
+        ${topGainers.map(c => `
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--text2)">${esc(c.name)}</span>
+            <span style="color:var(--green);font-weight:700">+${fmtNum(c.gain)}</span>
+          </div>`).join('')}
+        ${topGainers.length === 0 ? '<div style="font-size:12px;color:var(--text3)">No clan gained reputation this round.</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showTab(tab) {
+  if ((tab === 'deductions' || tab === 'suspects') && accessLevel !== 'admin') return;
+  state.currentTab = tab;
+  state.currentDetailClanId = null;
+
+  // Hide detail
+  document.getElementById('screen-detail').classList.remove('active');
+
+  // Show screen
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+
+  // Update tab bar
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  renderCurrentView();
+}
+
+function viewClan(clanId) {
+  if (!clanId || !state.data) return;
+  state.currentDetailClanId = clanId;
+
+  // Hide all screens, show detail
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-detail').classList.add('active');
+
+  renderDetail(clanId);
+}
+
+function goBack() {
+  state.currentDetailClanId = null;
+  document.getElementById('screen-detail').classList.remove('active');
+  document.getElementById('screen-' + state.currentTab).classList.add('active');
+  renderCurrentView();
+}
+
+// ============================================================
+// CLAN ACTIONS
+// ============================================================
+function setYourClan() {
+  if (!state.currentDetailClanId) return;
+  const clan = getClanById(state.currentDetailClanId);
+  if (!clan) return;
+
+  state.settings.yourClanId = clan.id;
+  saveToStorage();
+  applySettings();
+  renderDetail(state.currentDetailClanId);
+  renderYourClanBanner();
+
+  // Update header
+  document.getElementById('header-clan-title').textContent = clan.name;
+}
+
+function clearYourClan() {
+  state.settings.yourClanId = null;
+  saveToStorage();
+  applySettings();
+  renderYourClanBanner();
+  document.getElementById('header-clan-title').textContent = 'Clan Live Tracker';
+}
+
+document.addEventListener('click', e => {
+  if (e.target && e.target.id === 'set-your-clan-btn') {
+    const clan = getClanById(state.currentDetailClanId);
+    if (!clan) return;
+    const isYours = clan.id === state.settings.yourClanId;
+    if (isYours) { clearYourClan(); renderDetail(clan.id); }
+    else { setYourClan(); }
+  }
+});
+
+// ============================================================
+// SEASON COUNTDOWN
+// ============================================================
+function updateSeasonBar(season) {
+  if (!season) return;
+  const badge = document.getElementById('season-badge');
+  const name = document.getElementById('season-name');
+  if (badge) badge.textContent = 'S' + season.id;
+  if (name) name.textContent = season.name;
+  updateCountdown(season.end_time_ts);
+}
+
+let countdownInterval = null;
+function updateCountdown(endTs) {
+  if (countdownInterval) clearInterval(countdownInterval);
+  const update = () => {
+    const now = Math.floor(Date.now() / 1000);
+    const rem = endTs - now;
+    const el = document.getElementById('season-countdown');
+    if (!el) return;
+    if (rem <= 0) { el.textContent = 'Season Ended'; return; }
+    const d = Math.floor(rem / 86400);
+    const h = Math.floor((rem % 86400) / 3600);
+    const m = Math.floor((rem % 3600) / 60);
+    const s = rem % 60;
+    if (d > 0) el.textContent = `Ends in ${d}d ${h}h ${m}m`;
+    else el.textContent = `Ends in ${h}h ${m}m ${s}s`;
+  };
+  update();
+  countdownInterval = setInterval(update, 1000);
+}
+
+// ============================================================
+// LIVE POLLING — polls every 2s, re-renders only when data changes
+// ============================================================
+const POLL_INTERVAL = 2000; // ms — server regenerates every ~2s
+let liveTimer = null;
+let liveStatusTimer = null;
+let lastPollAt = null;
+let lastDataChangeAt = null;
+
+function startLivePolling() {
+  if (liveTimer) clearInterval(liveTimer);
+  liveTimer = setInterval(() => fetchData(false), POLL_INTERVAL);
+  startLiveStatusTick();
+}
+
+function startLiveStatusTick() {
+  if (liveStatusTimer) clearInterval(liveStatusTimer);
+  liveStatusTimer = setInterval(() => { updateLiveStatus(); tickChangeAgo(); }, 1000);
+  updateLiveStatus();
+}
+
+function updateLiveStatus() {
+  const dot = document.getElementById('live-dot');
+  const lbl = document.getElementById('live-label');
+  const nrl = document.getElementById('next-refresh-label');
+  if (!lbl) return;
+
+  const nowMs = Date.now();
+  const sincePoll = lastPollAt ? Math.floor((nowMs - lastPollAt) / 1000) : null;
+  const sinceChange = lastDataChangeAt ? Math.floor((nowMs - lastDataChangeAt) / 1000) : null;
+
+  // Dot state
+  if (!lastPollAt) {
+    if (dot) { dot.className = 'live-pulse stale'; }
+    lbl.textContent = 'Connecting…';
+  } else if (sincePoll > 12) {
+    if (dot) { dot.className = 'live-pulse error'; }
+    lbl.textContent = 'Offline?';
+  } else {
+    if (dot) { dot.className = 'live-pulse'; }
+    const nextIn = Math.max(0, Math.ceil(POLL_INTERVAL / 1000 - sincePoll));
+    lbl.textContent = sinceChange !== null
+      ? `Updated ${sinceChange}s ago · next in ${nextIn}s`
+      : `Checking… next in ${nextIn}s`;
+  }
+
+  if (nrl) {
+    nrl.textContent = lastPollAt
+      ? `Every ${POLL_INTERVAL/1000}s · last polled ${sincePoll ?? '?'}s ago`
+      : 'Starting…';
+  }
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function toggleNotif() {
+  if (!state.settings.notificationsEnabled) {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') {
+        state.settings.notificationsEnabled = true;
+        saveToStorage();
+        applySettings();
+      }
+    });
+  } else {
+    state.settings.notificationsEnabled = false;
+    saveToStorage();
+    applySettings();
+  }
+}
+
+const BLEEDING_GAINERS_THRESHOLD = 5;
+let lastNotifiedBleedingRoundId = null;
+function checkBleedingNotifications() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (!state.data || !state.round.startSnap) return;
+  const gainerCount = state.data.clans.filter(c => getClanRoundGain(c.id) > 0).length;
+  if (gainerCount > BLEEDING_GAINERS_THRESHOLD && lastNotifiedBleedingRoundId !== state.round.id) {
+    lastNotifiedBleedingRoundId = state.round.id;
+    new Notification('⚠ Bleeding Detected', {
+      body: `${gainerCount} clans have gained reputation this round.`,
+      icon: '',
+    });
+  }
+}
+
+// ============================================================
+// MODALS & CONFIRMS
+// ============================================================
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('visible');
+  // Remove dynamically added buttons
+  const extra = document.querySelector('.modal-actions .modal-btn:not(.confirm):not(:first-child)');
+  if (extra) extra.remove();
+  document.getElementById('modal-confirm-btn').onclick = null;
+}
+
+function confirmClearHistory() {
+  document.getElementById('modal-title').textContent = 'Clear Round History?';
+  document.getElementById('modal-sub').textContent = 'All recorded rounds will be deleted. This does not affect your current clan tracking.';
+  document.getElementById('modal-confirm-btn').textContent = 'Clear History';
+  document.getElementById('modal-confirm-btn').onclick = () => {
+    state.roundHistory = [];
+    saveToStorage();
+    closeModal();
+    renderHistory();
+  };
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+
+function confirmReset() {
+  document.getElementById('modal-title').textContent = 'Reset All Settings?';
+  document.getElementById('modal-sub').textContent = 'This will clear your clan selection and all round history.';
+  document.getElementById('modal-confirm-btn').textContent = 'Reset Everything';
+  document.getElementById('modal-confirm-btn').onclick = () => {
+    state.settings = { notificationsEnabled: false, yourClanId: null };
+    state.roundHistory = [];
+    state.round = { id: null, startTs: null, startSnap: null };
+    state.prevData = null;
+    saveToStorage();
+    closeModal();
+    applySettings();
+    document.getElementById('header-clan-title').textContent = 'Clan Live Tracker';
+    renderYourClanBanner();
+  };
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+
+function confirmDeleteLocalRecords() {
+  document.getElementById('modal-title').textContent = 'Delete Local Records?';
+  document.getElementById('modal-sub').textContent = 'This will erase all suspect and deduction logs saved on this device. Firebase data is untouched.';
+  document.getElementById('modal-confirm-btn').textContent = 'Delete Local Records';
+  document.getElementById('modal-confirm-btn').onclick = () => {
+    state.suspectLog = [];
+    state.deductionLog = [];
+    suspectLogKeysSeen.clear();
+    saveToStorage();
+    closeModal();
+    updateSuspectsTabBadge();
+    if (state.currentTab === 'suspects') renderSuspects();
+    if (state.currentTab === 'deductions') renderDeductions();
+  };
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+
+function confirmDeleteFirebaseRecords() {
+  showDeleteFirebasePasswordModal();
+}
+
+// ── Password-protected Firebase delete helpers ───────────────────────────
+
+async function hashPassword(plain) {
+  const enc = new TextEncoder().encode(plain);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Seeds the admin password hash in Firebase on first run (only if absent).
+// The plaintext password never appears in this file — only its SHA-256 hash.
+async function initAdminPassword() {
+  if (!db) return;
+  try {
+    const ref  = db.collection('config').doc('adminAuth');
+    const snap = await ref.get();
+    if (!snap.exists) {
+      const INIT_HASH = 'a2fab5c02e3766f3e75a6d50b7138918813c11935826605dbbb20b2f9e4d1387';
+      await ref.set({ passwordHash: INIT_HASH, createdAt: Date.now() });
+    }
+  } catch(e) { console.warn('initAdminPassword error', e); }
+}
+
+function showDeleteFirebasePasswordModal() {
+  pwModalMode = 'delete';
+  document.getElementById('pw-modal-title').textContent = '🔒 Admin Verification Required';
+  document.getElementById('pw-modal-sub').textContent = 'Enter the admin password to permanently delete all Firebase records. This action cannot be undone.';
+  const inp = document.getElementById('pw-input');
+  inp.value = '';
+  inp.type  = 'password';
+  inp.classList.remove('error');
+  document.getElementById('pw-error').textContent = '';
+  document.getElementById('pw-toggle-btn').textContent = '👁';
+  document.getElementById('pw-confirm-btn').disabled = false;
+  document.getElementById('pw-confirm-btn').textContent = 'Delete Firebase Records';
+  document.getElementById('pw-modal-overlay').classList.add('visible');
+  setTimeout(() => inp.focus(), 80);
+}
+
+function closePwModal(e) {
+  if (e && e.target !== document.getElementById('pw-modal-overlay')) return;
+  document.getElementById('pw-modal-overlay').classList.remove('visible');
+}
+
+function togglePwVisibility() {
+  const inp = document.getElementById('pw-input');
+  const btn = document.getElementById('pw-toggle-btn');
+  if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
+  else                         { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+async function submitPwModal() {
+  if (!db) { document.getElementById('pw-error').textContent = 'Firebase is not connected.'; return; }
+  const inp     = document.getElementById('pw-input');
+  const btn     = document.getElementById('pw-confirm-btn');
+  const errEl   = document.getElementById('pw-error');
+  const entered = inp.value;
+  if (!entered) { errEl.textContent = 'Please enter the admin password.'; inp.classList.add('error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+  errEl.textContent = '';
+
+  try {
+    const snap = await db.collection('config').doc('adminAuth').get();
+    if (!snap.exists) {
+      errEl.textContent = 'Admin config not found in Firebase. Contact the tracker owner.';
+      btn.disabled = false; btn.textContent = 'Delete Firebase Records'; return;
+    }
+    const storedHash  = snap.data().passwordHash;
+    const enteredHash = await hashPassword(entered);
+
+    if (enteredHash !== storedHash) {
+      errEl.textContent = 'Incorrect password. Access denied.';
+      inp.classList.add('error');
+      btn.disabled = false;
+      btn.textContent = pwModalMode === 'access' ? 'Unlock Admin Access' : 'Delete Firebase Records';
+      inp.value = '';
+      inp.focus();
+      return;
+    }
+
+    // Password correct — close modal then branch on mode
+    document.getElementById('pw-modal-overlay').classList.remove('visible');
+    if (pwModalMode === 'access') { setAccessLevel('admin'); return; }
+
+    try {
+      const suspSnap = await db.collection('suspectLog').limit(500).get();
+      const batch1 = db.batch();
+      suspSnap.forEach(doc => batch1.delete(doc.ref));
+      await batch1.commit();
+    } catch(e) { console.warn('Firebase suspectLog delete error', e); }
+
+    try {
+      const dedSnap = await db.collection('deductionLog').limit(500).get();
+      const batch2 = db.batch();
+      dedSnap.forEach(doc => batch2.delete(doc.ref));
+      await batch2.commit();
+    } catch(e) { console.warn('Firebase deductionLog delete error', e); }
+
+    state.suspectLog   = [];
+    state.deductionLog = [];
+    suspectLogKeysSeen.clear();
+    saveToStorage();
+    updateSuspectsTabBadge();
+    if (state.currentTab === 'suspects')   renderSuspects();
+    if (state.currentTab === 'deductions') renderDeductions();
+
+  } catch(e) {
+    console.warn('submitPwModal error', e);
+    errEl.textContent = 'An error occurred. Check your connection and try again.';
+    btn.disabled = false;
+    btn.textContent = pwModalMode === 'access' ? 'Unlock Admin Access' : 'Delete Firebase Records';
+  }
+}
+
+// ============================================================
+// ACCESS LEVEL
+// ============================================================
+function showAdminAccessModal() {
+  pwModalMode = 'access';
+  document.getElementById('pw-modal-title').textContent = '🔓 Admin Level Access';
+  document.getElementById('pw-modal-sub').textContent = 'Enter the admin password to unlock full access. This only elevates your view — it does not delete anything.';
+  const inp = document.getElementById('pw-input');
+  inp.value = '';
+  inp.type  = 'password';
+  inp.classList.remove('error');
+  document.getElementById('pw-error').textContent = '';
+  document.getElementById('pw-toggle-btn').textContent = '👁';
+  document.getElementById('pw-confirm-btn').disabled = false;
+  document.getElementById('pw-confirm-btn').textContent = 'Unlock Admin Access';
+  document.getElementById('pw-modal-overlay').classList.add('visible');
+  setTimeout(() => inp.focus(), 80);
+}
+
+function setAccessLevel(level) {
+  accessLevel = level;
+  const isAdmin = level === 'admin';
+
+  // Tab bar: show/hide Deductions and Suspects
+  document.getElementById('tab-deductions').style.display = isAdmin ? '' : 'none';
+  document.getElementById('tab-suspects').style.display   = isAdmin ? '' : 'none';
+
+  // Settings: toggle Firebase delete row and access buttons
+  const fbRow = document.getElementById('settings-firebase-row');
+  if (fbRow) fbRow.style.display = isAdmin ? '' : 'none';
+  const btnAccess = document.getElementById('btn-admin-access');
+  const btnExit   = document.getElementById('btn-exit-admin');
+  if (btnAccess) btnAccess.style.display = isAdmin ? 'none' : '';
+  if (btnExit)   btnExit.style.display   = isAdmin ? '' : 'none';
+
+  // If on a now-hidden tab, redirect to rankings
+  if (!isAdmin && (state.currentTab === 'deductions' || state.currentTab === 'suspects')) {
+    showTab('rankings');
+  } else {
+    renderCurrentView();
+  }
+}
+
+function exitAdminLevel() {
+  setAccessLevel('normal');
+}
+
+// ============================================================
+// DATA EXPORT
+// ============================================================
+function exportData() {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    settings: state.settings,
+    roundHistory: state.roundHistory,
+    currentRound: state.round,
+    latestData: state.data,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `clan-tracker-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmtNum(n) {
+  if (n === null || n === undefined) return '—';
+  return n.toLocaleString();
+}
+
+function fmtTime(d) {
+  if (!d) return '—';
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function fmtDateTime(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+         d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function fmtHM(d) {
+  if (!d) return '—';
+  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+
+function timeAgo(d) {
+  const s = Math.floor((Date.now() - d) / 1000);
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function statusColor(status) {
+  if (status === 'gaining-bleed')  return 'var(--safe)';
+  if (status === 'gaining-manual') return 'var(--safe)';
+  if (status === 'gaining')        return 'var(--safe)'; // legacy fallback
+  if (status === 'risk')           return 'var(--med)';
+  if (status === 'flat')           return 'var(--text3)';
+  return 'var(--text3)';
+}
+
+function statusLabel(status) {
+  if (status === 'gaining-bleed')  return 'Gaining (Bleed)';
+  if (status === 'gaining-manual') return 'Gaining (Manual)';
+  if (status === 'gaining')        return 'Gaining'; // legacy fallback
+  if (status === 'risk')           return 'Risk Bleed';
+  if (status === 'flat')           return 'Flat';
+  return '—';
+}
+
+function statusBadgeHtml(status) {
+  if (status === 'gaining-bleed')  return `<span class="badge badge-gaining-bleed">GAINING (BLEED)</span>`;
+  if (status === 'gaining-manual') return `<span class="badge badge-gaining-manual">GAINING (MANUAL)</span>`;
+  if (status === 'gaining')        return `<span class="badge badge-gaining-manual">GAINING</span>`; // legacy fallback
+  if (status === 'risk')           return `<span class="badge badge-med">RISK BLEED</span>`;
+  if (status === 'flat')           return `<span class="badge" style="background:rgba(108,112,134,0.15);color:var(--text3);border:1px solid rgba(108,112,134,0.3)">FLAT</span>`;
+  return '';
+}
+
+function roundWindowLabel(startTsIso) {
+  if (!startTsIso) return '—';
+  const start = new Date(startTsIso);
+  const end = new Date(start.getTime() + 30 * 60000);
+  return `${fmtHM(start)} – ${fmtHM(end)}`;
+}
+
+// ============================================================
+// FIREBASE SYNC
+// ============================================================
+let db = null;
+
+function initFirebase() {
+  try {
+    const firebaseConfig = {
+      apiKey:            'AIzaSyBt1VtMUsUd_pVOG6sKbCJTHS2bka8kVpo',
+      authDomain:        'clantracker-22435.firebaseapp.com',
+      projectId:         'clantracker-22435',
+      storageBucket:     'clantracker-22435.firebasestorage.app',
+      messagingSenderId: '354867534107',
+      appId:             '1:354867534107:web:8452c807f24ef26dcedbbe',
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    setFbStatus('connecting');
+    initAdminPassword();
+    initFirestoreListeners();
+  } catch(e) {
+    console.warn('Firebase init error', e);
+    setFbStatus('error');
+  }
+}
+
+function setFbStatus(state) {
+  const el = document.getElementById('fb-status');
+  if (!el) return;
+  el.className = state === 'connected' ? 'connected'
+               : state === 'error'     ? 'error'
+               : 'disconnected';
+  el.textContent = state === 'connected'   ? '⬤ Firebase'
+                 : state === 'connecting'  ? '◌ Firebase'
+                 : state === 'error'       ? '⬤ Firebase'
+                 : '⬤ Firebase';
+  el.title = state === 'connected'  ? 'Firebase connected — syncing in real time across all devices'
+           : state === 'connecting' ? 'Connecting to Firebase…'
+           : state === 'error'      ? 'Firebase error — check console'
+           : 'Firebase disconnected';
+}
+
+function initFirestoreListeners() {
+  if (!db) return;
+
+  // ── Suspect log: real-time listener ──────────────────────────
+  db.collection('suspectLog')
+    .orderBy('ts', 'desc')
+    .limit(1000)
+    .onSnapshot(snap => {
+      setFbStatus('connected');
+      let added = 0;
+      snap.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const entry = change.doc.data();
+          // Entries with clanDeduction===0 are valid — deduction may arrive after
+          // the rep drop is caught. Only skip malformed entries (no dedupKey).
+          if (!entry.dedupKey) return;
+          if (!suspectLogKeysSeen.has(entry.dedupKey)) {
+            suspectLogKeysSeen.add(entry.dedupKey);
+            if (!state.suspectLog) state.suspectLog = [];
+            state.suspectLog.push(entry);
+            added++;
+          }
+        }
+      });
+      if (added > 0) {
+        state.suspectLog.sort((a, b) => b.ts - a.ts);
+        if (state.suspectLog.length > 1000) state.suspectLog = state.suspectLog.slice(0, 1000);
+        saveToStorage();
+        updateSuspectsTabBadge();
+        if (state.currentTab === 'suspects') renderSuspects();
+      }
+    }, err => {
+      console.warn('Firestore suspectLog error', err);
+      setFbStatus('error');
+    });
+
+  // ── Deduction log: real-time listener ────────────────────────
+  db.collection('deductionLog')
+    .orderBy('ts', 'desc')
+    .limit(500)
+    .onSnapshot(snap => {
+      let added = 0;
+      snap.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const entry = change.doc.data();
+          const key = `${entry.clanId}_${entry.ts}`;
+          const alreadyHave = (state.deductionLog || []).some(e => `${e.clanId}_${e.ts}` === key);
+          if (!alreadyHave) {
+            if (!state.deductionLog) state.deductionLog = [];
+            state.deductionLog.push(entry);
+            added++;
+          }
+        }
+      });
+      if (added > 0) {
+        state.deductionLog.sort((a, b) => b.ts - a.ts);
+        if (state.deductionLog.length > 500) state.deductionLog = state.deductionLog.slice(0, 500);
+        saveToStorage();
+        if (state.currentTab === 'deductions') renderDeductions();
+      }
+    }, err => {
+      console.warn('Firestore deductionLog error', err);
+    });
+}
+
+// Called when a new suspect event is created — writes to Firestore so all devices see it
+function pushSuspectToFirestore(entry) {
+  if (!db) return;
+  db.collection('suspectLog').doc(entry.dedupKey).set(entry)
+    .catch(e => console.warn('Firestore suspect write error', e));
+}
+
+// Called when a new deduction entry is created — writes to Firestore so all devices see it
+function pushDeductionToFirestore(entry) {
+  if (!db) return;
+  // Strip the members array before writing — members are rebuilt from live data on read
+  const { members, ...core } = entry;
+  db.collection('deductionLog').doc(`${entry.clanId}_${entry.ts}`).set(core)
+    .catch(e => console.warn('Firestore deduction write error', e));
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadFromStorage();
+
+// Show loading
+document.getElementById('loading').classList.add('visible');
+
+// Set your clan name in header
+if (state.settings.yourClanId) {
+  document.getElementById('header-clan-title').textContent = 'Loading...';
+}
+
+// Fetch on load, then start recurring live polling + status ticking
+fetchData(false);
+startLivePolling();
+initFirebase();
+setAccessLevel('normal'); // default: normal level on open
+
+// ── Expose only what HTML onclick/oninput handlers need ─────────────
+// setAccessLevel is intentionally NOT exposed — it cannot be called
+// from the browser console or DevTools without the password flow.
+window.setRankingsFilter            = setRankingsFilter;
+window.fetchData                    = fetchData;
+window.viewClan                     = viewClan;
+window.renderRankings               = renderRankings;
+window.goBack                       = goBack;
+window.downloadDeductions           = downloadDeductions;
+window.setDedFilter                 = setDedFilter;
+window.downloadSuspects             = downloadSuspects;
+window.clearYourClan                = clearYourClan;
+window.toggleNotif                  = toggleNotif;
+window.exportData                   = exportData;
+window.confirmClearHistory          = confirmClearHistory;
+window.confirmReset                 = confirmReset;
+window.confirmDeleteLocalRecords    = confirmDeleteLocalRecords;
+window.confirmDeleteFirebaseRecords = confirmDeleteFirebaseRecords;
+window.showAdminAccessModal         = showAdminAccessModal;
+window.exitAdminLevel               = exitAdminLevel;
+window.setSuspectFilter             = setSuspectFilter;
+  window.showTab                      = showTab;
+window.closeModal                   = closeModal;
+window.closePwModal                 = closePwModal;
+window.submitPwModal                = submitPwModal;
+window.togglePwVisibility           = togglePwVisibility;
+
+})(); // end IIFE — all internals (accessLevel, setAccessLevel, etc.) are private
+</script>
+</body>
+</html>
