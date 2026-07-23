@@ -26,3 +26,7 @@ args = "node server.js"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[deployment]
+deploymentTarget = "vm"
+run = ["node", "server.js"]
