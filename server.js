@@ -19,7 +19,7 @@ import {
   collection,
   doc,
   setDoc,
-  serverTimestamp,
+  getDoc,
 } from 'firebase/firestore';
 
 // ─── Express health check ─────────────────────────────────────────────────────
@@ -38,6 +38,9 @@ const FIREBASE_CONFIG = {
   messagingSenderId: '354867534107',
   appId:             '1:354867534107:web:8452c807f24ef26dcedbbe',
 };
+
+// ─── Clan config ─────────────────────────────────────────────────────────────
+const YOUR_CLAN_ID = 777; // Hidden Cloud Village
 
 // ─── Round constants (same as HTML) ──────────────────────────────────────────
 const ROUND_SWITCH_GRACE_MS        = 15000;
@@ -72,9 +75,216 @@ let totalSuspectsWritten   = 0;
 let totalDeductionsWritten = 0;
 let pollCount              = 0;
 
+// ─── Weekly gains state ───────────────────────────────────────────────────────
+let weeklyState = {
+  weekKey:          null,   // e.g. "2026-07-20_2026-07-26"
+  weekStartUTC:     null,   // ms epoch of Mon 00:00 PHT in UTC
+  weekEndUTC:       null,   // ms epoch of Sun 23:59:59 PHT in UTC
+  weekStartLabel:   null,   // "2026-07-20"
+  weekEndLabel:     null,   // "2026-07-26"
+  memberBaselines:  {},     // memberId(str) → { name, startRep }
+  lastWrittenGains: {},     // memberId(str) → lastGain (skip unchanged writes)
+  initialized:      false,
+};
+
 // ─── Firebase init ────────────────────────────────────────────────────────────
 const firebaseApp = initializeApp(FIREBASE_CONFIG);
 const db          = getFirestore(firebaseApp);
+
+// ─── Weekly gains helpers ─────────────────────────────────────────────────────
+
+// Returns the current PH-time week bounds.
+// PH = UTC+8. Week = Monday 00:00 → Sunday 23:59:59 (PH time).
+function getPHWeekInfo() {
+  const PH_OFFSET_MS = 8 * 60 * 60 * 1000;
+  const nowUTC       = Date.now();
+  const phEpoch      = nowUTC + PH_OFFSET_MS;
+
+  // Treat the PH-shifted timestamp as if it were UTC to extract day/date components
+  const phDate      = new Date(phEpoch);
+  const day         = phDate.getUTCDay();                      // 0=Sun 1=Mon … 6=Sat in PH time
+  const daysSinceMon = day === 0 ? 6 : day - 1;
+
+  // Monday midnight (PH) — expressed in the shifted epoch space
+  const monMidPH = new Date(phEpoch);
+  monMidPH.setUTCDate(monMidPH.getUTCDate() - daysSinceMon);
+  monMidPH.setUTCHours(0, 0, 0, 0);
+
+  const sunMidPH = new Date(monMidPH.getTime() + 6 * 24 * 3600 * 1000);
+
+  // Convert back to real UTC timestamps
+  const weekStartUTC = monMidPH.getTime() - PH_OFFSET_MS;
+  const weekEndUTC   = sunMidPH.getTime() - PH_OFFSET_MS + 24 * 3600 * 1000 - 1;
+
+  const fmtD = d => {
+    const y  = d.getUTCFullYear();
+    const mo = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const dy = String(d.getUTCDate()).padStart(2, '0');
+    return `${y}-${mo}-${dy}`;
+  };
+  const weekStartLabel = fmtD(monMidPH);
+  const weekEndLabel   = fmtD(sunMidPH);
+  const weekKey        = `${weekStartLabel}_${weekEndLabel}`;
+  return { weekKey, weekStartLabel, weekEndLabel, weekStartUTC, weekEndUTC };
+}
+
+// On startup: restore baselines from Firestore so a server restart mid-week
+// doesn't lose progress. Also archives the previous week if it rolled over.
+async function initWeeklyTracking() {
+  const info = getPHWeekInfo();
+  try {
+    const snap = await getDoc(doc(db, 'weeklyGainsConfig', 'currentWeek'));
+    if (snap.exists()) {
+      const saved = snap.data();
+      if (saved.weekKey === info.weekKey) {
+        // Same week — restore baselines
+        weeklyState.weekKey         = saved.weekKey;
+        weeklyState.weekStartUTC    = saved.weekStartUTC;
+        weeklyState.weekEndUTC      = saved.weekEndUTC;
+        weeklyState.weekStartLabel  = saved.weekStartLabel;
+        weeklyState.weekEndLabel    = saved.weekEndLabel;
+        weeklyState.memberBaselines = saved.memberBaselines || {};
+        console.log(`[${ts()}] 📅 Weekly tracker resumed: ${saved.weekKey} (${Object.keys(weeklyState.memberBaselines).length} members)`);
+      } else {
+        // Old week config — archive what's in weeklyGains then start fresh
+        const oldGainsSnap = await getDoc(doc(db, 'weeklyGains', String(YOUR_CLAN_ID)));
+        if (oldGainsSnap.exists()) {
+          await archiveWeek(saved, oldGainsSnap.data());
+        }
+        console.log(`[${ts()}] 📅 Stale week found (${saved.weekKey}), starting fresh for ${info.weekKey}`);
+      }
+    }
+  } catch(e) {
+    console.error(`[${ts()}] Weekly init error:`, e.message);
+  }
+  weeklyState.initialized = true;
+}
+
+// Archive a completed week's gains into weeklyGainsHistory.
+async function archiveWeek(weekInfo, gainsDoc) {
+  try {
+    const membersMap = gainsDoc.members || {};
+    const membersArr = Object.entries(membersMap).map(([id, m]) => ({
+      memberId:  parseInt(id),
+      name:      m.name,
+      weekGain:  m.weekGain  || 0,
+      startRep:  m.weekStartRep || 0,
+      endRep:    m.currentRep   || 0,
+    })).sort((a, b) => b.weekGain - a.weekGain);
+
+    await setDoc(doc(db, 'weeklyGainsHistory', weekInfo.weekKey), {
+      weekKey:        weekInfo.weekKey,
+      weekStartLabel: weekInfo.weekStartLabel,
+      weekEndLabel:   weekInfo.weekEndLabel,
+      archivedAt:     Date.now(),
+      members:        membersArr,
+    });
+    console.log(`[${ts()}] 📦 Week ${weekInfo.weekKey} archived — ${membersArr.length} members`);
+  } catch(e) {
+    console.error(`[${ts()}] Archive error:`, e.message);
+  }
+}
+
+// Called every poll. Computes weekly rep gains for clan 777 members and writes
+// to weeklyGains/777 only when something actually changed (saves writes).
+async function updateWeeklyGains() {
+  if (!weeklyState.initialized || !currentData) return;
+  const clan = currentData.clans.find(c => c.id === YOUR_CLAN_ID);
+  if (!clan || !clan.member_list) return;
+
+  const info = getPHWeekInfo();
+
+  // ── Week rollover ──────────────────────────────────────────────────────────
+  if (weeklyState.weekKey && weeklyState.weekKey !== info.weekKey) {
+    console.log(`[${ts()}] 📅 Week rolled over: ${weeklyState.weekKey} → ${info.weekKey}`);
+    const oldSnap = await getDoc(doc(db, 'weeklyGains', String(YOUR_CLAN_ID)));
+    if (oldSnap.exists()) await archiveWeek(weeklyState, oldSnap.data());
+    weeklyState.weekKey          = null;
+    weeklyState.memberBaselines  = {};
+    weeklyState.lastWrittenGains = {};
+  }
+
+  // ── New week or first run ──────────────────────────────────────────────────
+  if (!weeklyState.weekKey) {
+    weeklyState.weekKey        = info.weekKey;
+    weeklyState.weekStartUTC   = info.weekStartUTC;
+    weeklyState.weekEndUTC     = info.weekEndUTC;
+    weeklyState.weekStartLabel = info.weekStartLabel;
+    weeklyState.weekEndLabel   = info.weekEndLabel;
+
+    // Seed baselines from current rep for any member not yet recorded
+    for (const m of clan.member_list) {
+      const id = String(m.id);
+      if (!weeklyState.memberBaselines[id]) {
+        weeklyState.memberBaselines[id] = { name: m.name, startRep: m.reputation };
+      }
+    }
+
+    // Persist config so restarts can recover baselines
+    try {
+      await setDoc(doc(db, 'weeklyGainsConfig', 'currentWeek'), {
+        weekKey:         weeklyState.weekKey,
+        weekStartUTC:    weeklyState.weekStartUTC,
+        weekEndUTC:      weeklyState.weekEndUTC,
+        weekStartLabel:  weeklyState.weekStartLabel,
+        weekEndLabel:    weeklyState.weekEndLabel,
+        memberBaselines: weeklyState.memberBaselines,
+      });
+      console.log(`[${ts()}] 📅 New week started: ${weeklyState.weekKey}`);
+    } catch(e) {
+      console.error(`[${ts()}] Config write error:`, e.message);
+    }
+  }
+
+  // ── Compute per-member weekly gains ────────────────────────────────────────
+  const now     = Date.now();
+  const members = {};
+  let changed   = (Object.keys(weeklyState.lastWrittenGains).length === 0); // always write first time
+
+  for (const m of clan.member_list) {
+    const id       = String(m.id);
+    // Register new members who joined mid-week
+    if (!weeklyState.memberBaselines[id]) {
+      weeklyState.memberBaselines[id] = { name: m.name, startRep: m.reputation };
+      changed = true;
+    }
+    const startRep = weeklyState.memberBaselines[id].startRep;
+    const weekGain = Math.max(0, m.reputation - startRep);
+
+    if (weekGain !== weeklyState.lastWrittenGains[id]) {
+      changed = true;
+    }
+    members[id] = {
+      name:        m.name,
+      weekGain,
+      currentRep:  m.reputation,
+      weekStartRep: startRep,
+      lastUpdated: now,
+    };
+  }
+
+  if (!changed) return; // nothing changed — skip the Firestore write
+
+  // ── Write single batched doc to Firestore ──────────────────────────────────
+  try {
+    await setDoc(doc(db, 'weeklyGains', String(YOUR_CLAN_ID)), {
+      clanId:         YOUR_CLAN_ID,
+      weekKey:        weeklyState.weekKey,
+      weekStartLabel: weeklyState.weekStartLabel,
+      weekEndLabel:   weeklyState.weekEndLabel,
+      weekStartUTC:   weeklyState.weekStartUTC,
+      weekEndUTC:     weeklyState.weekEndUTC,
+      lastUpdated:    now,
+      members,
+    });
+    // Update local cache so next poll skips unchanged members
+    for (const [id, m] of Object.entries(members)) {
+      weeklyState.lastWrittenGains[id] = m.weekGain;
+    }
+  } catch(e) {
+    console.error(`[${ts()}] Weekly gains write error:`, e.message);
+  }
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function getRoundStart(d) {
@@ -329,6 +539,7 @@ async function poll() {
     recordMemberGainEvents(roundRolledOver);
     recordMemberPeaks(roundRolledOver);
     await recordDeductionChanges();
+    await updateWeeklyGains();
 
     const newGeneratedAt = json.generated_at;
     if (newGeneratedAt !== lastGeneratedAt) {
@@ -447,3 +658,6 @@ console.log('══════════════════════�
 // First poll immediately, then every 5 seconds
 poll();
 setInterval(poll, POLL_MS);
+
+// Initialize weekly tracking (async — restores baselines from Firestore)
+initWeeklyTracking();

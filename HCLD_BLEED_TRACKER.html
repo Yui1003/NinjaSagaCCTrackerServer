@@ -395,6 +395,39 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* User badge shown in header after login */
 #header-user-badge{display:none;align-items:center;gap:5px;background:rgba(240,165,0,0.12);border:1px solid rgba(240,165,0,0.35);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:600;color:var(--mauve);white-space:nowrap;overflow:hidden;max-width:110px}
 #header-user-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;display:inline-block;vertical-align:middle}
+/* WEEKLY GAINS SCREEN */
+#wg-header{background:linear-gradient(135deg,#1c1800,#111111);border-bottom:1px solid var(--border);padding:10px 12px;flex-shrink:0}
+#wg-week-range{font-size:15px;font-weight:800;color:var(--mauve);letter-spacing:0.3px}
+#wg-ph-clock{font-size:11px;color:var(--text3);margin-top:2px;font-variant-numeric:tabular-nums}
+#wg-controls{display:flex;align-items:center;justify-content:space-between;padding:7px 12px 6px;flex-shrink:0;border-bottom:1px solid var(--border)}
+#wg-live-badge{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.wg-member-row{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:0;transition:border-color .2s}
+.wg-member-row.top1{border-color:rgba(249,226,175,0.5);background:linear-gradient(90deg,rgba(249,226,175,0.06),var(--card))}
+.wg-member-row.top2{border-color:rgba(205,214,244,0.35)}
+.wg-member-row.top3{border-color:rgba(250,179,135,0.35)}
+.wg-rank{width:30px;font-size:12px;font-weight:800;color:var(--text3);font-variant-numeric:tabular-nums;flex-shrink:0}
+.wg-rank.gold{color:#f9e2af}.wg-rank.silver{color:#cdd6f4}.wg-rank.bronze{color:#fab387}
+.wg-name{flex:1;font-size:13px;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px}
+.wg-gain{font-size:13px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;white-space:nowrap}
+.wg-gain.zero{color:var(--text3)}
+.wg-members-list{padding:0 12px 8px;display:flex;flex-direction:column;gap:4px;margin-top:6px}
+#wg-history-section{border-top:1px solid var(--border);padding-bottom:80px}
+.wg-hist-card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin:0 12px 6px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.wg-hist-card:hover{border-color:var(--border2)}
+.wg-hist-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px}
+.wg-hist-week-label{font-size:13px;font-weight:700;color:var(--text)}
+.wg-hist-meta{display:flex;align-items:center;gap:8px}
+.wg-hist-chevron{font-size:11px;color:var(--text3);transition:transform .2s}
+.wg-hist-chevron.open{transform:rotate(180deg)}
+.wg-hist-detail{display:none;border-top:1px solid var(--border);padding:8px 12px 10px}
+.wg-hist-detail.open{display:block}
+.wg-hist-row{display:flex;align-items:center;gap:0;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.wg-hist-row:last-child{border-bottom:none}
+.wg-hist-rank{width:28px;font-size:11px;font-weight:700;color:var(--text3)}
+.wg-hist-name{flex:1;font-size:12px;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px}
+.wg-hist-gain{font-size:12px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+.wg-hist-gain.zero{color:var(--text3)}
+.wg-hist-dl-btn{margin:8px 0 2px;display:flex;justify-content:flex-end}
 </style>
 </head>
 <body>
@@ -714,6 +747,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         </div>
       </div>
     </div>
+    <!-- WEEKLY GAINS SCREEN -->
+    <div id="screen-weekly" class="screen">
+      <div id="wg-header">
+        <div id="wg-week-range">Loading weekly data…</div>
+        <div id="wg-ph-clock"></div>
+      </div>
+      <div id="wg-controls">
+        <div id="wg-live-badge">
+          <span class="live-dot" id="wg-live-dot" style="background:var(--text3);animation:none"></span>
+          <span id="wg-live-label">Waiting for data…</span>
+        </div>
+        <button id="wg-download-btn" class="export-btn" onclick="downloadCurrentWeekXlsx()" style="display:none" title="Export current week as .xlsx">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export .xlsx
+        </button>
+      </div>
+      <div id="wg-members-list" class="wg-members-list"></div>
+      <div id="wg-history-section" style="display:none">
+        <div class="section-header" style="padding-top:14px">📆 Weekly History</div>
+        <div id="wg-history-list"></div>
+      </div>
+    </div>
   </div>
 
   <!-- TAB BAR -->
@@ -729,6 +784,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div class="tab" id="tab-history" onclick="showTab('history')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
       <span>History</span>
+    </div>
+    <div class="tab" id="tab-weekly" onclick="showTab('weekly')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      <span>Weekly</span>
     </div>
     <div class="tab" id="tab-deductions" onclick="showTab('deductions')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -800,6 +859,11 @@ let suspectLogKeysSeen = new Set();
 // 'normal' = default (Rankings, Risk Bleed, History, Settings only)
 // 'admin'  = full view (all tabs + Delete Firebase Records visible)
 let accessLevel = 'normal';
+
+// ── Weekly gains state ────────────────────────────────────────────────────────
+let weeklyGainsData    = null;  // live Firestore doc for weeklyGains/777
+let weeklyHistoryData  = [];    // array of past-week docs (newest first)
+let weekHistoryOpenKey = null;  // which history card is currently expanded
 
 // Controls which action the shared password modal performs
 let pwModalMode = 'delete'; // 'delete' | 'access'
@@ -1453,6 +1517,11 @@ function tickChangeAgo() {
     const agoEl = el.querySelector('.clan-delta-ago');
     if (agoEl) agoEl.textContent = 'as of ' + fmtAgo(ts);
   });
+  // Also tick the PH clock on the weekly tab
+  if (state.currentTab === 'weekly') {
+    const clockEl = document.getElementById('wg-ph-clock');
+    if (clockEl) clockEl.textContent = '🕐 PH Time: ' + fmtPHTime();
+  }
 }
 
 function getMemberDelta(clanId, memberId) {
@@ -1507,6 +1576,8 @@ function renderCurrentView() {
     renderBleeding();
   } else if (t === 'history') {
     renderHistory();
+  } else if (t === 'weekly') {
+    renderWeeklyGains();
   } else if (t === 'deductions') {
     renderDeductions();
   } else if (t === 'suspects') {
@@ -2996,6 +3067,12 @@ function setAccessLevel(level) {
   document.getElementById('tab-deductions').style.display = isAdmin ? '' : 'none';
   document.getElementById('tab-suspects').style.display   = isAdmin ? '' : 'none';
 
+  // Weekly Gains tab: show/hide admin-only controls
+  const wgDlBtn = document.getElementById('wg-download-btn');
+  if (wgDlBtn) wgDlBtn.style.display = isAdmin ? '' : 'none';
+  const wgHist = document.getElementById('wg-history-section');
+  if (wgHist) wgHist.style.display = isAdmin ? '' : 'none';
+
   // Settings: toggle Firebase delete row and access buttons
   const fbRow = document.getElementById('settings-firebase-row');
   if (fbRow) fbRow.style.display = isAdmin ? '' : 'none';
@@ -3211,6 +3288,29 @@ function initFirestoreListeners() {
     }, err => {
       console.warn('Firestore deductionLog error', err);
     });
+
+  // ── Weekly gains: single live doc ─────────────────────────────────────────
+  db.collection('weeklyGains').doc('777')
+    .onSnapshot(snap => {
+      if (snap.exists) {
+        weeklyGainsData = snap.data();
+        if (state.currentTab === 'weekly') renderWeeklyGains();
+      }
+    }, err => {
+      console.warn('Firestore weeklyGains error', err);
+    });
+
+  // ── Weekly gains history (always fetch; admin renders it, others don't) ───
+  db.collection('weeklyGainsHistory')
+    .orderBy('weekKey', 'desc')
+    .limit(52)
+    .onSnapshot(snap => {
+      weeklyHistoryData = [];
+      snap.forEach(d => weeklyHistoryData.push(d.data()));
+      if (state.currentTab === 'weekly' && accessLevel === 'admin') renderWeeklyGains();
+    }, err => {
+      console.warn('Firestore weeklyGainsHistory error', err);
+    });
 }
 
 // Called when a new suspect event is created \u2014 writes to Firestore so all devices see it
@@ -3227,6 +3327,191 @@ function pushDeductionToFirestore(entry) {
   const { members, ...core } = entry;
   db.collection('deductionLog').doc(`${entry.clanId}_${entry.ts}`).set(core)
     .catch(e => console.warn('Firestore deduction write error', e));
+}
+
+// ============================================================
+// WEEKLY GAINS
+// ============================================================
+
+function fmtPHTime() {
+  return new Date().toLocaleTimeString('en-US', {
+    timeZone: 'Asia/Manila',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  });
+}
+
+function fmtWeekDate(iso) {
+  if (!iso) return '\u2014';
+  const [y, m, d] = iso.split('-');
+  const dt = new Date(Date.UTC(+y, +m - 1, +d));
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+}
+
+function renderWeeklyGains() {
+  const clockEl = document.getElementById('wg-ph-clock');
+  if (clockEl) clockEl.textContent = '\uD83D\uDD50 PH Time: ' + fmtPHTime();
+
+  if (!weeklyGainsData) {
+    const rangeEl = document.getElementById('wg-week-range');
+    if (rangeEl) rangeEl.textContent = 'Waiting for weekly data\u2026';
+    const liveEl = document.getElementById('wg-live-label');
+    if (liveEl) liveEl.textContent = 'Server poller not started yet \u2014 check back shortly';
+    const listEl = document.getElementById('wg-members-list');
+    if (listEl) listEl.innerHTML = `<div class="empty-state" style="padding:30px 20px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;opacity:.4"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      <h3>No weekly data yet</h3>
+      <p>The server poller writes gains every 5 seconds. Data will appear here shortly after it starts tracking.</p>
+    </div>`;
+    return;
+  }
+
+  const d = weeklyGainsData;
+  const rangeEl = document.getElementById('wg-week-range');
+  if (rangeEl) rangeEl.textContent = '\uD83D\uDCC5 ' + fmtWeekDate(d.weekStartLabel) + ' \u2013 ' + fmtWeekDate(d.weekEndLabel);
+
+  const liveEl = document.getElementById('wg-live-label');
+  const dotEl  = document.getElementById('wg-live-dot');
+  if (d.lastUpdated) {
+    const secAgo = Math.floor((Date.now() - d.lastUpdated) / 1000);
+    const agoStr = secAgo < 60 ? secAgo + 's ago' : Math.floor(secAgo / 60) + 'm ago';
+    if (liveEl) liveEl.textContent = 'Updated ' + agoStr;
+    if (dotEl)  { dotEl.style.background = 'var(--green)'; dotEl.style.animation = 'pulse 2s infinite'; }
+  }
+
+  const membersMap = d.members || {};
+  const sorted = Object.entries(membersMap)
+    .map(([id, m]) => ({ id, ...m }))
+    .sort((a, b) => b.weekGain - a.weekGain);
+
+  const listEl = document.getElementById('wg-members-list');
+  if (!listEl) return;
+
+  if (sorted.length === 0) {
+    listEl.innerHTML = `<div class="empty-state" style="padding:24px 20px">
+      <h3>No members tracked yet</h3><p>Gains appear as clan members earn reputation this week.</p>
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = sorted.map(function(m, i) {
+    const rank = i + 1;
+    let rankClass = 'wg-rank';
+    let rowClass  = 'wg-member-row';
+    if (rank === 1)      { rankClass += ' gold';   rowClass += ' top1'; }
+    else if (rank === 2) { rankClass += ' silver';  rowClass += ' top2'; }
+    else if (rank === 3) { rankClass += ' bronze';  rowClass += ' top3'; }
+    const gainStr = m.weekGain > 0 ? '+' + fmtNum(m.weekGain) : '\u2014';
+    const gainCls = m.weekGain > 0 ? 'wg-gain' : 'wg-gain zero';
+    return '<div class="' + rowClass + '">' +
+      '<div class="' + rankClass + '">#' + rank + '</div>' +
+      '<div class="wg-name">' + esc(m.name) + '</div>' +
+      '<div class="' + gainCls + '">' + gainStr + '</div>' +
+      '</div>';
+  }).join('');
+
+  if (accessLevel !== 'admin') return;
+
+  const histListEl = document.getElementById('wg-history-list');
+  if (!histListEl) return;
+
+  if (weeklyHistoryData.length === 0) {
+    histListEl.innerHTML = '<div style="padding:12px 12px 8px;font-size:12px;color:var(--text3)">No past weeks archived yet. History appears after the first weekly reset (Monday 12am PH time).</div>';
+    return;
+  }
+
+  histListEl.innerHTML = weeklyHistoryData.map(function(w) {
+    const label   = fmtWeekDate(w.weekStartLabel) + ' \u2013 ' + fmtWeekDate(w.weekEndLabel);
+    const isOpen  = weekHistoryOpenKey === w.weekKey;
+    const members = w.members || [];
+    const topGain = members[0] ? fmtNum(members[0].weekGain) : '\u2014';
+
+    let detailHtml = '';
+    if (isOpen) {
+      const rows = members.map(function(m, i) {
+        const rank = i + 1;
+        let rCls = 'wg-hist-rank';
+        const gCls = m.weekGain > 0 ? 'wg-hist-gain' : 'wg-hist-gain zero';
+        if (rank === 1) rCls += ' gold';
+        else if (rank === 2) rCls += ' silver';
+        else if (rank === 3) rCls += ' bronze';
+        return '<div class="wg-hist-row">' +
+          '<div class="' + rCls + '">#' + rank + '</div>' +
+          '<div class="wg-hist-name">' + esc(m.name) + '</div>' +
+          '<div class="' + gCls + '">' + (m.weekGain > 0 ? '+' + fmtNum(m.weekGain) : '\u2014') + '</div>' +
+          '</div>';
+      }).join('');
+      const dlKey = esc(w.weekKey);
+      const dlLabel = esc(w.weekStartLabel) + ' week';
+      detailHtml = '<div class="wg-hist-detail open">' + rows +
+        '<div class="wg-hist-dl-btn">' +
+        '<button class="export-btn" onclick="downloadHistoryWeekXlsx(\'' + dlKey + '\')" title="Export this week as .xlsx">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+        ' Export ' + dlLabel + '</button></div></div>';
+    }
+
+    const openKey = esc(w.weekKey);
+    return '<div class="wg-hist-card" onclick="toggleWeekHistory(\'' + openKey + '\')">' +
+      '<div class="wg-hist-card-header">' +
+      '<div class="wg-hist-week-label">' + label + '</div>' +
+      '<div class="wg-hist-meta">' +
+      '<span style="font-size:11px;color:var(--text3)">' + members.length + ' members</span>' +
+      '<span style="font-size:11px;color:var(--green);font-weight:700;margin-left:6px">Top: +' + topGain + '</span>' +
+      '<span class="wg-hist-chevron' + (isOpen ? ' open' : '') + '">\u25BC</span>' +
+      '</div></div>' + detailHtml + '</div>';
+  }).join('');
+}
+
+function toggleWeekHistory(weekKey) {
+  weekHistoryOpenKey = weekHistoryOpenKey === weekKey ? null : weekKey;
+  renderWeeklyGains();
+}
+
+function downloadCurrentWeekXlsx() {
+  if (accessLevel !== 'admin' || !weeklyGainsData) return;
+  const d = weeklyGainsData;
+  const label = d.weekStartLabel + '_' + d.weekEndLabel;
+  const members = Object.entries(d.members || {})
+    .map(function(e) { return e[1]; })
+    .sort(function(a, b) { return b.weekGain - a.weekGain; });
+  _exportWeekXlsx(label, d.weekStartLabel, d.weekEndLabel, members, false);
+}
+
+function downloadHistoryWeekXlsx(weekKey) {
+  if (accessLevel !== 'admin') return;
+  const w = weeklyHistoryData.find(function(x) { return x.weekKey === weekKey; });
+  if (!w) return;
+  _exportWeekXlsx(weekKey, w.weekStartLabel, w.weekEndLabel, w.members || [], true);
+}
+
+function _exportWeekXlsx(fileLabel, startLabel, endLabel, membersArr, isArchived) {
+  const now = new Date();
+  const stamp = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') +
+                '_' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
+  const generatedAt = now.toLocaleDateString([], { weekday:'long', year:'numeric', month:'long', day:'numeric' }) +
+                      ' \u00B7 ' + now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  const weekLabel = fmtWeekDate(startLabel) + ' \u2013 ' + fmtWeekDate(endLabel) + (isArchived ? ' (archived)' : ' (live)');
+
+  const rows = [];
+  rows.push(['Hidden Cloud Village \u2014 Weekly Reputation Gains', '', '', '', '']);
+  rows.push(['Week: ' + weekLabel, '', '', '', '']);
+  rows.push(['Generated: ' + generatedAt, '', '', '', '']);
+  rows.push([]);
+  rows.push(['Rank', 'Member Name', 'Weekly Gain', 'Start Rep', 'End Rep']);
+  membersArr.forEach(function(m, i) {
+    rows.push([
+      i + 1,
+      m.name,
+      m.weekGain || 0,
+      isArchived ? (m.startRep || 0) : (m.weekStartRep || 0),
+      isArchived ? (m.endRep   || 0) : (m.currentRep   || 0),
+    ]);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{ wch: 6 }, { wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'Weekly Gains');
+  XLSX.writeFile(wb, 'weekly_gains_' + fileLabel + '_' + stamp + '.xlsx');
 }
 
 // ============================================================
@@ -3280,11 +3565,14 @@ window.confirmDeleteFirebaseRecords = confirmDeleteFirebaseRecords;
 window.showAdminAccessModal         = showAdminAccessModal;
 window.exitAdminLevel               = exitAdminLevel;
 window.setSuspectFilter             = setSuspectFilter;
-  window.showTab                      = showTab;
+window.showTab                      = showTab;
 window.closeModal                   = closeModal;
 window.closePwModal                 = closePwModal;
 window.submitPwModal                = submitPwModal;
 window.togglePwVisibility           = togglePwVisibility;
+window.downloadCurrentWeekXlsx     = downloadCurrentWeekXlsx;
+window.downloadHistoryWeekXlsx     = downloadHistoryWeekXlsx;
+window.toggleWeekHistory            = toggleWeekHistory;
 
 })(); // end IIFE \u2014 all internals (accessLevel, setAccessLevel, etc.) are private
 </script>
