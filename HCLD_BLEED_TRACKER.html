@@ -7,29 +7,30 @@
 <title>Hidden Cloud CW Live Tracker | ninjasaga.cc</title>
 <style>
 :root {
-  --bg: #0d0d14;
-  --bg2: #13131e;
-  --bg3: #1a1a28;
-  --card: #181825;
-  --card2: #1e1e2e;
-  --border: #2a2a3e;
-  --border2: #363650;
-  --text: #cdd6f4;
-  --text2: #a6adc8;
-  --text3: #6c7086;
-  --primary: #f38ba8;
-  --amber: #f9e2af;
-  --green: #a6e3a1;
-  --blue: #89b4fa;
-  --red: #f38ba8;
-  --orange: #fab387;
-  --yellow: #f9e2af;
-  --mauve: #cba6f7;
-  --safe: #a6e3a1;
-  --low: #f9e2af;
-  --med: #fab387;
-  --high: #f38ba8;
-  --bleed: #f38ba8;
+  /* Hidden Cloud Village — Black · Gold · White */
+  --bg: #0a0a0a;
+  --bg2: #111111;
+  --bg3: #191400;
+  --card: #141414;
+  --card2: #1e1a00;
+  --border: #2a2000;
+  --border2: #3d3000;
+  --text: #f0f0f0;
+  --text2: #b8b8b8;
+  --text3: #585858;
+  --primary: #ef4444;
+  --amber: #fbbf24;
+  --green: #4ade80;
+  --blue: #60a5fa;
+  --red: #ef4444;
+  --orange: #fb923c;
+  --yellow: #fbbf24;
+  --mauve: #f0a500;
+  --safe: #4ade80;
+  --low: #fbbf24;
+  --med: #fb923c;
+  --high: #ef4444;
+  --bleed: #ef4444;
   --header-h: 56px;
   --tab-h: 60px;
 }
@@ -45,7 +46,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #app{display:flex;flex-direction:column;height:100%;overflow:hidden}
 /* HEADER */
 #header{height:var(--header-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0;z-index:10}
-#header-logo{width:32px;height:32px;background:linear-gradient(135deg,#f38ba8,#cba6f7);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#1e1e2e;flex-shrink:0}
+#header-logo{width:32px;height:32px;background:linear-gradient(135deg,#f0a500,#ffd60a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#0a0a0a;flex-shrink:0}
 #header-title{flex:1;min-width:0}
 #header-title h1{font-size:15px;font-weight:700;color:var(--text);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #header-title p{font-size:11px;color:var(--text3);margin-top:1px}
@@ -66,9 +67,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column}
 .screen.active{display:flex}
 /* SEASON BAR */
-#season-bar{background:linear-gradient(90deg,#1e1e2e,#181825);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#season-bar{background:linear-gradient(90deg,#111111,#0a0a0a);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 #season-info{display:flex;align-items:center;gap:8px}
-#season-badge{background:var(--mauve);color:#1e1e2e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;letter-spacing:0.5px}
+#season-badge{background:var(--mauve);color:#0a0a0a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;letter-spacing:0.5px}
 #season-name{font-size:12px;color:var(--text2);font-weight:600}
 #season-countdown{font-size:11px;color:var(--amber);font-weight:600;font-variant-numeric:tabular-nums}
 /* SEARCH */
@@ -78,11 +79,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .search-wrap{position:relative}
 .search-wrap svg{position:absolute;left:22px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
 /* YOUR CLAN BANNER */
-#your-clan-banner{margin:0 12px 8px;background:linear-gradient(135deg,#1e1e2e,#181825);border:1px solid var(--mauve);border-radius:12px;padding:10px 12px;cursor:pointer;transition:all .2s;display:none}
+#your-clan-banner{margin:0 12px 8px;background:linear-gradient(135deg,#1c1800,#141414);border:1px solid var(--mauve);border-radius:12px;padding:10px 12px;cursor:pointer;transition:all .2s;display:none}
 #your-clan-banner.visible{display:block}
 #your-clan-banner:hover{border-color:var(--primary)}
 #ycb-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-#ycb-badge{background:var(--mauve);color:#1e1e2e;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:0.5px}
+#ycb-badge{background:var(--mauve);color:#0a0a0a;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:0.5px}
 #ycb-name{font-size:14px;font-weight:700;color:var(--text);flex:1}
 #ycb-rank{font-size:12px;color:var(--mauve);font-weight:600}
 #ycb-stats{display:flex;gap:12px}
@@ -113,7 +114,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .clan-name{flex:1;font-size:14px;font-weight:700;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .clan-badges{display:flex;gap:4px;flex-shrink:0;align-items:center}
 .badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:0.4px;white-space:nowrap}
-.badge-your{background:var(--mauve);color:#1e1e2e}
+.badge-your{background:var(--mauve);color:#0a0a0a}
 .badge-safe{background:rgba(166,227,161,0.15);color:var(--safe);border:1px solid rgba(166,227,161,0.3)}
 .badge-low{background:rgba(249,226,175,0.15);color:var(--low);border:1px solid rgba(249,226,175,0.3)}
 .badge-med{background:rgba(250,179,135,0.15);color:var(--med);border:1px solid rgba(250,179,135,0.3)}
@@ -139,7 +140,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #detail-clan-name{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #detail-clan-sub{font-size:11px;color:var(--text3);margin-top:1px}
 #detail-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-#set-your-clan-btn{background:var(--mauve);color:#1e1e2e;border:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+#set-your-clan-btn{background:var(--mauve);color:#0a0a0a;border:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
 #set-your-clan-btn:hover{opacity:0.85}
 #detail-stats-row{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
 .detail-stat-box{flex:1;padding:10px 12px;border-right:1px solid var(--border);text-align:center}
@@ -218,7 +219,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .settings-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:8px;font-size:12px;outline:none;width:80px;text-align:center}
 .settings-input:focus{border-color:var(--mauve)}
 .settings-section-title{padding:14px 14px 6px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px}
-.btn-primary{background:var(--mauve);color:#1e1e2e;border:none;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;width:100%}
+.btn-primary{background:var(--mauve);color:#0a0a0a;border:none;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;width:100%}
 .btn-primary:hover{opacity:0.85}
 .btn-danger{background:rgba(243,139,168,0.15);color:var(--red);border:1px solid rgba(243,139,168,0.3);padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;width:100%}
 .btn-danger:hover{background:rgba(243,139,168,0.25)}
@@ -245,7 +246,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .modal-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
 .modal-actions{display:flex;gap:8px;margin-top:16px}
 .modal-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text);transition:all .2s}
-.modal-btn.confirm{background:var(--mauve);border-color:var(--mauve);color:#1e1e2e}
+.modal-btn.confirm{background:var(--mauve);border-color:var(--mauve);color:#0a0a0a}
 .modal-btn:hover{opacity:0.85}
 /* PASSWORD MODAL */
 .pw-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
@@ -300,7 +301,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ded-filter-btn.active{background:rgba(243,139,168,0.15);border-color:rgba(243,139,168,0.5);color:var(--red)}
 .rank-filter-bar{display:flex;gap:6px;padding:6px 12px 2px;flex-wrap:wrap}
 .rank-filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;transition:all .2s}
-.rank-filter-btn.active{background:rgba(203,166,247,0.15);border-color:rgba(203,166,247,0.5);color:var(--mauve)}
+.rank-filter-btn.active{background:rgba(240,165,0,0.15);border-color:rgba(240,165,0,0.5);color:var(--mauve)}
 .rank-filter-btn.bleed.active{background:rgba(243,139,168,0.15);border-color:rgba(243,139,168,0.5);color:var(--red)}
 .rank-filter-btn.manual.active{background:rgba(166,227,161,0.15);border-color:rgba(166,227,161,0.5);color:#a6e3a1}
 .rank-filter-btn.risk.active{background:rgba(250,179,135,0.15);border-color:rgba(250,179,135,0.5);color:#fab387}
@@ -315,7 +316,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .member-row.suspect-med{border-color:rgba(250,179,135,0.4);background:linear-gradient(90deg,rgba(250,179,135,0.06),var(--card))}
 .suspect-filter-bar{display:flex;gap:6px;padding:6px 12px 4px;overflow-x:auto;flex-shrink:0}
 .suspect-filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;transition:all .2s}
-.suspect-filter-btn.active{background:rgba(203,166,247,0.15);border-color:rgba(203,166,247,0.5);color:var(--mauve)}
+.suspect-filter-btn.active{background:rgba(240,165,0,0.15);border-color:rgba(240,165,0,0.5);color:var(--mauve)}
 .suspect-filter-btn.high.active{background:rgba(243,139,168,0.15);border-color:rgba(243,139,168,0.5);color:var(--red)}
 .suspect-clan-no-member{font-size:11px;color:var(--text3);padding:4px 0;font-style:italic}
 .suspect-reason{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.3}
@@ -363,10 +364,90 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .mch-name{font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mch-total{font-size:13px;font-weight:700;color:var(--red);white-space:nowrap}
 .mch-meta{font-size:10px;color:var(--text3);margin-top:3px}
+
+/* ============================================================
+   LOGIN SCREEN
+   ============================================================ */
+#login-screen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;overflow-y:auto}
+.login-card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:30px 24px;display:flex;flex-direction:column;gap:20px}
+.login-logo{width:60px;height:60px;background:linear-gradient(135deg,#f0a500,#ffd60a);border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#0a0a0a;margin:0 auto;box-shadow:0 8px 28px rgba(240,165,0,0.35)}
+.login-branding{text-align:center}
+.login-branding h1{font-size:19px;font-weight:800;color:var(--text);line-height:1.3;letter-spacing:0.2px}
+.login-branding p{font-size:11px;color:var(--mauve);margin-top:5px;font-weight:700;letter-spacing:1px}
+.login-field{display:flex;flex-direction:column;gap:7px}
+.login-field label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:0.3px}
+.login-input{width:100%;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);padding:13px 14px;border-radius:10px;font-size:16px;outline:none;transition:border-color .2s;font-variant-numeric:tabular-nums;letter-spacing:0.5px}
+.login-input:focus{border-color:var(--mauve)}
+.login-input.shake{animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.login-hint{background:rgba(137,180,250,0.07);border:1px solid rgba(137,180,250,0.2);border-radius:10px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start}
+.login-hint-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.login-hint-text{font-size:11px;color:var(--text2);line-height:1.6}
+.login-hint-text strong{color:var(--blue)}
+.login-error{background:rgba(243,139,168,0.09);border:1px solid rgba(243,139,168,0.35);border-radius:10px;padding:11px 13px;display:none;flex-direction:column;gap:3px}
+.login-error.visible{display:flex}
+.login-error-title{font-size:13px;font-weight:700;color:var(--red)}
+.login-error-sub{font-size:11px;color:var(--text2);line-height:1.5}
+.login-btn{width:100%;background:linear-gradient(135deg,#f0a500,#ffd60a);color:#0a0a0a;border:none;padding:14px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .2s;letter-spacing:0.3px}
+.login-btn:hover{opacity:0.88}
+.login-btn:disabled{opacity:0.5;cursor:not-allowed}
+.login-footer-txt{text-align:center;font-size:10px;color:var(--text3);line-height:1.6}
+/* User badge shown in header after login */
+#header-user-badge{display:none;align-items:center;gap:5px;background:rgba(240,165,0,0.12);border:1px solid rgba(240,165,0,0.35);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:600;color:var(--mauve);white-space:nowrap;overflow:hidden;max-width:110px}
+#header-user-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;display:inline-block;vertical-align:middle}
 </style>
 </head>
 <body>
-<div id="app">
+
+<!-- ============================================================
+     LOGIN SCREEN — shown before the app, hidden after auth
+     ============================================================ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">HC</div>
+
+    <div class="login-branding">
+      <h1>Hidden Cloud Village<br>CW Live Tracker</h1>
+      <p>⚡ EXCLUSIVE MEMBER ACCESS</p>
+    </div>
+
+    <div class="login-field">
+      <label for="login-uid-input">Your Ninja Saga User ID</label>
+      <input
+        class="login-input"
+        id="login-uid-input"
+        type="number"
+        inputmode="numeric"
+        placeholder="e.g. 55698"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter')window.doLogin()"
+        oninput="document.getElementById('login-uid-input').classList.remove('shake');document.getElementById('login-error-box').classList.remove('visible')"
+      />
+    </div>
+
+    <div class="login-hint">
+      <div class="login-hint-icon">💡</div>
+      <div class="login-hint-text">
+        Your <strong>User ID</strong> is shown in Ninja Saga under your
+        <strong>Profile tab</strong>, displayed as a number beside the emblem logo (e.g. <strong>ID: 55698</strong>).
+      </div>
+    </div>
+
+    <div class="login-error" id="login-error-box">
+      <div class="login-error-title">🚫 Access Denied</div>
+      <div class="login-error-sub" id="login-error-msg">This User ID is not a member of Hidden Cloud Village.</div>
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="window.doLogin()">Enter Tracker</button>
+
+    <div class="login-footer-txt">
+      Hidden Cloud Village &nbsp;·&nbsp; Ninja Saga &nbsp;·&nbsp; CW Live Tracker<br>
+      <span style="font-size:10px;opacity:0.6">Access is verified live against the clan roster</span>
+    </div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
   <!-- HEADER -->
   <div id="header">
     <div id="header-logo">HC</div>
@@ -375,10 +456,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <p><span class="live-dot"></span><span id="header-sub">ninjasaga.cc</span></p>
     </div>
     <div id="header-right">
-      <span id="fb-status" class="disconnected" title="Firebase sync status">⬤ Firebase</span>
+      <span id="header-user-badge">&#128100; <span id="header-user-name"></span></span>
+      <span id="fb-status" class="disconnected" title="Firebase sync status">&#11044; Firebase</span>
       <div id="live-status" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)">
         <span class="live-pulse" id="live-dot"></span>
-        <span id="live-label">Connecting…</span>
+        <span id="live-label">Connecting&#8230;</span>
       </div>
       <button id="refresh-btn" onclick="fetchData(true)" title="Force refresh">
         <svg id="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -400,31 +482,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div id="your-clan-banner" onclick="viewClan(state.yourClanId)">
         <div id="ycb-top">
           <div id="ycb-badge">YOUR CLAN</div>
-          <div id="ycb-name">—</div>
-          <div id="ycb-rank">—</div>
+          <div id="ycb-name">&#8212;</div>
+          <div id="ycb-rank">&#8212;</div>
         </div>
         <div id="ycb-stats">
           <div class="ycb-stat">
             <div class="ycb-stat-label">Reputation</div>
-            <div class="ycb-stat-value" id="ycb-rep">—</div>
+            <div class="ycb-stat-value" id="ycb-rep">&#8212;</div>
           </div>
           <div class="ycb-stat">
             <div class="ycb-stat-label">Change</div>
-            <div class="ycb-stat-value" id="ycb-delta">—</div>
+            <div class="ycb-stat-value" id="ycb-delta">&#8212;</div>
           </div>
           <div class="ycb-stat">
             <div class="ycb-stat-label">Status</div>
-            <div class="ycb-stat-value" id="ycb-stamina">—</div>
+            <div class="ycb-stat-value" id="ycb-stamina">&#8212;</div>
           </div>
           <div class="ycb-stat">
             <div class="ycb-stat-label">Members</div>
-            <div class="ycb-stat-value" id="ycb-members">—</div>
+            <div class="ycb-stat-value" id="ycb-members">&#8212;</div>
           </div>
         </div>
         <div id="ycb-stamina-bar"><div id="ycb-stamina-fill"></div></div>
       </div>
       <div class="bleed-alert" id="home-bleed-alert">
-        <div class="bleed-alert-icon">⚠️</div>
+        <div class="bleed-alert-icon">&#9888;&#65039;</div>
         <div class="bleed-alert-text">
           <h3 id="home-bleed-title">RISK BLEED</h3>
           <p id="home-bleed-sub">No reputation gained this round</p>
@@ -436,9 +518,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       </div>
       <div id="rank-filter-bar" class="rank-filter-bar">
         <button class="rank-filter-btn active" onclick="setRankingsFilter('all',this)">All</button>
-        <button class="rank-filter-btn bleed" onclick="setRankingsFilter('gaining-bleed',this)">🔴 Gaining (Bleed)</button>
-        <button class="rank-filter-btn manual" onclick="setRankingsFilter('gaining-manual',this)">🟢 Gaining (Manual)</button>
-        <button class="rank-filter-btn risk" onclick="setRankingsFilter('risk',this)">⚠️ Risk Bleed</button>
+        <button class="rank-filter-btn bleed" onclick="setRankingsFilter('gaining-bleed',this)">&#128308; Gaining (Bleed)</button>
+        <button class="rank-filter-btn manual" onclick="setRankingsFilter('gaining-manual',this)">&#128994; Gaining (Manual)</button>
+        <button class="rank-filter-btn risk" onclick="setRankingsFilter('risk',this)">&#9888;&#65039; Risk Bleed</button>
       </div>
       <div id="error-bar" class="error-bar"></div>
       <div id="loading" class="loading-text">
@@ -457,7 +539,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         </button>
         <div id="detail-title">
           <div id="detail-clan-name">Clan Name</div>
-          <div id="detail-clan-sub">Rank #— · Master: —</div>
+          <div id="detail-clan-sub">Rank #&#8212; &#183; Master: &#8212;</div>
         </div>
         <div id="detail-actions">
           <button id="set-your-clan-btn">Set as Yours</button>
@@ -465,36 +547,36 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       </div>
       <div id="detail-stats-row">
         <div class="detail-stat-box">
-          <div class="val" id="ds-rep">—</div>
+          <div class="val" id="ds-rep">&#8212;</div>
           <div class="lbl">Reputation</div>
         </div>
         <div class="detail-stat-box">
-          <div class="val" id="ds-delta">—</div>
+          <div class="val" id="ds-delta">&#8212;</div>
           <div class="lbl">Change</div>
         </div>
         <div class="detail-stat-box">
-          <div class="val" id="ds-members">—</div>
+          <div class="val" id="ds-members">&#8212;</div>
           <div class="lbl">Members</div>
         </div>
         <div class="detail-stat-box">
-          <div class="val" id="ds-bleed">—</div>
+          <div class="val" id="ds-bleed">&#8212;</div>
           <div class="lbl">Bleeding</div>
         </div>
       </div>
       <div id="detail-stamina-section">
-        <h3>REPUTATION STATUS — THIS ROUND</h3>
-        <div class="section-subtext">Gaining (Bleed) = rep gained by 2+ members within 5s of each other, OR a single member gained rep twice within 10s (too fast for manual). Gaining (Manual) = rep gained but pattern looks like a single slow manual attack. Risk Bleed = this clan is flat and a confirmed bleed is happening nearby — it may be the target. Flat = no rep gained and no bleed detected.</div>
+        <h3>REPUTATION STATUS &#8212; THIS ROUND</h3>
+        <div class="section-subtext">Gaining (Bleed) = rep gained by 2+ members within 5s of each other, OR a single member gained rep twice within 10s (too fast for manual). Gaining (Manual) = rep gained but pattern looks like a single slow manual attack. Risk Bleed = this clan is flat and a confirmed bleed is happening nearby &#8212; it may be the target. Flat = no rep gained and no bleed detected.</div>
         <div class="stamina-bar-wrap">
           <div class="stamina-bar-bg"><div class="stamina-bar-fill" id="detail-stamina-fill"></div></div>
-          <div class="stamina-pct" id="detail-stamina-pct">—</div>
+          <div class="stamina-pct" id="detail-stamina-pct">&#8212;</div>
         </div>
         <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text3)">
-          <span>Round: <span id="detail-round-window">—</span></span>
-          <span>Gained: <span id="detail-round-gain" style="color:var(--text2);font-weight:600">—</span></span>
+          <span>Round: <span id="detail-round-window">&#8212;</span></span>
+          <span>Gained: <span id="detail-round-gain" style="color:var(--text2);font-weight:600">&#8212;</span></span>
         </div>
       </div>
       <div id="detail-bleed-alert">
-        <h3 id="detail-bleed-alert-title">⚠ RISK BLEED</h3>
+        <h3 id="detail-bleed-alert-title">&#9888; RISK BLEED</h3>
         <p id="detail-bleed-msg">No reputation gained this round</p>
       </div>
       <div id="members-list-header">
@@ -544,8 +626,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         </button>
       </div>
       <div class="how-it-works">
-        <strong>Confirmed suspect detection:</strong> A player is listed here only when their individual rep drop is caught live AND aligns exactly with their clan's anti-cheat deduction change — confirming they are the cheater.<br>
-        <strong style="color:var(--red)">🚨 HIGH Suspicion</strong> = rep gain→drop caught live AND the total drop matches the clan's deduction change exactly.<br>
+        <strong>Confirmed suspect detection:</strong> A player is listed here only when their individual rep drop is caught live AND aligns exactly with their clan's anti-cheat deduction change &#8212; confirming they are the cheater.<br>
+        <strong style="color:var(--red)">&#128680; HIGH Suspicion</strong> = rep gain&#8594;drop caught live AND the total drop matches the clan's deduction change exactly.<br>
         <span style="color:var(--text3)">Clan-level deduction history is shown in the <strong style="color:var(--mauve)">Deductions</strong> tab.</span>
       </div>
 
@@ -562,7 +644,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
           <div class="settings-row">
             <div>
               <div class="settings-row-label">Your Clan</div>
-              <div class="settings-row-sub" id="setting-your-clan-name">Not set — go to Rankings to pick</div>
+              <div class="settings-row-sub" id="setting-your-clan-name">Not set &#8212; go to Rankings to pick</div>
             </div>
             <button class="tc-remove" onclick="clearYourClan()">Clear</button>
           </div>
@@ -580,9 +662,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
           <div class="settings-row">
             <div>
               <div class="settings-row-label">Live Polling</div>
-              <div class="settings-row-sub" id="next-refresh-label">—</div>
+              <div class="settings-row-sub" id="next-refresh-label">&#8212;</div>
             </div>
-            <button class="tc-remove" onclick="fetchData(true)" style="color:var(--mauve);background:rgba(203,166,247,0.1);border-color:rgba(203,166,247,0.3)">Refresh Now</button>
+            <button class="tc-remove" onclick="fetchData(true)" style="color:var(--mauve);background:rgba(240,165,0,0.1);border-color:rgba(240,165,0,0.3)">Refresh Now</button>
           </div>
         </div>
 
@@ -617,18 +699,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
           <div class="settings-section-title">Access Level</div>
           <div class="settings-btn-row">
             <button class="btn-primary" id="btn-admin-access" onclick="showAdminAccessModal()"
-              style="background:rgba(203,166,247,0.15);border:1px solid rgba(203,166,247,0.4);color:var(--mauve)">
-              🔒 Admin Level Access
+              style="background:rgba(240,165,0,0.15);border:1px solid rgba(240,165,0,0.4);color:var(--mauve)">
+              &#128274; Admin Level Access
             </button>
             <button class="btn-danger" id="btn-exit-admin" onclick="exitAdminLevel()"
               style="display:none;background:rgba(243,139,168,0.12);border:1px solid rgba(243,139,168,0.35);color:var(--red)">
-              🔓 Exit Admin Level
+              &#128275; Exit Admin Level
             </button>
           </div>
         </div>
 
         <div style="padding:16px 12px;text-align:center;font-size:11px;color:var(--text3)">
-          Clan Bleed x Cheater Tracker · ninjasaga.cc · Hidden Cloud Village
+          Clan Bleed x Cheater Tracker &#183; ninjasaga.cc &#183; Hidden Cloud Village
         </div>
       </div>
     </div>
@@ -675,17 +757,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   </div>
 </div>
 
-<!-- PASSWORD MODAL — Firebase delete protection -->
+<!-- PASSWORD MODAL &#8212; Firebase delete protection -->
 <div class="pw-modal-overlay" id="pw-modal-overlay" onclick="closePwModal(event)">
   <div class="pw-modal" onclick="event.stopPropagation()">
-    <div class="pw-modal-title" id="pw-modal-title">🔒 Admin Verification Required</div>
+    <div class="pw-modal-title" id="pw-modal-title">&#128274; Admin Verification Required</div>
     <div class="pw-modal-sub" id="pw-modal-sub">Enter the admin password to permanently delete all Firebase records. This action cannot be undone.</div>
     <div class="pw-input-wrap">
-      <input class="pw-input" id="pw-input" type="password" placeholder="Enter password…" autocomplete="off"
+      <input class="pw-input" id="pw-input" type="password" placeholder="Enter password&#8230;" autocomplete="off"
         onkeydown="if(event.key==='Enter')submitPwModal()"
         oninput="document.getElementById('pw-input').classList.remove('error');document.getElementById('pw-error').textContent=''"
       />
-      <button class="pw-toggle" onclick="togglePwVisibility()" id="pw-toggle-btn" title="Show/hide">👁</button>
+      <button class="pw-toggle" onclick="togglePwVisibility()" id="pw-toggle-btn" title="Show/hide">&#128065;</button>
     </div>
     <div class="pw-error-msg" id="pw-error"></div>
     <div class="pw-modal-actions">
@@ -695,7 +777,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   </div>
 </div>
 
-<!-- SheetJS — Excel export -->
+<!-- SheetJS &#8212; Excel export -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <!-- Firebase compat SDK (works with regular non-module scripts) -->
@@ -710,11 +792,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 const API_URL = 'https://static.ninjasaga.cc/data/clan_rankings.json';
 const STORAGE_KEY = 'clan_live_tracker';
 
-// In-memory dedup set for suspectLog — rebuilt from storage on load
+// In-memory dedup set for suspectLog \u2014 rebuilt from storage on load
 // Prevents the same drop event being recorded twice across polls
 let suspectLogKeysSeen = new Set();
 
-// ── Access level ────────────────────────────────────────────
+// \u2500\u2500 Access level \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 // 'normal' = default (Rankings, Risk Bleed, History, Settings only)
 // 'admin'  = full view (all tabs + Delete Firebase Records visible)
 let accessLevel = 'normal';
@@ -741,25 +823,25 @@ let state = {
   // Finalized rounds, oldest first, capped at 100
   roundHistory: [],       // [{id, startTs, endTs, clans: [{clanId, name, startRep, endRep, gain}]}]
   // Last actual reputation change per clan, reset to 0/null every round start.
-  // {clanId: {amount, ts}} — ts is ms epoch of when that change was detected, or null if no change yet this round.
+  // {clanId: {amount, ts}} \u2014 ts is ms epoch of when that change was detected, or null if no change yet this round.
   clanActivity: {},
-  // Rolling log of per-poll rep deltas per clan — NOT persisted, ephemeral only.
-  // Key: clanId → [{amount, ts}, ...] — entries older than 5s are trimmed on write.
+  // Rolling log of per-poll rep deltas per clan \u2014 NOT persisted, ephemeral only.
+  // Key: clanId \u2192 [{amount, ts}, ...] \u2014 entries older than 5s are trimmed on write.
   // Used to compute the 5s accumulated change display during gaining-bleed status.
   clanRepEvents: {},
   // Per-member peak reputation seen across ALL polls this round.
-  // Key: `${clanId}_${memberId}` → {peak, peakTs, dropAmount, dropTs, dropCount}
-  // dropAmount > 0 means the rep fell below its peak at some point — strong cheat signal.
+  // Key: `${clanId}_${memberId}` \u2192 {peak, peakTs, dropAmount, dropTs, dropCount}
+  // dropAmount > 0 means the rep fell below its peak at some point \u2014 strong cheat signal.
   // Reset to current rep at every round boundary so peaks don't bleed across rounds.
   memberPeakRep: {},
-  // Per-member rolling log of rep-gain event timestamps — reset each round.
-  // Key: `${clanId}_${memberId}` → [ts, ts, ...] — ms epoch of each poll where rep went up.
+  // Per-member rolling log of rep-gain event timestamps \u2014 reset each round.
+  // Key: `${clanId}_${memberId}` \u2192 [ts, ts, ...] \u2014 ms epoch of each poll where rep went up.
   // Entries older than 15s are trimmed on every write. Drives bleed vs manual detection.
   memberGainEvents: {},
-  // Deduction change log — newest first, capped at 500 entries.
+  // Deduction change log \u2014 newest first, capped at 500 entries.
   // Each entry: {clanId, clanName, clanRank, deduction, prevDeduction, change, ts, members:[]}
   deductionLog: [],
-  // Persistent suspect event log — survives round rollovers — newest first, capped at 1000 entries.
+  // Persistent suspect event log \u2014 survives round rollovers \u2014 newest first, capped at 1000 entries.
   // Each entry: {dedupKey, ts, clanId, clanName, clanRank, clanDeduction,
   //              memberId, memberName, memberLevel, memberRep, peakRep,
   //              dropAmount, dropCount, confidence, reason}
@@ -814,7 +896,7 @@ function applySettings() {
     if(state.settings.yourClanId && state.data) {
       const c = getClanById(state.settings.yourClanId);
       ycn.textContent = c ? c.name : 'ID: ' + state.settings.yourClanId;
-    } else { ycn.textContent = 'Not set — go to Rankings to pick'; }
+    } else { ycn.textContent = 'Not set \u2014 go to Rankings to pick'; }
   }
   const detailScreen = document.getElementById('screen-detail');
   if (detailScreen && detailScreen.classList.contains('active') && state.currentDetailClanId) {
@@ -857,7 +939,7 @@ async function fetchData(manual = false) {
     lastPollAt = Date.now();
 
     // Timestamp updates on every successful poll, even if data unchanged
-    document.getElementById('header-sub').textContent = json.clans.length + ' clans · ' + fmtTime(state.lastFetch);
+    document.getElementById('header-sub').textContent = json.clans.length + ' clans \u00B7 ' + fmtTime(state.lastFetch);
 
     // Only re-render if data actually changed (generated_at comparison)
     const newGeneratedAt = json.generated_at;
@@ -880,10 +962,10 @@ async function fetchData(manual = false) {
 
       if (state.settings.notificationsEnabled) checkBleedingNotifications();
     } else {
-      // Data unchanged — just update loading state silently
+      // Data unchanged \u2014 just update loading state silently
       document.getElementById('loading').classList.remove('visible');
       document.getElementById('error-bar').classList.remove('visible');
-      // A round can still roll over even when nobody's reputation changed —
+      // A round can still roll over even when nobody's reputation changed \u2014
       // re-render so "Risk Bleed" clans reset onto the new round's clock.
       if (roundRolledOver) { renderCurrentView(); saveToStorage(); }
     }
@@ -892,7 +974,7 @@ async function fetchData(manual = false) {
   } catch(e) {
     lastPollAt = Date.now(); // still mark poll attempt
     const eb = document.getElementById('error-bar');
-    eb.textContent = '⚠ ' + e.message;
+    eb.textContent = '\u26A0 ' + e.message;
     eb.classList.add('visible');
     document.getElementById('loading').classList.remove('visible');
     const dot = document.getElementById('live-dot');
@@ -932,7 +1014,7 @@ function repSnapshot(json) {
   return snap;
 }
 
-// Rounds are aligned to the game's fixed :00/:30 half-hour marks — every
+// Rounds are aligned to the game's fixed :00/:30 half-hour marks \u2014 every
 // round starts at HH:00 or HH:30 and runs for 30 minutes, regardless of
 // when a clan's stamina actually crosses the bleed threshold inside it.
 function getRoundStart(d) {
@@ -948,7 +1030,7 @@ function getRoundStart(d) {
 // round's starting snapshot (showing up as 0 gain instead of being counted
 // where it belongs, in the round that was closing). Waiting this many ms
 // past the real boundary before switching rounds gives that data time to
-// settle, so the tracker still LABELS rounds at the true HH:00/HH:30 mark —
+// settle, so the tracker still LABELS rounds at the true HH:00/HH:30 mark \u2014
 // it just delays *detecting* the switch until HH:00:10 / HH:30:10.
 const ROUND_SWITCH_GRACE_MS = 15000;
 
@@ -961,7 +1043,7 @@ function updateRoundTracking() {
   const roundId = roundStart.toISOString();
 
   if (!state.round.id) {
-    // First run ever — just open the current round, nothing to finalize.
+    // First run ever \u2014 just open the current round, nothing to finalize.
     state.round = { id: roundId, startTs: roundStart.toISOString(), startSnap: repSnapshot(state.data) };
     return false;
   }
@@ -970,7 +1052,7 @@ function updateRoundTracking() {
 
   // Boundary crossed since the last poll. Use the last data we saw *before*
   // this poll (state.prevData) as the closing snapshot for the round that
-  // just ended — it's the closest thing we have to "reputation at HH:30".
+  // just ended \u2014 it's the closest thing we have to "reputation at HH:30".
   finalizeRound(state.round, state.prevData || state.data);
   state.round = { id: roundId, startTs: roundStart.toISOString(), startSnap: repSnapshot(state.data) };
   return true;
@@ -999,12 +1081,12 @@ function getClanRoundGain(clanId) {
 
 // Only clans inside the top N are realistic war targets, so a flat clan
 // there is worth flagging as "might be bleeding". Outside that range, a
-// flat clan is just... flat — not worth raising an alarm over.
+// flat clan is just... flat \u2014 not worth raising an alarm over.
 const RISK_BLEED_RANK_THRESHOLD = 20;
 
 // Time windows for bleed-pattern detection
-const BLEED_MULTI_MEMBER_WINDOW_MS = 5000;  // 2+ different members gaining within 5s → bleed
-const BLEED_SINGLE_MEMBER_WINDOW_MS = 10000; // 1 member gaining 2+ times within 10s → bleed
+const BLEED_MULTI_MEMBER_WINDOW_MS = 5000;  // 2+ different members gaining within 5s \u2192 bleed
+const BLEED_SINGLE_MEMBER_WINDOW_MS = 10000; // 1 member gaining 2+ times within 10s \u2192 bleed
 
 // Has ANY clan gained reputation yet in the current round? Kept for UI notes.
 function isRoundActive() {
@@ -1015,17 +1097,17 @@ function isRoundActive() {
 // Analyses the recent rep-gain timing pattern for a clan to distinguish
 // bleed (auto-attack) from a manual attack.
 //
-// A manual attack is slow — the player physically controls their character,
+// A manual attack is slow \u2014 the player physically controls their character,
 // fights, and queues the next fight. This takes well over 10 seconds per cycle.
 //
 // When a clan IS bleeding, attackers gain rep from auto-battle, which is
-// much faster — the same player can gain rep multiple times within 10s, or
+// much faster \u2014 the same player can gain rep multiple times within 10s, or
 // several players all gain rep within a 5s window because the target is
 // auto-assigning fights to whoever is available.
 //
 // Returns true (bleed pattern detected) if EITHER:
-//   A) A single member gained rep 2+ times within 10s — too fast for manual.
-//   B) 2+ different members each gained rep within 5s of each other —
+//   A) A single member gained rep 2+ times within 10s \u2014 too fast for manual.
+//   B) 2+ different members each gained rep within 5s of each other \u2014
 //      coordinated auto-battle pattern. Condition A acting as a confirmation
 //      guard: the 10s single-member check above catches the edge case where
 //      two players coincidentally won manual attacks within 5s of each other
@@ -1092,7 +1174,7 @@ function getClanRepStatus(clanId) {
   if (gain > 0) {
     return isClanBleeding(clanId) ? 'gaining-bleed' : 'gaining-manual';
   }
-  // Flat — only show Risk Bleed when a confirmed bleed is actually happening
+  // Flat \u2014 only show Risk Bleed when a confirmed bleed is actually happening
   if (!isAnyBleedDetected()) return 'flat';
   const clan = getClanById(clanId);
   const rank = clan ? clan.rank : Infinity;
@@ -1114,7 +1196,7 @@ function getClanDelta(clanId) {
 }
 
 // Tracks, per clan, the most recent ACTUAL reputation change and when it
-// happened — separate from getClanDelta, which only ever reflects the very
+// happened \u2014 separate from getClanDelta, which only ever reflects the very
 // last poll-to-poll diff. This is what "as of Xs/Xm ago" is built from.
 // Reset to {amount:0, ts:null} at the start of every round, so every clan
 // reads 0 the moment a round begins, then updates in place each time it
@@ -1173,7 +1255,7 @@ function getClanDisplayActivity(clanId) {
   return getClanActivity(clanId);
 }
 
-// Per-member session peak tracking — MEMORY ONLY, no Firestore writes here.
+// Per-member session peak tracking \u2014 MEMORY ONLY, no Firestore writes here.
 // The ACP first flags a member with a rep drop (preliminary signal) before the
 // official clan deduction is confirmed in the API. Writing to Firestore at flag
 // time wastes writes on unconfirmed events and records the wrong timestamp.
@@ -1189,7 +1271,7 @@ function recordMemberPeaks(roundJustRolledOver) {
       const entry = state.memberPeakRep[key];
 
       if (roundJustRolledOver || !entry) {
-        // Start of a new round — reset baseline to current rep
+        // Start of a new round \u2014 reset baseline to current rep
         state.memberPeakRep[key] = {
           peak: m.reputation,
           peakTs: Date.now(),
@@ -1201,10 +1283,10 @@ function recordMemberPeaks(roundJustRolledOver) {
       }
 
       if (m.reputation > entry.peak) {
-        // New high — update peak
+        // New high \u2014 update peak
         state.memberPeakRep[key] = { ...entry, peak: m.reputation, peakTs: Date.now() };
       } else if (entry.peak > 0 && m.reputation < entry.peak) {
-        // Rep fell below peak — ACP preliminary flag, stored in memory only.
+        // Rep fell below peak \u2014 ACP preliminary flag, stored in memory only.
         // Firestore write happens in recordDeductionChanges() when official.
         const dropAmount = entry.peak - m.reputation;
         const newDropCount = (entry.dropCount || 0) + 1;
@@ -1242,7 +1324,7 @@ function recordMemberGainEvents(roundJustRolledOver) {
         const prevClan = state.prevData.clans.find(c => c.id === clan.id);
         const prevMember = prevClan?.member_list.find(mm => mm.id === m.id);
         if (prevMember && m.reputation > prevMember.reputation) {
-          // Rep went up since last poll — log the event timestamp
+          // Rep went up since last poll \u2014 log the event timestamp
           state.memberGainEvents[key].push(now);
         }
       }
@@ -1334,16 +1416,16 @@ function recordDeductionChanges() {
   if (state.deductionLog.length > 500) state.deductionLog = state.deductionLog.slice(0, 500);
 }
 
-// Exact timestamp string: "07/21/2026 · 08:07:06 PM"
+// Exact timestamp string: "07/21/2026 \u00B7 08:07:06 PM"
 function fmtDateTime(ts) {
-  if (!ts) return '—';
+  if (!ts) return '\u2014';
   const d = new Date(ts);
   const date = d.toLocaleDateString([], { month: '2-digit', day: '2-digit', year: 'numeric' });
   const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  return `${date} · ${time}`;
+  return `${date} \u00B7 ${time}`;
 }
 
-// "5s ago" / "3m ago" / "2h ago" — null ts means no change yet this round.
+// "5s ago" / "3m ago" / "2h ago" \u2014 null ts means no change yet this round.
 function fmtAgo(ts) {
   if (!ts) return null;
   const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
@@ -1385,14 +1467,14 @@ function getMemberDelta(clanId, memberId) {
 }
 
 // Reputation gained by a specific member so far in the current (in-progress)
-// round — mirrors getClanRoundGain, but per member. Since it's computed
+// round \u2014 mirrors getClanRoundGain, but per member. Since it's computed
 // straight off the round-start snapshot vs whatever the latest poll says,
 // it's live by construction: it updates on every poll, no separate tracking
 // needed. Returns null if a member truly has no baseline yet (e.g. they
 // joined mid-round). If the round itself predates per-member tracking
 // (an old startSnap saved before this feature existed, or one carried over
-// from localStorage), we can't recover the true round-start values — so we
-// seed the baseline from right now instead of showing "—" for the rest of
+// from localStorage), we can't recover the true round-start values \u2014 so we
+// seed the baseline from right now instead of showing "\u2014" for the rest of
 // the round. Gains accumulate live from that point on.
 function getMemberRoundGain(clanId, memberId) {
   if (!state.round.startSnap || !state.data) return null;
@@ -1460,7 +1542,7 @@ function updateSuspectsTabBadge() {
     }
     badge.textContent = caught;
     badge.style.background = highCount > 0 ? 'var(--red)' : 'var(--green)';
-    badge.style.color = '#1e1e2e';
+    badge.style.color = '#0a0a0a';
   } else if (badge) {
     badge.remove();
   }
@@ -1542,9 +1624,9 @@ function renderRankings() {
         </div>
         <div class="clan-stat">
           <div class="clan-stat-label">This Round</div>
-          <div class="clan-stat-value" style="color:${statusColor(status)}">${roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '—'}</div>
+          <div class="clan-stat-value" style="color:${statusColor(status)}">${roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '\u2014'}</div>
         </div>
-        <div class="clan-master" style="margin-left:auto">⚔ ${esc(clan.master)}</div>
+        <div class="clan-master" style="margin-left:auto">\u2694 ${esc(clan.master)}</div>
       </div>
     </div>`;
   }).join('');
@@ -1585,9 +1667,9 @@ function renderYourClanBanner() {
 
   if (status === 'risk') {
     alertDiv.classList.add('visible');
-    document.getElementById('home-bleed-title').textContent = '⚠ ' + clan.name + ' — RISK BLEED';
+    document.getElementById('home-bleed-title').textContent = '\u26A0 ' + clan.name + ' \u2014 RISK BLEED';
     document.getElementById('home-bleed-sub').textContent =
-      `No reputation gained this round (${roundGain !== null ? fmtNum(roundGain) : '—'}) — a confirmed bleed is happening nearby; this clan may be the target`;
+      `No reputation gained this round (${roundGain !== null ? fmtNum(roundGain) : '\u2014'}) \u2014 a confirmed bleed is happening nearby; this clan may be the target`;
   } else {
     alertDiv.classList.remove('visible');
   }
@@ -1604,7 +1686,7 @@ function renderDetail(clanId) {
   const roundGain = getClanRoundGain(clan.id);
 
   document.getElementById('detail-clan-name').textContent = clan.name;
-  document.getElementById('detail-clan-sub').textContent = `Rank #${clan.rank} · Master: ${clan.master}`;
+  document.getElementById('detail-clan-sub').textContent = `Rank #${clan.rank} \u00B7 Master: ${clan.master}`;
   document.getElementById('ds-rep').textContent = fmtNum(clan.reputation);
   document.getElementById('ds-delta').innerHTML = changeDeltaHtml(activity);
   document.getElementById('ds-delta').style.color = activity.amount > 0 ? 'var(--green)' : activity.amount < 0 ? 'var(--red)' : 'var(--text3)';
@@ -1621,20 +1703,20 @@ function renderDetail(clanId) {
   document.getElementById('detail-stamina-pct').textContent = statusLabel(status);
   document.getElementById('detail-stamina-pct').style.color = statusColor(status);
   document.getElementById('detail-round-window').textContent = roundWindowLabel(state.round.startTs);
-  document.getElementById('detail-round-gain').textContent = roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '—';
+  document.getElementById('detail-round-gain').textContent = roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '\u2014';
 
   // Bleed alerts
   const ba = document.getElementById('detail-bleed-alert');
   if (status === 'gaining-bleed') {
     ba.classList.add('visible');
-    document.getElementById('detail-bleed-alert-title').textContent = '🔴 GAINING (BLEED)';
+    document.getElementById('detail-bleed-alert-title').textContent = '\u{1F534} GAINING (BLEED)';
     document.getElementById('detail-bleed-msg').textContent =
-      `Bleed pattern detected — 2+ members gained rep within 5s of each other, or a single member gained rep consecutively within 10s. This clan is likely farming a bleeding target.`;
+      `Bleed pattern detected \u2014 2+ members gained rep within 5s of each other, or a single member gained rep consecutively within 10s. This clan is likely farming a bleeding target.`;
   } else if (status === 'risk') {
     ba.classList.add('visible');
-    document.getElementById('detail-bleed-alert-title').textContent = '⚠ RISK BLEED';
+    document.getElementById('detail-bleed-alert-title').textContent = '\u26A0 RISK BLEED';
     document.getElementById('detail-bleed-msg').textContent =
-      `No reputation gained this round and a confirmed bleed is occurring nearby — this clan may be the bleeding target, or simply hasn't attacked yet.`;
+      `No reputation gained this round and a confirmed bleed is occurring nearby \u2014 this clan may be the bleeding target, or simply hasn't attacked yet.`;
   } else {
     ba.classList.remove('visible');
   }
@@ -1642,16 +1724,16 @@ function renderDetail(clanId) {
   // Set Your Clan button
   const sycBtn = document.getElementById('set-your-clan-btn');
   if (isYours) {
-    sycBtn.textContent = '✓ Your Clan (tap to unset)';
-    sycBtn.style.background = 'rgba(203,166,247,0.15)';
+    sycBtn.textContent = '\u2713 Your Clan (tap to unset)';
+    sycBtn.style.background = 'rgba(240,165,0,0.15)';
     sycBtn.style.color = 'var(--mauve)';
   } else {
     sycBtn.textContent = 'Set as Yours';
     sycBtn.style.background = 'var(--mauve)';
-    sycBtn.style.color = '#1e1e2e';
+    sycBtn.style.color = '#0a0a0a';
   }
 
-  // Render member list — sorted by biggest gainers first (most active attackers)
+  // Render member list \u2014 sorted by biggest gainers first (most active attackers)
   const membersSorted = [...clan.member_list].sort((a, b) => {
     const da = getMemberRoundGain(clan.id, a.id) ?? 0;
     const db = getMemberRoundGain(clan.id, b.id) ?? 0;
@@ -1671,14 +1753,14 @@ function renderDetail(clanId) {
     const peak  = getMemberPeak(clan.id, m.id);
     const deltaHtml = d !== null
       ? `<span class="clan-delta ${d > 0 ? 'pos' : d < 0 ? 'neg' : 'neu'}">${d >= 0 ? '+' : ''}${fmtNum(d)}</span>`
-      : '<span class="clan-delta neu">—</span>';
+      : '<span class="clan-delta neu">\u2014</span>';
 
     // Peak indicator: show peak rep and drop amount if different from current
     let peakHtml = '';
     if (peak && peak.peak > m.reputation && peak.dropAmount > 0) {
       peakHtml = `<div style="font-size:10px;color:var(--red);margin-top:1px">` +
-                 `peak ${fmtNum(peak.peak)} → -${fmtNum(peak.dropAmount)}` +
-                 (peak.dropCount > 1 ? ` (${peak.dropCount}×)` : '') +
+                 `peak ${fmtNum(peak.peak)} \u2192 -${fmtNum(peak.dropAmount)}` +
+                 (peak.dropCount > 1 ? ` (${peak.dropCount}\u00D7)` : '') +
                  `</div>`;
     }
 
@@ -1689,7 +1771,7 @@ function renderDetail(clanId) {
     if (suspect) {
       rowClass += suspect.confidence === 'HIGH' ? ' suspect-high' : ' suspect-med';
       const badgeCls   = suspect.confidence === 'HIGH' ? 'badge-suspect-high' : 'badge-suspect-med';
-      const badgeLabel = suspect.confidence === 'HIGH'  ? '🚨 SUSPECT' : '⚠ SUSPECT?';
+      const badgeLabel = suspect.confidence === 'HIGH'  ? '\u{1F6A8} SUSPECT' : '\u26A0 SUSPECT?';
       suspectBadge  = `<span class="badge ${badgeCls}" style="margin-left:6px;font-size:9px">${badgeLabel}</span>`;
       suspectReason = `<div class="suspect-reason">${esc(suspect.reason)}</div>`;
     }
@@ -1705,7 +1787,7 @@ function renderDetail(clanId) {
     </div>`;
   }).join('');
 
-  // ── Accumulated anti-cheat history from suspect log (admin only) ──
+  // \u2500\u2500 Accumulated anti-cheat history from suspect log (admin only) \u2500\u2500
   const cheatHistEl = document.getElementById('detail-cheat-history');
   if (accessLevel !== 'admin') { cheatHistEl.innerHTML = ''; }
   else {
@@ -1730,13 +1812,13 @@ function renderDetail(clanId) {
     const totalDeducted = sorted.reduce((n, m) => n + m.totalDrop, 0);
 
     let histHtml = `<div class="detail-cheat-section-header">
-      ⚠ ANTI-CHEAT HISTORY — SEASON TO DATE
+      \u26A0 ANTI-CHEAT HISTORY \u2014 SEASON TO DATE
       <span style="font-weight:400;color:var(--text3);margin-left:6px;text-transform:none;letter-spacing:0;font-size:10px">
-        ${sorted.length} member${sorted.length !== 1 ? 's' : ''} caught · ${fmtNum(clanSuspectHistory.length)} total event${clanSuspectHistory.length !== 1 ? 's' : ''}
+        ${sorted.length} member${sorted.length !== 1 ? 's' : ''} caught \u00B7 ${fmtNum(clanSuspectHistory.length)} total event${clanSuspectHistory.length !== 1 ? 's' : ''}
       </span>
     </div>
     <div style="margin:0 12px 6px;font-size:11px;color:var(--text3)">
-      Accumulated deductions tracked this session — stays until records are cleared. Persists across polls but resets if session data is wiped.
+      Accumulated deductions tracked this session \u2014 stays until records are cleared. Persists across polls but resets if session data is wiped.
     </div>`;
 
     for (const m of sorted) {
@@ -1750,8 +1832,8 @@ function renderDetail(clanId) {
         </div>
         <div class="mch-meta">
           ${m.events} reversal${m.events !== 1 ? 's' : ''} caught
-          · <span style="color:var(--text2)">first: ${firstStr}</span>
-          ${!sameTime ? `· <span style="color:var(--text2)">last: ${lastStr}</span>` : ''}
+          \u00B7 <span style="color:var(--text2)">first: ${firstStr}</span>
+          ${!sameTime ? `\u00B7 <span style="color:var(--text2)">last: ${lastStr}</span>` : ''}
         </div>
       </div>`;
     }
@@ -1759,7 +1841,7 @@ function renderDetail(clanId) {
   } else {
     // No history: only show a note if the clan has any deductions at all
     if (clan.deduction > 0) {
-      cheatHistEl.innerHTML = `<div class="detail-cheat-section-header">⚠ ANTI-CHEAT HISTORY</div>
+      cheatHistEl.innerHTML = `<div class="detail-cheat-section-header">\u26A0 ANTI-CHEAT HISTORY</div>
         <div style="margin:0 12px 8px;font-size:11px;color:var(--text3)">
           No individual member events recorded yet this session. History builds up as the tracker catches reversals live.
         </div>`;
@@ -1783,25 +1865,25 @@ function getLatestClanDeductionChange(clanId) {
 }
 
 // Returns array of suspected cheater members for a given clan.
-// Works for ANY clan with clan.deduction > 0 — from API data alone if needed.
+// Works for ANY clan with clan.deduction > 0 \u2014 from API data alone if needed.
 //
 // Detection signals (all caught "live" via the tracker's 5s polling):
-//   SIGNAL 1 — session peak tracker caught a rep spike that was later reversed
-//   SIGNAL 2 — rep dropped between the two most recent polls
-//   SIGNAL 3 — net round gain is negative (reversal within the round window)
-//   SIGNAL 4 — rep was >0 at round start, now exactly 0 (hard reset)
-//   SIGNAL 5 — rep lower than round start but drop not caught live (API-inferred)
+//   SIGNAL 1 \u2014 session peak tracker caught a rep spike that was later reversed
+//   SIGNAL 2 \u2014 rep dropped between the two most recent polls
+//   SIGNAL 3 \u2014 net round gain is negative (reversal within the round window)
+//   SIGNAL 4 \u2014 rep was >0 at round start, now exactly 0 (hard reset)
+//   SIGNAL 5 \u2014 rep lower than round start but drop not caught live (API-inferred)
 //
 // Suspicion levels (new, replacing old HIGH/MEDIUM confidence):
-//   HIGH — individual member rep drop was caught live AND the TOTAL drops for
+//   HIGH \u2014 individual member rep drop was caught live AND the TOTAL drops for
 //           all caught members exactly match the clan's latest deduction change.
-//           e.g. clan went from -244 → -268 (change = 24), member drops sum to 24 → HIGH.
-//   LOW  — rep gain→drop detected live but total doesn't align with clan deduction change,
+//           e.g. clan went from -244 \u2192 -268 (change = 24), member drops sum to 24 \u2192 HIGH.
+//   LOW  \u2014 rep gain\u2192drop detected live but total doesn't align with clan deduction change,
 //           OR the drop was inferred from API alone (not caught live).
 //
 // detectionSource:
-//   'live' — tracker's polling directly observed the rep gain and subsequent drop
-//   'api'  — only inferred from clan.deduction > 0 with no live member event caught
+//   'live' \u2014 tracker's polling directly observed the rep gain and subsequent drop
+//   'api'  \u2014 only inferred from clan.deduction > 0 with no live member event caught
 function getSuspectedCheaters(clanId) {
   const clan = getClanById(clanId);
   if (!clan || !clan.deduction || clan.deduction <= 0) return [];
@@ -1823,34 +1905,34 @@ function getSuspectedCheaters(clanId) {
     let dropTs     = null;
     let reason     = '';
 
-    // ── SIGNAL 1: peak tracker caught a transient rep spike that later dropped ──
+    // \u2500\u2500 SIGNAL 1: peak tracker caught a transient rep spike that later dropped \u2500\u2500
     if (peak && peak.dropAmount > 0 && peak.dropTs !== null && !seen.has(m.id)) {
       detectionSource = 'live';
       dropAmount = peak.dropAmount;
       dropCount  = peak.dropCount;
       dropTs     = peak.dropTs;
-      reason     = `Session peak was ${fmtNum(peak.peak)} — rep dropped by ${fmtNum(peak.dropAmount)} — anti-cheat reversed a cheated win mid-session`;
+      reason     = `Session peak was ${fmtNum(peak.peak)} \u2014 rep dropped by ${fmtNum(peak.dropAmount)} \u2014 anti-cheat reversed a cheated win mid-session`;
 
-    // ── SIGNAL 2: rep dropped between the two most recent polls ──
+    // \u2500\u2500 SIGNAL 2: rep dropped between the two most recent polls \u2500\u2500
     } else if (pollDelta !== null && pollDelta < 0 && !seen.has(m.id)) {
       detectionSource = 'live';
       dropAmount = Math.abs(pollDelta);
       dropCount  = 1;
-      reason     = `Rep just dropped ${fmtNum(pollDelta)} between the last two polls — caught the anti-cheat reversal live`;
+      reason     = `Rep just dropped ${fmtNum(pollDelta)} between the last two polls \u2014 caught the anti-cheat reversal live`;
 
-    // ── SIGNAL 3: net round gain is negative ──
+    // \u2500\u2500 SIGNAL 3: net round gain is negative \u2500\u2500
     } else if (roundGain !== null && roundGain < 0 && !seen.has(m.id)) {
       detectionSource = 'live';
       dropAmount = Math.abs(roundGain);
       dropCount  = 1;
-      reason     = `Rep is down ${fmtNum(roundGain)} since round start — cheated win flagged and gain reversed within this round`;
+      reason     = `Rep is down ${fmtNum(roundGain)} since round start \u2014 cheated win flagged and gain reversed within this round`;
 
-    // ── SIGNAL 4: was >0 at round start, now exactly 0 — hard reset ──
+    // \u2500\u2500 SIGNAL 4: was >0 at round start, now exactly 0 \u2014 hard reset \u2500\u2500
     } else if (startRep !== undefined && startRep > 0 && m.reputation === 0 && !seen.has(m.id)) {
       detectionSource = 'live';
       dropAmount = startRep;
       dropCount  = 1;
-      reason     = `Rep reset from ${fmtNum(startRep)} → 0 this round while clan took a ${fmtNum(clan.deduction)} anti-cheat deduction`;
+      reason     = `Rep reset from ${fmtNum(startRep)} \u2192 0 this round while clan took a ${fmtNum(clan.deduction)} anti-cheat deduction`;
 
     } else {
       continue; // no signal for this member
@@ -1861,7 +1943,7 @@ function getSuspectedCheaters(clanId) {
                     suspicionLevel: null /* assigned below */ });
   }
 
-  // ── Assign suspicion levels ──────────────────────────────────────────────
+  // \u2500\u2500 Assign suspicion levels \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   // HIGH: sum of all live-caught drops == latest clan deduction change (lined up exactly).
   // LOW:  live catch but not aligned, or only API-inferred.
   const totalLiveDrops = suspects
@@ -1923,7 +2005,7 @@ function downloadSuspects() {
   const now = new Date();
   const stamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
   const generatedAt = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-                    + ' · ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    + ' \u00B7 ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   function legacyToSuspicion(e) {
     return e.suspicionLevel || (e.confidence === 'HIGH' ? 'HIGH' : 'LOW');
@@ -1933,10 +2015,10 @@ function downloadSuspects() {
   const log = state.suspectLog || [];
   const rows = [];
 
-  rows.push(['INDIVIDUAL CHEATER SUSPECTS — History (All Rounds)', '', '', '', '', '', '', '', '', '', '', '', '']);
+  rows.push(['INDIVIDUAL CHEATER SUSPECTS \u2014 History (All Rounds)', '', '', '', '', '', '', '', '', '', '', '', '']);
   rows.push([`Generated: ${generatedAt}`, '', '', '', '', '', '', '', '', '', '', '', '']);
-  rows.push(['Suspicion Level: HIGH = rep drop caught live AND aligned exactly with clan deduction change — confirmed cheater', '', '', '', '', '', '', '', '', '', '', '', '']);
-  rows.push(['Detection Source: Caught Live = tracker observed rep gain→drop | API Based = inferred from API', '', '', '', '', '', '', '', '', '', '', '', '']);
+  rows.push(['Suspicion Level: HIGH = rep drop caught live AND aligned exactly with clan deduction change \u2014 confirmed cheater', '', '', '', '', '', '', '', '', '', '', '', '']);
+  rows.push(['Detection Source: Caught Live = tracker observed rep gain\u2192drop | API Based = inferred from API', '', '', '', '', '', '', '', '', '', '', '', '']);
   rows.push([]);
 
   if (log.length === 0) {
@@ -1973,7 +2055,7 @@ function downloadDeductions() {
   const now    = new Date();
   const stamp  = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
   const generatedAt = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-                    + ' · ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    + ' \u00B7 ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   function fmtTs(ts) {
     const d = new Date(ts);
@@ -1985,12 +2067,12 @@ function downloadDeductions() {
   const suspectLog = state.suspectLog || [];
   const dedLog     = state.deductionLog || [];
 
-  // ── Sheet 1 (default): Current API Deduction State ───────────────────────
+  // \u2500\u2500 Sheet 1 (default): Current API Deduction State \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   const apiRows = [];
-  apiRows.push(['CLAN DEDUCTION — Current API State', '', '', '', '', '', '', '', '', '', '', '', '']);
+  apiRows.push(['CLAN DEDUCTION \u2014 Current API State', '', '', '', '', '', '', '', '', '', '', '', '']);
   apiRows.push([`Generated: ${generatedAt}`, '', '', '', '', '', '', '', '', '', '', '', '']);
   apiRows.push(['Clan Source: Caught Live = tracker observed rep drop | API Based = only from API', '', '', '', '', '', '', '', '', '', '', '', '']);
-  apiRows.push(['Alignment: individual live rep drops == clan deduction change → lined up', '', '', '', '', '', '', '', '', '', '', '', '']);
+  apiRows.push(['Alignment: individual live rep drops == clan deduction change \u2192 lined up', '', '', '', '', '', '', '', '', '', '', '', '']);
   apiRows.push([]);
 
   if (state.data) {
@@ -2037,9 +2119,9 @@ function downloadDeductions() {
   const wsApi = XLSX.utils.aoa_to_sheet(apiRows);
   wsApi['!cols'] = [28, 10, 22, 16, 18, 14, 22, 8, 12, 16, 14, 10, 10, 60].map(w => ({ wch: w }));
 
-  // ── Sheet 2: Deduction Change Log (timestamped events) ───────────────────
+  // \u2500\u2500 Sheet 2: Deduction Change Log (timestamped events) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   const logRows = [];
-  logRows.push(['CLAN DEDUCTION — Change Log (timestamped events)', '', '', '', '']);
+  logRows.push(['CLAN DEDUCTION \u2014 Change Log (timestamped events)', '', '', '', '']);
   logRows.push([`Generated: ${generatedAt}`, '', '', '', '']);
   logRows.push([]);
 
@@ -2081,9 +2163,9 @@ function downloadDeductions() {
         }
       }
       const dateRange = firstTs
-        ? (firstTs === lastTs ? fmtTs(firstTs) : `${fmtTs(firstTs)}  –  ${fmtTs(lastTs)}`)
-        : '—';
-      logRows.push([`${meta.name}  ·  Rank #${meta.rank}`, '', dateRange, '', '']);
+        ? (firstTs === lastTs ? fmtTs(firstTs) : `${fmtTs(firstTs)}  \u2013  ${fmtTs(lastTs)}`)
+        : '\u2014';
+      logRows.push([`${meta.name}  \u00B7  Rank #${meta.rank}`, '', dateRange, '', '']);
       if (entries.length === 0) {
         logRows.push(['', 'Cheating Clan Members', '(no individual events recorded yet)', '', '']);
         logRows.push(['', 'Total Reputation Deducted', '', `-${fmtNum(meta.currentDeduction)}`, '']);
@@ -2142,7 +2224,7 @@ function renderSuspects() {
   if (log.length === 0) {
     const deductedClans = state.data.clans.filter(c => c.deduction > 0).length;
     const msg = deductedClans > 0
-      ? `${deductedClans} clan${deductedClans !== 1 ? 's have' : ' has'} anti-cheat deductions but no confirmed suspects yet. A suspect is confirmed when a live rep drop exactly matches the clan\xe2\x80\x99s deduction change. Keep the tracker open \xe2\x80\x94 events are caught automatically.`
+      ? `${deductedClans} clan${deductedClans !== 1 ? 's have' : ' has'} anti-cheat deductions but no confirmed suspects yet. A suspect is confirmed when a live rep drop exactly matches the clan\u2019s deduction change. Keep the tracker open \u2014 events are caught automatically.`
       : 'No clans have anti-cheat deductions. Nothing to investigate.';
     container.innerHTML = `<div class="empty-state">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -2151,7 +2233,7 @@ function renderSuspects() {
   }
 
   let html = `<div style="margin:0 12px 10px;font-size:11px;color:var(--text3)">
-    <span style="color:var(--red);font-weight:700">${log.length} HIGH</span> confirmed suspect${log.length !== 1 ? 's' : ''} \xe2\x80\x94 rep drop caught live and aligned exactly with clan deduction change
+    <span style="color:var(--red);font-weight:700">${log.length} HIGH</span> confirmed suspect${log.length !== 1 ? 's' : ''} \u2014 rep drop caught live and aligned exactly with clan deduction change
   </div>`;
 
   // Group by date
@@ -2167,9 +2249,9 @@ function renderSuspects() {
   for (const grp of groups) {
     html += `<div class="ded-date-header">${esc(grp.date)}</div>`;
     for (const e of grp.entries) {
-      const srcTag   = `<span style="font-size:9px;color:#a6e3a1;background:rgba(166,227,161,0.12);border:1px solid rgba(166,227,161,0.3);padding:1px 5px;border-radius:5px">\xf0\x9f\x9f\xa2 Live</span>`;
+      const srcTag   = `<span style="font-size:9px;color:#a6e3a1;background:rgba(166,227,161,0.12);border:1px solid rgba(166,227,161,0.3);padding:1px 5px;border-radius:5px">\u{1F7E2} Live</span>`;
       const dropLine = e.dropAmount > 0
-        ? `<span style="color:var(--red);font-size:10px;margin-left:4px">\xe2\x88\x92${fmtNum(e.dropAmount)}${e.dropCount > 1 ? ` (${e.dropCount}\xc3\x97)` : ''}</span>` : '';
+        ? `<span style="color:var(--red);font-size:10px;margin-left:4px">\u2212${fmtNum(e.dropAmount)}${e.dropCount > 1 ? ` (${e.dropCount}\u00D7)` : ''}</span>` : '';
       const detectedAt = e.dropTs
         ? new Date(e.dropTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         : new Date(e.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -2179,7 +2261,7 @@ function renderSuspects() {
               <div class="suspect-hist-clan">${esc(e.clanName)} <span style="font-size:11px;color:var(--text3)">#${e.clanRank}</span></div>
               <div style="font-size:10px;color:var(--text3);margin-top:2px">
                 Clan deduction at event: <span style="color:var(--red);font-weight:700">-${fmtNum(e.clanDeduction)}</span>
-                &nbsp;\xc2\xb7&nbsp; ${srcTag}
+                &nbsp;\u00B7&nbsp; ${srcTag}
               </div>
             </div>
             <div class="suspect-hist-ts" style="flex-shrink:0;margin-left:8px">
@@ -2188,10 +2270,10 @@ function renderSuspects() {
             </div>
           </div>
           <div class="suspect-hist-member">
-            <div class="sm-icon">\xf0\x9f\x9a\xa8</div>
+            <div class="sm-icon">\u{1F6A8}</div>
             <div class="sm-info">
               <div class="sm-name">${esc(e.memberName)}
-                <span style="font-size:10px;color:var(--text3)">Lv ${e.memberLevel} \xc2\xb7 Rep ${fmtNum(e.memberRep)}${dropLine}</span>
+                <span style="font-size:10px;color:var(--text3)">Lv ${e.memberLevel} \u00B7 Rep ${fmtNum(e.memberRep)}${dropLine}</span>
               </div>
               <div class="sm-reason">${esc(e.reason)}</div>
             </div>
@@ -2246,17 +2328,17 @@ function renderDeductions() {
       ).join('');
   }
 
-  // ── SECTION 1: Current API Deduction State ───────────────────────────────
+  // \u2500\u2500 SECTION 1: Current API Deduction State \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   let html = '';
   if (state.data) {
     const allDed = getAllClanDeductions();
     if (allDed.length > 0) {
-      html += `<div class="section-header" style="padding-top:10px">📡 Current API Deduction State</div>`;
+      html += `<div class="section-header" style="padding-top:10px">\u{1F4E1} Current API Deduction State</div>`;
       html += `<div style="margin:0 12px 8px;font-size:11px;color:var(--text3)">
-        ${allDed.length} clan${allDed.length !== 1 ? 's' : ''} with active deductions —
-        <span class="badge-src-live" style="font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(166,227,161,0.12);color:#a6e3a1;border:1px solid rgba(166,227,161,0.3)">🟢 Caught Live</span>
+        ${allDed.length} clan${allDed.length !== 1 ? 's' : ''} with active deductions \u2014
+        <span class="badge-src-live" style="font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(166,227,161,0.12);color:#a6e3a1;border:1px solid rgba(166,227,161,0.3)">\u{1F7E2} Caught Live</span>
         = tracker observed rep drop live &nbsp;
-        <span class="badge-src-api" style="font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(137,180,250,0.1);color:#89b4fa;border:1px solid rgba(137,180,250,0.3)">📡 API Based</span>
+        <span class="badge-src-api" style="font-size:9px;padding:1px 5px;border-radius:5px;background:rgba(137,180,250,0.1);color:#89b4fa;border:1px solid rgba(137,180,250,0.3)">\u{1F4E1} API Based</span>
         = from API only
       </div>`;
 
@@ -2275,23 +2357,23 @@ function renderDeductions() {
         const highCount = suspects.filter(s => s.suspicionLevel === 'HIGH').length;
 
         const srcBadge = clanSource === 'live'
-          ? `<span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(166,227,161,0.12);color:#a6e3a1;border:1px solid rgba(166,227,161,0.3)">🟢 Caught Live</span>`
-          : `<span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(137,180,250,0.1);color:#89b4fa;border:1px solid rgba(137,180,250,0.3)">📡 API Based</span>`;
+          ? `<span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(166,227,161,0.12);color:#a6e3a1;border:1px solid rgba(166,227,161,0.3)">\u{1F7E2} Caught Live</span>`
+          : `<span style="font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(137,180,250,0.1);color:#89b4fa;border:1px solid rgba(137,180,250,0.3)">\u{1F4E1} API Based</span>`;
 
         let alignHtml = '';
         if (latestChange !== null && latestChange > 0) {
           const alignColor = isAligned ? 'var(--green)' : '#f9e2af';
-          const alignIcon  = isAligned ? '✅' : '⚠️';
+          const alignIcon  = isAligned ? '\u2705' : '\u26A0\uFE0F';
           alignHtml = `<div style="font-size:10px;color:var(--text3);margin-top:3px">
             Deduction change: <span style="color:var(--red);font-weight:700">+${fmtNum(latestChange)}</span>
-            (${fmtNum(prevDedVal)} → ${fmtNum(clan.deduction)})${dedTs ? ` at ${dedTs}` : ''}
-            &nbsp;·&nbsp; Members' live drop total: <span style="color:${alignColor};font-weight:700">${fmtNum(liveMemberDrops)}</span>
+            (${fmtNum(prevDedVal)} \u2192 ${fmtNum(clan.deduction)})${dedTs ? ` at ${dedTs}` : ''}
+            &nbsp;\u00B7&nbsp; Members' live drop total: <span style="color:${alignColor};font-weight:700">${fmtNum(liveMemberDrops)}</span>
             &nbsp;${alignIcon} ${isAligned ? '<span style="color:var(--green)">Aligned</span>' : '<span style="color:#f9e2af">Not aligned</span>'}
           </div>`;
         } else {
           alignHtml = `<div style="font-size:10px;color:var(--blue);margin-top:3px">
             Total cumulative deduction: <span style="color:var(--red);font-weight:700">-${fmtNum(clan.deduction)}</span>
-            &nbsp;·&nbsp; Detected from API only — no live change logged this session
+            &nbsp;\u00B7&nbsp; Detected from API only \u2014 no live change logged this session
           </div>`;
         }
 
@@ -2309,7 +2391,7 @@ function renderDeductions() {
               ${alignHtml}
             </div>
             <div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0;margin-left:8px">
-              ${highCount > 0 ? `<span class="badge badge-suspect-high">🚨 ${highCount} HIGH</span>` : ''}
+              ${highCount > 0 ? `<span class="badge badge-suspect-high">\u{1F6A8} ${highCount} HIGH</span>` : ''}
               ${suspects.length === 0 ? `<span style="font-size:9px;color:var(--text3)">No members caught</span>` : ''}
             </div>
           </div>
@@ -2318,8 +2400,8 @@ function renderDeductions() {
     }
   }
 
-  // ── SECTION 2: Deduction Change Log (timestamped events) ────────────────
-  html += `<div class="section-header" style="padding-top:${state.data && getAllClanDeductions().length > 0 ? '14' : '10'}px">⏱ Deduction Change Log</div>`;
+  // \u2500\u2500 SECTION 2: Deduction Change Log (timestamped events) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  html += `<div class="section-header" style="padding-top:${state.data && getAllClanDeductions().length > 0 ? '14' : '10'}px">\u23F1 Deduction Change Log</div>`;
 
   if (log.length === 0) {
     html += `<div class="empty-state" style="padding:24px 20px">
@@ -2366,15 +2448,15 @@ function renderDeductions() {
       const membersHtml = (e.members && e.members.length > 0)
         ? `<div class="ded-members">
             ${e.members.map(m => {
-              const icon = '🚨';
+              const icon = '\u{1F6A8}';
               const badgeCls = 'badge-suspect-high';
               const dropLine = m.dropAmount > 0
-                ? ` <span style="color:var(--red);font-size:9px">−${fmtNum(m.dropAmount)}${m.dropCount > 1 ? ` (${m.dropCount}×)` : ''}</span>`
+                ? ` <span style="color:var(--red);font-size:9px">\u2212${fmtNum(m.dropAmount)}${m.dropCount > 1 ? ` (${m.dropCount}\u00D7)` : ''}</span>`
                 : '';
               return `<div class="ded-member-row">
                 <div class="ded-member-icon">${icon}</div>
                 <div class="ded-member-info">
-                  <div class="ded-member-name">${esc(m.name)} <span style="font-size:10px;color:var(--text3)">Lv ${m.level} · Rep ${fmtNum(m.reputation)}${dropLine}</span></div>
+                  <div class="ded-member-name">${esc(m.name)} <span style="font-size:10px;color:var(--text3)">Lv ${m.level} \u00B7 Rep ${fmtNum(m.reputation)}${dropLine}</span></div>
                   <div class="ded-member-reason">${esc(m.reason)}</div>
                 </div>
                 <div class="ded-member-badge"><span class="badge badge-suspect-high" style="font-size:9px">HIGH</span></div>
@@ -2391,7 +2473,7 @@ function renderDeductions() {
           </div>
           <div class="ded-clan">
             <div class="ded-clan-name">${esc(e.clanName)}</div>
-            <div class="ded-clan-rank">Rank #${e.clanRank} · ${fmtNum(e.prevDeduction)} → ${fmtNum(e.deduction)}</div>
+            <div class="ded-clan-rank">Rank #${e.clanRank} \u00B7 ${fmtNum(e.prevDeduction)} \u2192 ${fmtNum(e.deduction)}</div>
           </div>
           <div class="ded-amounts">
             <div class="ded-total">-${fmtNum(e.deduction)}</div>
@@ -2425,14 +2507,14 @@ function renderBleeding() {
     .filter(c => getClanRepStatus(c.id) === 'gaining-bleed')
     .sort((a, b) => a.rank - b.rank);
 
-  // Flat top-20 clans — only shown when a confirmed bleed is happening
+  // Flat top-20 clans \u2014 only shown when a confirmed bleed is happening
   const riskClans = state.data.clans
     .filter(c => getClanRepStatus(c.id) === 'risk')
     .sort((a, b) => a.rank - b.rank);
 
   const activeNote = isRoundActive()
     ? ''
-    : ' · no rep movement yet this round — everyone shows Flat until someone attacks';
+    : ' \u00B7 no rep movement yet this round \u2014 everyone shows Flat until someone attacks';
   let html = `<div style="margin:0 12px 10px;font-size:11px;color:var(--text3)">Current round: ${windowLabel}${activeNote}</div>`;
 
   const yourClan = state.settings.yourClanId ? getClanById(state.settings.yourClanId) : null;
@@ -2441,15 +2523,15 @@ function renderBleeding() {
     html += repStatusCardHtml(yourClan);
   }
 
-  // ── RISK BLEED section — only shown when a confirmed bleed is active ───────
+  // \u2500\u2500 RISK BLEED section \u2014 only shown when a confirmed bleed is active \u2500\u2500\u2500\u2500\u2500\u2500\u2500
   const otherRisk = riskClans.filter(c => !yourClan || c.id !== yourClan.id);
-  html += `<div class="section-header">⚠ RISK BLEED — FLAT TOP ${RISK_BLEED_RANK_THRESHOLD} (${otherRisk.length})</div>`;
+  html += `<div class="section-header">\u26A0 RISK BLEED \u2014 FLAT TOP ${RISK_BLEED_RANK_THRESHOLD} (${otherRisk.length})</div>`;
   if (!bleedDetected) {
     html += `<div class="empty-state" style="padding:16px 12px">
-      <p style="font-size:12px">No confirmed bleed this round — Risk Bleed only shows when a bleed pattern is active.</p>
+      <p style="font-size:12px">No confirmed bleed this round \u2014 Risk Bleed only shows when a bleed pattern is active.</p>
     </div>`;
   } else if (otherRisk.length > 0) {
-    html += `<div style="margin:0 12px 8px;font-size:11px;color:var(--text3)">These top-${RISK_BLEED_RANK_THRESHOLD} clans haven't gained rep while a bleed is confirmed. They may be the bleeding target — or just haven't attacked yet.</div>`;
+    html += `<div style="margin:0 12px 8px;font-size:11px;color:var(--text3)">These top-${RISK_BLEED_RANK_THRESHOLD} clans haven't gained rep while a bleed is confirmed. They may be the bleeding target \u2014 or just haven't attacked yet.</div>`;
     html += otherRisk.map(c => repStatusCardHtml(c)).join('');
   } else {
     html += `<div class="empty-state" style="padding:16px 12px">
@@ -2469,7 +2551,7 @@ function repStatusCardHtml(clan) {
         <h3>${esc(clan.name)} <span style="font-size:11px;color:var(--text3)">#${clan.rank}</span></h3>
         <div style="font-size:11px;color:var(--text3);margin-top:2px">${statusBadgeHtml(status)}</div>
       </div>
-      <div class="bleed-clan-delta-big" style="color:${statusColor(status)}">${roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '—'}</div>
+      <div class="bleed-clan-delta-big" style="color:${statusColor(status)}">${roundGain !== null ? (roundGain >= 0 ? '+' : '') + fmtNum(roundGain) : '\u2014'}</div>
     </div>
   </div>`;
 }
@@ -2496,7 +2578,7 @@ function renderHistory() {
 
     return `<div class="history-snapshot-card">
       <div class="hsc-top">
-        <div class="hsc-time">${fmtHM(start)} – ${fmtHM(end)}</div>
+        <div class="hsc-time">${fmtHM(start)} \u2013 ${fmtHM(end)}</div>
         <span class="badge" style="background:rgba(166,227,161,0.15);color:var(--safe);border:1px solid rgba(166,227,161,0.3)">${gainers.length} GAINING</span>
         <span class="badge badge-med" style="margin-left:4px">${riskClans.length} RISK BLEED</span>
         <span class="badge" style="margin-left:4px;background:rgba(108,112,134,0.15);color:var(--text3);border:1px solid rgba(108,112,134,0.3)">${flatClans.length} FLAT</span>
@@ -2622,9 +2704,9 @@ function updateCountdown(endTs) {
 }
 
 // ============================================================
-// LIVE POLLING — polls every 2s, re-renders only when data changes
+// LIVE POLLING \u2014 polls every 2s, re-renders only when data changes
 // ============================================================
-const POLL_INTERVAL = 2000; // ms — server regenerates every ~2s
+const POLL_INTERVAL = 2000; // ms \u2014 server regenerates every ~2s
 let liveTimer = null;
 let liveStatusTimer = null;
 let lastPollAt = null;
@@ -2655,7 +2737,7 @@ function updateLiveStatus() {
   // Dot state
   if (!lastPollAt) {
     if (dot) { dot.className = 'live-pulse stale'; }
-    lbl.textContent = 'Connecting…';
+    lbl.textContent = 'Connecting\u2026';
   } else if (sincePoll > 12) {
     if (dot) { dot.className = 'live-pulse error'; }
     lbl.textContent = 'Offline?';
@@ -2663,14 +2745,14 @@ function updateLiveStatus() {
     if (dot) { dot.className = 'live-pulse'; }
     const nextIn = Math.max(0, Math.ceil(POLL_INTERVAL / 1000 - sincePoll));
     lbl.textContent = sinceChange !== null
-      ? `Updated ${sinceChange}s ago · next in ${nextIn}s`
-      : `Checking… next in ${nextIn}s`;
+      ? `Updated ${sinceChange}s ago \u00B7 next in ${nextIn}s`
+      : `Checking\u2026 next in ${nextIn}s`;
   }
 
   if (nrl) {
     nrl.textContent = lastPollAt
-      ? `Every ${POLL_INTERVAL/1000}s · last polled ${sincePoll ?? '?'}s ago`
-      : 'Starting…';
+      ? `Every ${POLL_INTERVAL/1000}s \u00B7 last polled ${sincePoll ?? '?'}s ago`
+      : 'Starting\u2026';
   }
 }
 
@@ -2701,7 +2783,7 @@ function checkBleedingNotifications() {
   const gainerCount = state.data.clans.filter(c => getClanRoundGain(c.id) > 0).length;
   if (gainerCount > BLEEDING_GAINERS_THRESHOLD && lastNotifiedBleedingRoundId !== state.round.id) {
     lastNotifiedBleedingRoundId = state.round.id;
-    new Notification('⚠ Bleeding Detected', {
+    new Notification('\u26A0 Bleeding Detected', {
       body: `${gainerCount} clans have gained reputation this round.`,
       icon: '',
     });
@@ -2772,7 +2854,7 @@ function confirmDeleteFirebaseRecords() {
   showDeleteFirebasePasswordModal();
 }
 
-// ── Password-protected Firebase delete helpers ───────────────────────────
+// \u2500\u2500 Password-protected Firebase delete helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 async function hashPassword(plain) {
   const enc = new TextEncoder().encode(plain);
@@ -2781,7 +2863,7 @@ async function hashPassword(plain) {
 }
 
 // Seeds the admin password hash in Firebase on first run (only if absent).
-// The plaintext password never appears in this file — only its SHA-256 hash.
+// The plaintext password never appears in this file \u2014 only its SHA-256 hash.
 async function initAdminPassword() {
   if (!db) return;
   try {
@@ -2796,14 +2878,14 @@ async function initAdminPassword() {
 
 function showDeleteFirebasePasswordModal() {
   pwModalMode = 'delete';
-  document.getElementById('pw-modal-title').textContent = '🔒 Admin Verification Required';
+  document.getElementById('pw-modal-title').textContent = '\u{1F512} Admin Verification Required';
   document.getElementById('pw-modal-sub').textContent = 'Enter the admin password to permanently delete all Firebase records. This action cannot be undone.';
   const inp = document.getElementById('pw-input');
   inp.value = '';
   inp.type  = 'password';
   inp.classList.remove('error');
   document.getElementById('pw-error').textContent = '';
-  document.getElementById('pw-toggle-btn').textContent = '👁';
+  document.getElementById('pw-toggle-btn').textContent = '\u{1F441}';
   document.getElementById('pw-confirm-btn').disabled = false;
   document.getElementById('pw-confirm-btn').textContent = 'Delete Firebase Records';
   document.getElementById('pw-modal-overlay').classList.add('visible');
@@ -2818,8 +2900,8 @@ function closePwModal(e) {
 function togglePwVisibility() {
   const inp = document.getElementById('pw-input');
   const btn = document.getElementById('pw-toggle-btn');
-  if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
-  else                         { inp.type = 'password'; btn.textContent = '👁'; }
+  if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '\u{1F648}'; }
+  else                         { inp.type = 'password'; btn.textContent = '\u{1F441}'; }
 }
 
 async function submitPwModal() {
@@ -2831,7 +2913,7 @@ async function submitPwModal() {
   if (!entered) { errEl.textContent = 'Please enter the admin password.'; inp.classList.add('error'); return; }
 
   btn.disabled = true;
-  btn.textContent = 'Verifying…';
+  btn.textContent = 'Verifying\u2026';
   errEl.textContent = '';
 
   try {
@@ -2853,7 +2935,7 @@ async function submitPwModal() {
       return;
     }
 
-    // Password correct — close modal then branch on mode
+    // Password correct \u2014 close modal then branch on mode
     document.getElementById('pw-modal-overlay').classList.remove('visible');
     if (pwModalMode === 'access') { setAccessLevel('admin'); return; }
 
@@ -2892,14 +2974,14 @@ async function submitPwModal() {
 // ============================================================
 function showAdminAccessModal() {
   pwModalMode = 'access';
-  document.getElementById('pw-modal-title').textContent = '🔓 Admin Level Access';
-  document.getElementById('pw-modal-sub').textContent = 'Enter the admin password to unlock full access. This only elevates your view — it does not delete anything.';
+  document.getElementById('pw-modal-title').textContent = '\u{1F513} Admin Level Access';
+  document.getElementById('pw-modal-sub').textContent = 'Enter the admin password to unlock full access. This only elevates your view \u2014 it does not delete anything.';
   const inp = document.getElementById('pw-input');
   inp.value = '';
   inp.type  = 'password';
   inp.classList.remove('error');
   document.getElementById('pw-error').textContent = '';
-  document.getElementById('pw-toggle-btn').textContent = '👁';
+  document.getElementById('pw-toggle-btn').textContent = '\u{1F441}';
   document.getElementById('pw-confirm-btn').disabled = false;
   document.getElementById('pw-confirm-btn').textContent = 'Unlock Admin Access';
   document.getElementById('pw-modal-overlay').classList.add('visible');
@@ -2958,23 +3040,23 @@ function exportData() {
 // HELPERS
 // ============================================================
 function fmtNum(n) {
-  if (n === null || n === undefined) return '—';
+  if (n === null || n === undefined) return '\u2014';
   return n.toLocaleString();
 }
 
 function fmtTime(d) {
-  if (!d) return '—';
+  if (!d) return '\u2014';
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
 function fmtDateTime(d) {
-  if (!d) return '—';
+  if (!d) return '\u2014';
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
          d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 function fmtHM(d) {
-  if (!d) return '—';
+  if (!d) return '\u2014';
   return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
@@ -3005,7 +3087,7 @@ function statusLabel(status) {
   if (status === 'gaining')        return 'Gaining'; // legacy fallback
   if (status === 'risk')           return 'Risk Bleed';
   if (status === 'flat')           return 'Flat';
-  return '—';
+  return '\u2014';
 }
 
 function statusBadgeHtml(status) {
@@ -3018,10 +3100,10 @@ function statusBadgeHtml(status) {
 }
 
 function roundWindowLabel(startTsIso) {
-  if (!startTsIso) return '—';
+  if (!startTsIso) return '\u2014';
   const start = new Date(startTsIso);
   const end = new Date(start.getTime() + 30 * 60000);
-  return `${fmtHM(start)} – ${fmtHM(end)}`;
+  return `${fmtHM(start)} \u2013 ${fmtHM(end)}`;
 }
 
 // ============================================================
@@ -3056,20 +3138,20 @@ function setFbStatus(state) {
   el.className = state === 'connected' ? 'connected'
                : state === 'error'     ? 'error'
                : 'disconnected';
-  el.textContent = state === 'connected'   ? '⬤ Firebase'
-                 : state === 'connecting'  ? '◌ Firebase'
-                 : state === 'error'       ? '⬤ Firebase'
-                 : '⬤ Firebase';
-  el.title = state === 'connected'  ? 'Firebase connected — syncing in real time across all devices'
-           : state === 'connecting' ? 'Connecting to Firebase…'
-           : state === 'error'      ? 'Firebase error — check console'
+  el.textContent = state === 'connected'   ? '\u2B24 Firebase'
+                 : state === 'connecting'  ? '\u25CC Firebase'
+                 : state === 'error'       ? '\u2B24 Firebase'
+                 : '\u2B24 Firebase';
+  el.title = state === 'connected'  ? 'Firebase connected \u2014 syncing in real time across all devices'
+           : state === 'connecting' ? 'Connecting to Firebase\u2026'
+           : state === 'error'      ? 'Firebase error \u2014 check console'
            : 'Firebase disconnected';
 }
 
 function initFirestoreListeners() {
   if (!db) return;
 
-  // ── Suspect log: real-time listener ──────────────────────────
+  // \u2500\u2500 Suspect log: real-time listener \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   db.collection('suspectLog')
     .orderBy('ts', 'desc')
     .limit(1000)
@@ -3079,7 +3161,7 @@ function initFirestoreListeners() {
       snap.docChanges().forEach(change => {
         if (change.type === 'added') {
           const entry = change.doc.data();
-          // Entries with clanDeduction===0 are valid — deduction may arrive after
+          // Entries with clanDeduction===0 are valid \u2014 deduction may arrive after
           // the rep drop is caught. Only skip malformed entries (no dedupKey).
           if (!entry.dedupKey) return;
           if (!suspectLogKeysSeen.has(entry.dedupKey)) {
@@ -3102,7 +3184,7 @@ function initFirestoreListeners() {
       setFbStatus('error');
     });
 
-  // ── Deduction log: real-time listener ────────────────────────
+  // \u2500\u2500 Deduction log: real-time listener \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   db.collection('deductionLog')
     .orderBy('ts', 'desc')
     .limit(500)
@@ -3131,43 +3213,54 @@ function initFirestoreListeners() {
     });
 }
 
-// Called when a new suspect event is created — writes to Firestore so all devices see it
+// Called when a new suspect event is created \u2014 writes to Firestore so all devices see it
 function pushSuspectToFirestore(entry) {
   if (!db) return;
   db.collection('suspectLog').doc(entry.dedupKey).set(entry)
     .catch(e => console.warn('Firestore suspect write error', e));
 }
 
-// Called when a new deduction entry is created — writes to Firestore so all devices see it
+// Called when a new deduction entry is created \u2014 writes to Firestore so all devices see it
 function pushDeductionToFirestore(entry) {
   if (!db) return;
-  // Strip the members array before writing — members are rebuilt from live data on read
+  // Strip the members array before writing \u2014 members are rebuilt from live data on read
   const { members, ...core } = entry;
   db.collection('deductionLog').doc(`${entry.clanId}_${entry.ts}`).set(core)
     .catch(e => console.warn('Firestore deduction write error', e));
 }
 
 // ============================================================
-// INIT
+// INIT — called by the login gate after membership is verified
 // ============================================================
-loadFromStorage();
+window._hcldInitTracker = function(userId, userName) {
+  // Load any existing persisted state
+  loadFromStorage();
+  // Hard-lock yourClanId to Hidden Cloud Village (id 777) — always
+  state.settings.yourClanId = 777;
+  saveToStorage();
 
-// Show loading
-document.getElementById('loading').classList.add('visible');
+  // Show the logged-in user's name in the header badge
+  const badge = document.getElementById('header-user-badge');
+  if (badge) badge.style.display = 'flex';
+  const nameEl = document.getElementById('header-user-name');
+  if (nameEl) nameEl.textContent = userName;
 
-// Set your clan name in header
-if (state.settings.yourClanId) {
-  document.getElementById('header-clan-title').textContent = 'Loading...';
-}
+  // Reveal the app, hide the login screen
+  document.getElementById('app').style.display = 'flex';
+  const loginScreen = document.getElementById('login-screen');
+  if (loginScreen) loginScreen.style.display = 'none';
 
-// Fetch on load, then start recurring live polling + status ticking
-fetchData(false);
-startLivePolling();
-initFirebase();
-setAccessLevel('normal'); // default: normal level on open
+  // Normal startup sequence
+  document.getElementById('loading').classList.add('visible');
+  document.getElementById('header-clan-title').textContent = 'HC Village Tracker';
+  fetchData(false);
+  startLivePolling();
+  initFirebase();
+  setAccessLevel('normal');
+};
 
-// ── Expose only what HTML onclick/oninput handlers need ─────────────
-// setAccessLevel is intentionally NOT exposed — it cannot be called
+// \u2500\u2500 Expose only what HTML onclick/oninput handlers need \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// setAccessLevel is intentionally NOT exposed \u2014 it cannot be called
 // from the browser console or DevTools without the password flow.
 window.setRankingsFilter            = setRankingsFilter;
 window.fetchData                    = fetchData;
@@ -3193,7 +3286,94 @@ window.closePwModal                 = closePwModal;
 window.submitPwModal                = submitPwModal;
 window.togglePwVisibility           = togglePwVisibility;
 
-})(); // end IIFE — all internals (accessLevel, setAccessLevel, etc.) are private
+})(); // end IIFE \u2014 all internals (accessLevel, setAccessLevel, etc.) are private
+</script>
+
+<!-- ============================================================
+     LOGIN GATE — runs after the IIFE so _hcldInitTracker exists
+     Uses sessionStorage: survives refresh, cleared when tab closes
+     ============================================================ -->
+<script>
+(function () {
+  const CLAN_ID     = 777;
+  const API_URL     = 'https://static.ninjasaga.cc/data/clan_rankings.json';
+  const SESSION_KEY = 'hcld_session';
+
+  /* ── session helpers ── */
+  function readSession() {
+    try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)); } catch(_) { return null; }
+  }
+  function writeSession(userId, userName) {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ userId: userId, userName: userName }));
+  }
+
+  /* ── UI helpers ── */
+  function showError(msg) {
+    document.getElementById('login-error-msg').textContent = msg;
+    document.getElementById('login-error-box').classList.add('visible');
+    var inp = document.getElementById('login-uid-input');
+    inp.classList.remove('shake');
+    void inp.offsetWidth; // reflow to restart animation
+    inp.classList.add('shake');
+  }
+
+  function setLoading(on) {
+    var btn = document.getElementById('login-btn');
+    var inp = document.getElementById('login-uid-input');
+    btn.disabled = on;
+    btn.textContent = on ? 'Verifying\u2026' : 'Enter Tracker';
+    inp.disabled = on;
+  }
+
+  /* ── login action (called by button + Enter key) ── */
+  window.doLogin = async function () {
+    var raw = document.getElementById('login-uid-input').value.trim();
+    if (!raw) { showError('Please enter your User ID.'); return; }
+    var userId = parseInt(raw, 10);
+    if (!userId || userId <= 0) { showError('User ID must be a positive number.'); return; }
+
+    setLoading(true);
+    try {
+      var res = await fetch(API_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('API returned ' + res.status + '. Try again.');
+      var data = await res.json();
+
+      var clan = (data.clans || []).find(function(c){ return c.id === CLAN_ID; });
+      if (!clan) throw new Error('Clan data unavailable. Please refresh and try again.');
+
+      var member = (clan.member_list || []).find(function(m){ return m.id === userId; });
+      if (!member) {
+        showError(
+          'User ID ' + userId + ' is not a member of Hidden Cloud Village. ' +
+          'Only active clan members can access this tracker.'
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Valid member — save session and boot the tracker
+      writeSession(userId, member.name);
+      window._hcldInitTracker(userId, member.name);
+
+    } catch (e) {
+      showError(e.message || 'Could not verify membership. Check your connection and try again.');
+      setLoading(false);
+    }
+  };
+
+  /* ── on page load: resume session or show login ── */
+  var session = readSession();
+  if (session && session.userId && session.userName) {
+    // Valid session — skip login screen and boot immediately
+    window._hcldInitTracker(session.userId, session.userName);
+  } else {
+    // No session — login screen is visible (#app is display:none)
+    setTimeout(function () {
+      var inp = document.getElementById('login-uid-input');
+      if (inp) inp.focus();
+    }, 80);
+  }
+})();
 </script>
 </body>
 </html>
