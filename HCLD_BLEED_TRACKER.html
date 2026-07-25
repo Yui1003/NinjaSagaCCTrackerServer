@@ -428,6 +428,72 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .wg-hist-gain{font-size:12px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
 .wg-hist-gain.zero{color:var(--text3)}
 .wg-hist-dl-btn{margin:8px 0 2px;display:flex;justify-content:flex-end}
+/* EVENTS SCREEN */
+#ev-header{background:linear-gradient(135deg,#1a1000,#111111);border-bottom:1px solid var(--border);padding:10px 12px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+#ev-header-title{font-size:15px;font-weight:800;color:var(--mauve)}
+#ev-list{padding:0 0 8px}
+#ev-history-section{border-top:1px solid var(--border);padding-bottom:80px}
+.ev-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:8px 12px 0;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.ev-card:hover{border-color:var(--border2)}
+.ev-card.ev-card-open{border-color:rgba(240,165,0,0.6)}
+.ev-card-header{display:flex;align-items:flex-start;justify-content:space-between;padding:12px}
+.ev-card-left{flex:1;min-width:0}
+.ev-card-title{font-size:14px;font-weight:700;color:var(--text);margin:4px 0 3px}
+.ev-card-date{font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums}
+.ev-chevron{font-size:10px;color:var(--text3);transition:transform .2s;flex-shrink:0;padding-top:4px;margin-left:8px}
+.ev-chevron.open{transform:rotate(180deg)}
+.ev-status-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;letter-spacing:0.5px;display:inline-block}
+.ev-status-live{background:rgba(74,222,128,0.18);color:var(--green);border:1px solid rgba(74,222,128,0.5);animation:pulse 2s infinite}
+.ev-status-upcoming{background:rgba(251,191,36,0.15);color:var(--amber);border:1px solid rgba(251,191,36,0.4)}
+.ev-status-ended{background:rgba(88,88,88,0.18);color:var(--text3);border:1px solid rgba(88,88,88,0.3)}
+.ev-detail-body{border-top:1px solid var(--border);padding:12px}
+.ev-detail-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;white-space:pre-wrap}
+.ev-detail-row{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.ev-detail-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px}
+.ev-detail-val{font-size:12px;color:var(--text2);line-height:1.5}
+.ev-detail-actions{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+.ev-live-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(96,165,250,0.12);border:1px solid rgba(96,165,250,0.35);color:var(--blue);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s}
+.ev-live-btn:hover{background:rgba(96,165,250,0.22)}
+.ev-live-btn.ev-live-btn-active{background:rgba(96,165,250,0.22);border-color:var(--blue)}
+.ev-admin-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.3);color:var(--mauve);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;transition:all .2s}
+.ev-admin-btn:hover{background:rgba(240,165,0,0.18)}
+.ev-admin-btn-danger{background:rgba(243,139,168,0.1)!important;border-color:rgba(243,139,168,0.3)!important;color:var(--red)!important}
+.ev-admin-btn-danger:hover{background:rgba(243,139,168,0.2)!important}
+.ev-lp-container{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:10px}
+.ev-lp-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text)}
+.ev-lp-row{display:flex;align-items:center;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.ev-lp-row:last-child{border-bottom:none}
+.ev-lp-row.top1{background:rgba(249,226,175,0.06)}
+.ev-lp-row.top2{background:rgba(205,214,244,0.03)}
+.ev-lp-row.top3{background:rgba(250,179,135,0.03)}
+.ev-lp-rank{width:30px;font-size:12px;font-weight:800;color:var(--text3);flex-shrink:0}
+.ev-lp-rank.gold{color:#f9e2af}.ev-lp-rank.silver{color:#cdd6f4}.ev-lp-rank.bronze{color:#fab387}
+.ev-lp-name{flex:1;font-size:13px;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px}
+.ev-lp-gain{font-size:13px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ev-lp-gain.zero{color:var(--text3)}
+.ev-hist-card{background:var(--card);border:1px solid var(--border);border-radius:10px;margin:0 12px 6px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.ev-hist-card:hover{border-color:var(--border2)}
+.ev-hist-card-header{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 12px}
+.ev-hist-card-title{font-size:13px;font-weight:700;color:var(--text)}
+.ev-hist-card-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:2px}
+.ev-hist-card-chevron{font-size:10px;color:var(--text3);transition:transform .2s}
+.ev-hist-card-chevron.open{transform:rotate(180deg)}
+.ev-hist-detail{display:none;border-top:1px solid var(--border);padding:10px 12px 12px}
+.ev-hist-detail.open{display:block}
+.ev-hist-desc{font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5;white-space:pre-wrap}
+/* EVENT FORM OVERLAY */
+.ev-form-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:150;display:none;align-items:flex-end;justify-content:center}
+.ev-form-overlay.visible{display:flex}
+.ev-form-modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 18px 28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+.ev-form-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px}
+.ev-form-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.ev-form-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px}
+.ev-form-input{background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:10px;font-size:13px;outline:none;width:100%;transition:border-color .2s;resize:vertical;font-family:inherit}
+.ev-form-input:focus{border-color:var(--mauve)}
+.ev-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.ev-form-error{font-size:12px;color:var(--red);min-height:16px;margin-bottom:6px}
+/* ADMIN BADGE */
+#header-admin-badge{display:none;align-items:center;gap:4px;background:rgba(240,165,0,0.18);border:1px solid rgba(240,165,0,0.5);border-radius:8px;padding:3px 7px;font-size:10px;font-weight:700;color:var(--mauve);white-space:nowrap;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -490,6 +556,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
     <div id="header-right">
       <span id="header-user-badge">&#128100; <span id="header-user-name"></span></span>
+      <span id="header-admin-badge">&#128081; Admin</span>
       <span id="fb-status" class="disconnected" title="Firebase sync status">&#11044; Firebase</span>
       <div id="live-status" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)">
         <span class="live-pulse" id="live-dot"></span>
@@ -747,6 +814,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         </div>
       </div>
     </div>
+    <!-- EVENTS SCREEN -->
+    <div id="screen-events" class="screen">
+      <div id="ev-header">
+        <div id="ev-header-title">🎯 Events</div>
+        <button id="ev-create-btn" class="export-btn" onclick="openCreateEventForm()" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Create Event
+        </button>
+      </div>
+      <div id="ev-list"></div>
+      <div id="ev-history-section" style="display:none">
+        <div class="section-header" style="padding-top:14px">📋 Past Events</div>
+        <div id="ev-history-list"></div>
+      </div>
+    </div>
+
     <!-- WEEKLY GAINS SCREEN -->
     <div id="screen-weekly" class="screen">
       <div id="wg-header">
@@ -788,6 +871,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div class="tab" id="tab-weekly" onclick="showTab('weekly')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
       <span>Weekly</span>
+    </div>
+    <div class="tab" id="tab-events" onclick="showTab('events')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Events</span>
     </div>
     <div class="tab" id="tab-deductions" onclick="showTab('deductions')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -836,6 +923,40 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   </div>
 </div>
 
+<!-- EVENT FORM OVERLAY -->
+<div class="ev-form-overlay" id="ev-form-overlay" onclick="if(event.target===this)closeEventForm()">
+  <div class="ev-form-modal" onclick="event.stopPropagation()">
+    <div class="ev-form-title" id="ev-form-title">&#10024; Create Event</div>
+    <div class="ev-form-field">
+      <label class="ev-form-label" for="ev-f-title">Title</label>
+      <input class="ev-form-input" id="ev-f-title" type="text" placeholder="e.g. Raffle" maxlength="80" />
+    </div>
+    <div class="ev-form-field">
+      <label class="ev-form-label" for="ev-f-desc">Description</label>
+      <textarea class="ev-form-input" id="ev-f-desc" rows="3" placeholder="What is this event about?"></textarea>
+    </div>
+    <div class="ev-form-row">
+      <div class="ev-form-field" style="margin-bottom:0">
+        <label class="ev-form-label" for="ev-f-start">Start Date &amp; Time</label>
+        <input class="ev-form-input" id="ev-f-start" type="datetime-local" />
+      </div>
+      <div class="ev-form-field" style="margin-bottom:0">
+        <label class="ev-form-label" for="ev-f-end">End Date &amp; Time</label>
+        <input class="ev-form-input" id="ev-f-end" type="datetime-local" />
+      </div>
+    </div>
+    <div class="ev-form-field">
+      <label class="ev-form-label" for="ev-f-condition">Condition</label>
+      <textarea class="ev-form-input" id="ev-f-condition" rows="2" placeholder="e.g. Must gain at least 1,000 reputation to be eligible."></textarea>
+    </div>
+    <div class="ev-form-error" id="ev-form-error"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeEventForm()">Cancel</button>
+      <button class="modal-btn confirm" id="ev-form-save-btn" onclick="submitEventForm()">Save Event</button>
+    </div>
+  </div>
+</div>
+
 <!-- SheetJS &#8212; Excel export -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
@@ -864,6 +985,15 @@ let accessLevel = 'normal';
 let weeklyGainsData    = null;  // live Firestore doc for weeklyGains/777
 let weeklyHistoryData  = [];    // array of past-week docs (newest first)
 let weekHistoryOpenKey = null;  // which history card is currently expanded
+
+// ── Events state ──────────────────────────────────────────────────────────────
+let eventsData         = [];   // all events from Firestore (desc startTs)
+let eventGainsData     = {};   // eventId → live gains doc
+let eventGainsListeners = {};  // eventId → unsubscribe fn
+let evOpenId           = null; // expanded active/upcoming event card id
+let evHistOpenId       = null; // expanded past event card id
+let evLiveId           = null; // event whose live progress panel is open
+let evEditingId        = null; // null = creating new, string = editing id
 
 // Controls which action the shared password modal performs
 let pwModalMode = 'delete'; // 'delete' | 'access'
@@ -1582,6 +1712,8 @@ function renderCurrentView() {
     renderDeductions();
   } else if (t === 'suspects') {
     renderSuspects();
+  } else if (t === 'events') {
+    renderEvents();
   } else if (t === 'settings') {
     applySettings();
   }
@@ -3081,6 +3213,10 @@ function setAccessLevel(level) {
   if (btnAccess) btnAccess.style.display = isAdmin ? 'none' : '';
   if (btnExit)   btnExit.style.display   = isAdmin ? '' : 'none';
 
+  // Admin badge in header
+  const adminBadge = document.getElementById('header-admin-badge');
+  if (adminBadge) adminBadge.style.display = isAdmin ? 'flex' : 'none';
+
   // If on a now-hidden tab, redirect to rankings
   if (!isAdmin && (state.currentTab === 'deductions' || state.currentTab === 'suspects')) {
     showTab('rankings');
@@ -3311,6 +3447,25 @@ function initFirestoreListeners() {
     }, err => {
       console.warn('Firestore weeklyGainsHistory error', err);
     });
+
+  // ── Events: real-time listener ────────────────────────────────────────────
+  db.collection('events')
+    .orderBy('startTs', 'desc')
+    .limit(100)
+    .onSnapshot(snap => {
+      eventsData = [];
+      snap.forEach(d => eventsData.push({ id: d.id, ...d.data() }));
+      // Subscribe to gains for currently-active events
+      const now = Date.now();
+      eventsData.forEach(ev => {
+        if (ev.startTs && ev.endTs && ev.startTs <= now && now <= ev.endTs) {
+          subscribeEventGains(ev.id);
+        }
+      });
+      if (state.currentTab === 'events') renderEvents();
+    }, err => {
+      console.warn('Firestore events error', err);
+    });
 }
 
 // Called when a new suspect event is created \u2014 writes to Firestore so all devices see it
@@ -3515,6 +3670,412 @@ function _exportWeekXlsx(fileLabel, startLabel, endLabel, membersArr, isArchived
 }
 
 // ============================================================
+// EVENTS
+// ============================================================
+
+function subscribeEventGains(eventId) {
+  if (eventGainsListeners[eventId] || !db) return;
+  const unsub = db.collection('eventGains').doc(eventId)
+    .onSnapshot(snap => {
+      if (snap.exists) {
+        eventGainsData[eventId] = snap.data();
+        if (state.currentTab === 'events' && evLiveId === eventId) {
+          const lpEl = document.getElementById('ev-lp-' + eventId);
+          if (lpEl) lpEl.innerHTML = renderLiveProgress(eventId);
+        }
+      }
+    }, err => console.warn('eventGains listener error', err));
+  eventGainsListeners[eventId] = unsub;
+}
+
+function evStatusOf(ev) {
+  const now = Date.now();
+  if (now < ev.startTs) return 'upcoming';
+  if (now <= ev.endTs)  return 'active';
+  return 'ended';
+}
+
+function fmtEvDateTime(ms) {
+  if (!ms) return '—';
+  const d = new Date(ms);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+         ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+
+function msToDatetimeLocal(ms) {
+  if (!ms) return '';
+  const d = new Date(ms);
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) +
+         'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function renderEvents() {
+  const listEl      = document.getElementById('ev-list');
+  const histListEl  = document.getElementById('ev-history-list');
+  const histSection = document.getElementById('ev-history-section');
+  const createBtn   = document.getElementById('ev-create-btn');
+  if (!listEl) return;
+
+  if (createBtn) createBtn.style.display = accessLevel === 'admin' ? '' : 'none';
+
+  const active = eventsData.filter(ev => evStatusOf(ev) !== 'ended');
+  const past   = eventsData.filter(ev => evStatusOf(ev) === 'ended');
+
+  // Active / upcoming events
+  if (active.length === 0) {
+    listEl.innerHTML = `<div class="empty-state" style="padding:30px 20px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;opacity:.4">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <h3>No active events</h3>
+      <p>${accessLevel === 'admin' ? 'Use the Create Event button above to start one.' : 'Check back later for upcoming events.'}</p>
+    </div>`;
+  } else {
+    listEl.innerHTML = active.map(ev => renderEventCard(ev)).join('');
+    if (evLiveId) {
+      const lpEl = document.getElementById('ev-lp-' + evLiveId);
+      if (lpEl) lpEl.innerHTML = renderLiveProgress(evLiveId);
+    }
+  }
+
+  // Past events history
+  if (past.length > 0) {
+    if (histSection) histSection.style.display = '';
+    if (histListEl)  histListEl.innerHTML = past.map(ev => renderPastEventCard(ev)).join('');
+    if (evLiveId) {
+      const lpEl = document.getElementById('ev-lp-' + evLiveId);
+      if (lpEl) lpEl.innerHTML = renderLiveProgress(evLiveId);
+    }
+  } else {
+    if (histSection) histSection.style.display = 'none';
+  }
+}
+
+function renderEventCard(ev) {
+  const status = evStatusOf(ev);
+  const isOpen = evOpenId === ev.id;
+  const isLive = evLiveId === ev.id;
+  const dateStr = fmtEvDateTime(ev.startTs) + ' \u2192 ' + fmtEvDateTime(ev.endTs);
+
+  const statusHtml = status === 'active'
+    ? '<span class="ev-status-badge ev-status-live">\uD83D\uDFE2 LIVE</span>'
+    : '<span class="ev-status-badge ev-status-upcoming">\uD83D\uDFE1 UPCOMING</span>';
+
+  let detailHtml = '';
+  if (isOpen) {
+    let liveBtn = '';
+    if (status === 'active') {
+      liveBtn = `<button class="ev-live-btn${isLive ? ' ev-live-btn-active' : ''}"
+        onclick="event.stopPropagation();toggleLiveProgress('${ev.id}')">
+        \uD83D\uDCCA ${isLive ? 'Hide Progress' : 'Live Progress'}
+      </button>`;
+    }
+    const adminBtns = accessLevel === 'admin' ? `
+      <button class="ev-admin-btn" onclick="event.stopPropagation();editEvent('${ev.id}')">&#9999;&#65039; Edit</button>
+      <button class="ev-admin-btn ev-admin-btn-danger" onclick="event.stopPropagation();confirmDeleteEvent('${ev.id}')">&#128465;&#65039; Delete</button>
+    ` : '';
+
+    detailHtml = `<div class="ev-detail-body">
+      ${ev.description ? `<div class="ev-detail-desc">${esc(ev.description)}</div>` : ''}
+      <div class="ev-detail-row">
+        <span class="ev-detail-label">\uD83D\uDCC5 Date Range</span>
+        <span class="ev-detail-val">${esc(dateStr)}</span>
+      </div>
+      ${ev.condition ? `<div class="ev-detail-row">
+        <span class="ev-detail-label">\uD83D\uDCCC Condition</span>
+        <span class="ev-detail-val">${esc(ev.condition)}</span>
+      </div>` : ''}
+      <div class="ev-detail-actions">${liveBtn}${adminBtns}</div>
+      <div id="ev-lp-${ev.id}"></div>
+    </div>`;
+  }
+
+  return `<div class="ev-card${isOpen ? ' ev-card-open' : ''}" onclick="toggleEventCard('${ev.id}')">
+    <div class="ev-card-header">
+      <div class="ev-card-left">
+        ${statusHtml}
+        <div class="ev-card-title">${esc(ev.title)}</div>
+        <div class="ev-card-date">${esc(dateStr)}</div>
+      </div>
+      <span class="ev-chevron${isOpen ? ' open' : ''}">&#9660;</span>
+    </div>
+    ${detailHtml}
+  </div>`;
+}
+
+function renderPastEventCard(ev) {
+  const isOpen = evHistOpenId === ev.id;
+  const isLive = evLiveId === ev.id;
+  const dateStr = fmtEvDateTime(ev.startTs) + ' \u2192 ' + fmtEvDateTime(ev.endTs);
+
+  let detailHtml = '';
+  if (isOpen) {
+    const resultsBtn = `<button class="ev-live-btn${isLive ? ' ev-live-btn-active' : ''}"
+      onclick="event.stopPropagation();toggleLiveProgress('${ev.id}')">
+      \uD83D\uDCCB ${isLive ? 'Hide Results' : 'View Results'}
+    </button>`;
+    const dlBtn = accessLevel === 'admin'
+      ? `<button class="export-btn" style="font-size:11px" onclick="event.stopPropagation();downloadEventXlsx('${ev.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </button>`
+      : '';
+    const adminBtns = accessLevel === 'admin'
+      ? `<button class="ev-admin-btn ev-admin-btn-danger" onclick="event.stopPropagation();confirmDeleteEvent('${ev.id}')">&#128465;&#65039; Delete</button>`
+      : '';
+
+    detailHtml = `<div class="ev-hist-detail open">
+      ${ev.description ? `<div class="ev-hist-desc">${esc(ev.description)}</div>` : ''}
+      ${ev.condition ? `<div class="ev-detail-row" style="margin-bottom:8px">
+        <span class="ev-detail-label">\uD83D\uDCCC Condition</span>
+        <span class="ev-detail-val" style="font-size:11px">${esc(ev.condition)}</span>
+      </div>` : ''}
+      <div class="ev-detail-actions">${resultsBtn}${dlBtn}${adminBtns}</div>
+      <div id="ev-lp-${ev.id}"></div>
+    </div>`;
+  }
+
+  return `<div class="ev-hist-card" onclick="toggleEvHistory('${ev.id}')">
+    <div class="ev-hist-card-header">
+      <div style="min-width:0;flex:1">
+        <div class="ev-hist-card-title">${esc(ev.title)}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;font-variant-numeric:tabular-nums">${esc(dateStr)}</div>
+      </div>
+      <div class="ev-hist-card-meta">
+        <span class="ev-status-badge ev-status-ended">ENDED</span>
+        <span class="ev-hist-card-chevron${isOpen ? ' open' : ''}">&#9660;</span>
+      </div>
+    </div>
+    ${detailHtml}
+  </div>`;
+}
+
+function renderLiveProgress(eventId) {
+  const gains = eventGainsData[eventId];
+  const ev = eventsData.find(e => e.id === eventId);
+  if (!ev) return '';
+  const isActive = evStatusOf(ev) === 'active';
+
+  if (!gains || !gains.members) {
+    return `<div class="ev-lp-container">
+      <div class="ev-lp-header">
+        <span>${isActive ? '<span class="live-dot" style="margin-right:6px"></span>Live Progress' : '\uD83D\uDCCB Final Results'}</span>
+        <span style="font-size:10px;color:var(--text3)">Loading\u2026</span>
+      </div>
+      <div style="padding:16px;font-size:12px;color:var(--text3);text-align:center">Waiting for data from the server poller\u2026</div>
+    </div>`;
+  }
+
+  const lastUpd = gains.lastUpdated ? Math.floor((Date.now() - gains.lastUpdated) / 1000) : null;
+  const updStr  = lastUpd !== null ? (lastUpd < 60 ? lastUpd + 's ago' : Math.floor(lastUpd/60) + 'm ago') : '\u2014';
+
+  const sorted = Object.entries(gains.members)
+    .map(([id, m]) => ({ id, ...m }))
+    .sort((a, b) => b.eventGain - a.eventGain);
+
+  const rows = sorted.map((m, i) => {
+    const rank = i + 1;
+    let rCls = 'ev-lp-rank'; let rowCls = 'ev-lp-row';
+    if (rank === 1) { rCls += ' gold';   rowCls += ' top1'; }
+    else if (rank === 2) { rCls += ' silver'; rowCls += ' top2'; }
+    else if (rank === 3) { rCls += ' bronze'; rowCls += ' top3'; }
+    const gCls = m.eventGain > 0 ? 'ev-lp-gain' : 'ev-lp-gain zero';
+    const gStr = m.eventGain > 0 ? '+' + fmtNum(m.eventGain) : '0';
+    return `<div class="${rowCls}"><div class="${rCls}">#${rank}</div><div class="ev-lp-name">${esc(m.name)}</div><div class="${gCls}">${gStr}</div></div>`;
+  }).join('');
+
+  const titleHtml = isActive
+    ? `<span class="live-dot" style="margin-right:6px"></span><span>Live Progress</span>`
+    : `<span>\uD83D\uDCCB Final Results</span>`;
+
+  return `<div class="ev-lp-container">
+    <div class="ev-lp-header"><span style="display:flex;align-items:center">${titleHtml}</span><span style="font-size:10px;color:var(--text3)">Updated ${updStr}</span></div>
+    ${rows || '<div style="padding:12px;font-size:12px;color:var(--text3);text-align:center">No gains recorded yet.</div>'}
+  </div>`;
+}
+
+function toggleEventCard(eventId) {
+  const wasOpen = evOpenId === eventId;
+  evOpenId = wasOpen ? null : eventId;
+  if (wasOpen && evLiveId === eventId) evLiveId = null;
+  renderEvents();
+  if (evLiveId) {
+    const lpEl = document.getElementById('ev-lp-' + evLiveId);
+    if (lpEl) lpEl.innerHTML = renderLiveProgress(evLiveId);
+  }
+}
+
+function toggleEvHistory(eventId) {
+  const wasOpen = evHistOpenId === eventId;
+  evHistOpenId = wasOpen ? null : eventId;
+  if (wasOpen && evLiveId === eventId) evLiveId = null;
+  renderEvents();
+  if (evLiveId) {
+    const lpEl = document.getElementById('ev-lp-' + evLiveId);
+    if (lpEl) lpEl.innerHTML = renderLiveProgress(evLiveId);
+  }
+}
+
+function toggleLiveProgress(eventId) {
+  evLiveId = evLiveId === eventId ? null : eventId;
+  if (evLiveId) subscribeEventGains(eventId);
+  renderEvents();
+  if (evLiveId) {
+    const lpEl = document.getElementById('ev-lp-' + evLiveId);
+    if (lpEl) lpEl.innerHTML = renderLiveProgress(evLiveId);
+  }
+}
+
+// ── Admin: Create / Edit ──────────────────────────────────────────────────────
+function openCreateEventForm() {
+  if (accessLevel !== 'admin') return;
+  evEditingId = null;
+  document.getElementById('ev-form-title').textContent = '\u2728 Create Event';
+  document.getElementById('ev-f-title').value     = '';
+  document.getElementById('ev-f-desc').value      = '';
+  document.getElementById('ev-f-start').value     = '';
+  document.getElementById('ev-f-end').value       = '';
+  document.getElementById('ev-f-condition').value = '';
+  document.getElementById('ev-form-error').textContent = '';
+  const saveBtn = document.getElementById('ev-form-save-btn');
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Event'; }
+  document.getElementById('ev-form-overlay').classList.add('visible');
+  setTimeout(() => document.getElementById('ev-f-title').focus(), 80);
+}
+
+function editEvent(eventId) {
+  if (accessLevel !== 'admin') return;
+  const ev = eventsData.find(e => e.id === eventId);
+  if (!ev) return;
+  evEditingId = eventId;
+  document.getElementById('ev-form-title').textContent = '\u270F\uFE0F Edit Event';
+  document.getElementById('ev-f-title').value     = ev.title || '';
+  document.getElementById('ev-f-desc').value      = ev.description || '';
+  document.getElementById('ev-f-start').value     = msToDatetimeLocal(ev.startTs);
+  document.getElementById('ev-f-end').value       = msToDatetimeLocal(ev.endTs);
+  document.getElementById('ev-f-condition').value = ev.condition || '';
+  document.getElementById('ev-form-error').textContent = '';
+  const saveBtn = document.getElementById('ev-form-save-btn');
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Event'; }
+  document.getElementById('ev-form-overlay').classList.add('visible');
+  setTimeout(() => document.getElementById('ev-f-title').focus(), 80);
+}
+
+function closeEventForm() {
+  document.getElementById('ev-form-overlay').classList.remove('visible');
+  evEditingId = null;
+}
+
+async function submitEventForm() {
+  if (accessLevel !== 'admin' || !db) return;
+  const title     = document.getElementById('ev-f-title').value.trim();
+  const desc      = document.getElementById('ev-f-desc').value.trim();
+  const startVal  = document.getElementById('ev-f-start').value;
+  const endVal    = document.getElementById('ev-f-end').value;
+  const condition = document.getElementById('ev-f-condition').value.trim();
+  const errEl     = document.getElementById('ev-form-error');
+  const saveBtn   = document.getElementById('ev-form-save-btn');
+
+  if (!title)    { errEl.textContent = 'Title is required.'; return; }
+  if (!startVal) { errEl.textContent = 'Start date & time is required.'; return; }
+  if (!endVal)   { errEl.textContent = 'End date & time is required.'; return; }
+
+  const startTs = new Date(startVal).getTime();
+  const endTs   = new Date(endVal).getTime();
+  if (isNaN(startTs) || isNaN(endTs)) { errEl.textContent = 'Invalid date/time values.'; return; }
+  if (endTs <= startTs)               { errEl.textContent = 'End time must be after start time.'; return; }
+
+  errEl.textContent = '';
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving\u2026'; }
+
+  const now  = Date.now();
+  const data = { title, description: desc, startTs, endTs, condition, updatedAt: now };
+
+  try {
+    if (evEditingId) {
+      // If start time changed, reset snapshot so server re-captures at new time
+      const old = eventsData.find(e => e.id === evEditingId);
+      if (old && old.startTs !== startTs) data.snapshotTaken = false;
+      await db.collection('events').doc(evEditingId).update(data);
+    } else {
+      data.createdAt     = now;
+      data.snapshotTaken = false; // server sets true when start time arrives
+      await db.collection('events').add(data);
+    }
+    closeEventForm();
+  } catch(e) {
+    errEl.textContent = 'Save failed: ' + (e.message || 'unknown error');
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Event'; }
+  }
+}
+
+function confirmDeleteEvent(eventId) {
+  if (accessLevel !== 'admin') return;
+  const ev = eventsData.find(e => e.id === eventId);
+  if (!ev) return;
+  document.getElementById('modal-title').textContent = 'Delete Event?';
+  document.getElementById('modal-sub').textContent   =
+    `"${ev.title}" will be permanently removed from Firestore, including all tracked gains. This cannot be undone.`;
+  document.getElementById('modal-confirm-btn').textContent = 'Delete Event';
+  document.getElementById('modal-confirm-btn').onclick = async () => {
+    closeModal();
+    if (!db) return;
+    try {
+      await db.collection('events').doc(eventId).delete();
+      db.collection('eventGains').doc(eventId).delete().catch(() => {});
+      db.collection('eventSnapshots').doc(eventId).delete().catch(() => {});
+      if (evOpenId    === eventId) evOpenId    = null;
+      if (evHistOpenId === eventId) evHistOpenId = null;
+      if (evLiveId    === eventId) evLiveId    = null;
+    } catch(e) { console.warn('Delete event error', e); }
+  };
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+
+async function downloadEventXlsx(eventId) {
+  if (accessLevel !== 'admin') return;
+  const ev = eventsData.find(e => e.id === eventId);
+  if (!ev) return;
+
+  // Fetch gains if not yet cached
+  let gains = eventGainsData[eventId];
+  if (!gains && db) {
+    try {
+      const snap = await db.collection('eventGains').doc(eventId).get();
+      if (snap.exists) { gains = snap.data(); eventGainsData[eventId] = gains; }
+    } catch(e) { console.warn('Event gains fetch error', e); }
+  }
+
+  const members = gains && gains.members
+    ? Object.entries(gains.members).map(([id, m]) => ({ id, ...m })).sort((a, b) => b.eventGain - a.eventGain)
+    : [];
+
+  const now = new Date();
+  const stamp = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') +
+                '_' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
+  const generatedAt = now.toLocaleDateString([], { weekday:'long', year:'numeric', month:'long', day:'numeric' }) +
+                      ' \u00B7 ' + now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+
+  const rows = [];
+  rows.push(['Hidden Cloud Village \u2014 Event Results', '', '', '', '']);
+  rows.push(['Event: ' + ev.title, '', '', '', '']);
+  rows.push(['Period: ' + fmtEvDateTime(ev.startTs) + ' \u2192 ' + fmtEvDateTime(ev.endTs), '', '', '', '']);
+  rows.push(['Condition: ' + (ev.condition || '\u2014'), '', '', '', '']);
+  rows.push(['Generated: ' + generatedAt, '', '', '', '']);
+  rows.push([]);
+  rows.push(['Rank', 'Member Name', 'Rep Gained', 'Start Rep', 'End Rep']);
+  members.forEach((m, i) => rows.push([i + 1, m.name, m.eventGain || 0, m.startRep || 0, m.currentRep || 0]));
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{ wch: 6 }, { wch: 26 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'Event Results');
+  const safeName = ev.title.replace(/[^a-z0-9]/gi, '_').toLowerCase().slice(0, 30);
+  XLSX.writeFile(wb, 'event_' + safeName + '_' + stamp + '.xlsx');
+}
+
+// ============================================================
 // INIT — called by the login gate after membership is verified
 // ============================================================
 window._hcldInitTracker = function(userId, userName) {
@@ -3573,6 +4134,15 @@ window.togglePwVisibility           = togglePwVisibility;
 window.downloadCurrentWeekXlsx     = downloadCurrentWeekXlsx;
 window.downloadHistoryWeekXlsx     = downloadHistoryWeekXlsx;
 window.toggleWeekHistory            = toggleWeekHistory;
+window.openCreateEventForm          = openCreateEventForm;
+window.closeEventForm               = closeEventForm;
+window.submitEventForm              = submitEventForm;
+window.toggleEventCard              = toggleEventCard;
+window.toggleEvHistory              = toggleEvHistory;
+window.toggleLiveProgress           = toggleLiveProgress;
+window.editEvent                    = editEvent;
+window.confirmDeleteEvent           = confirmDeleteEvent;
+window.downloadEventXlsx            = downloadEventXlsx;
 
 })(); // end IIFE \u2014 all internals (accessLevel, setAccessLevel, etc.) are private
 </script>

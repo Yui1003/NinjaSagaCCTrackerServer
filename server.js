@@ -20,6 +20,8 @@ import {
   doc,
   setDoc,
   getDoc,
+  getDocs,
+  updateDoc,
 } from 'firebase/firestore';
 
 // ─── Express health check ─────────────────────────────────────────────────────
@@ -74,6 +76,17 @@ const deductionKeysSeen = new Set();
 let totalSuspectsWritten   = 0;
 let totalDeductionsWritten = 0;
 let pollCount              = 0;
+
+// ─── Events tracking state ────────────────────────────────────────────────────
+let cachedEvents      = [];   // array of event docs from Firestore
+let eventsCacheTs     = 0;    // when cachedEvents was last refreshed
+const EVENTS_CACHE_MS = 30000; // re-read events list every 30s
+
+// In-memory snapshot data — loaded from Firestore once per event per server run
+// so we don't hit Firestore on every 5s poll
+let eventSnapshotsLoaded  = {}; // eventId → bool
+let eventSnapshotMembers  = {}; // eventId → {memberId(str) → {name, startRep}}
+let eventLastWritten      = {}; // eventId → {memberId(str) → gain} (skip unchanged writes)
 
 // ─── Weekly gains state ───────────────────────────────────────────────────────
 let weeklyState = {
@@ -515,6 +528,126 @@ async function recordDeductionChanges() {
   }
 }
 
+// ─── Events: load list from Firestore ────────────────────────────────────────
+async function loadEventsFromFirestore() {
+  try {
+    const snap = await getDocs(collection(db, 'events'));
+    cachedEvents = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    eventsCacheTs = Date.now();
+    if (cachedEvents.length > 0) {
+      console.log(`[${ts()}] 🎯 Events loaded: ${cachedEvents.length} event(s)`);
+    }
+  } catch(e) {
+    console.warn(`[${ts()}] Events load error:`, e.message);
+  }
+}
+
+// ─── Events: process active events each poll ──────────────────────────────────
+async function processEvents() {
+  const now = Date.now();
+
+  // Refresh events list from Firestore every 30s
+  if (now - eventsCacheTs > EVENTS_CACHE_MS) {
+    await loadEventsFromFirestore();
+  }
+
+  if (!currentData || cachedEvents.length === 0) return;
+  const clan = currentData.clans.find(c => c.id === YOUR_CLAN_ID);
+  if (!clan || !clan.member_list) return;
+
+  for (const ev of cachedEvents) {
+    const { id: eventId, startTs, endTs, snapshotTaken, title } = ev;
+    if (!startTs || !endTs) continue;
+
+    // Skip events that haven't started yet
+    if (now < startTs) continue;
+
+    // Skip events that ended more than 24h ago — no more tracking needed
+    if (now > endTs + 86400000) continue;
+
+    const isActive = now <= endTs;
+
+    // ── Step 1: Capture baseline snapshot the moment start time arrives ───────
+    // snapshotTaken is false when event is created; server sets it true here.
+    if (!snapshotTaken) {
+      const snapshotMembers = {};
+      for (const m of clan.member_list) {
+        snapshotMembers[String(m.id)] = { name: m.name, startRep: m.reputation };
+      }
+      try {
+        await setDoc(doc(db, 'eventSnapshots', eventId), {
+          eventId,
+          capturedAt: now,
+          members: snapshotMembers,
+        });
+        await updateDoc(doc(db, 'events', eventId), { snapshotTaken: true });
+        ev.snapshotTaken = true; // update local cache to avoid re-capturing
+        eventSnapshotsLoaded[eventId] = true;
+        eventSnapshotMembers[eventId] = snapshotMembers;
+        console.log(`[${ts()}] 📸 Event snapshot captured: "${title}" (${Object.keys(snapshotMembers).length} members)`);
+      } catch(e) {
+        console.warn(`[${ts()}] Snapshot capture error for "${title}":`, e.message);
+        continue;
+      }
+    }
+
+    // ── Step 2: Load snapshot into memory if not already there ────────────────
+    if (!eventSnapshotsLoaded[eventId]) {
+      try {
+        const snapDoc = await getDoc(doc(db, 'eventSnapshots', eventId));
+        if (!snapDoc.exists()) continue; // snapshot not ready yet
+        eventSnapshotMembers[eventId] = snapDoc.data().members || {};
+        eventSnapshotsLoaded[eventId] = true;
+      } catch(e) {
+        console.warn(`[${ts()}] Snapshot load error for "${title}":`, e.message);
+        continue;
+      }
+    }
+
+    // ── Step 3: Compute per-member gains from baseline ────────────────────────
+    const snapshot = eventSnapshotMembers[eventId];
+    if (!snapshot) continue;
+
+    const members = {};
+    let changed = (Object.keys(eventLastWritten[eventId] || {}).length === 0); // always write first time
+
+    for (const m of clan.member_list) {
+      const id       = String(m.id);
+      const startRep = snapshot[id] ? snapshot[id].startRep : m.reputation;
+      const eventGain = Math.max(0, m.reputation - startRep);
+
+      if (eventGain !== (eventLastWritten[eventId] || {})[id]) changed = true;
+
+      members[id] = {
+        name:        m.name,
+        eventGain,
+        startRep,
+        currentRep:  m.reputation,
+        lastUpdated: now,
+      };
+    }
+
+    if (!changed) continue; // nothing changed — skip Firestore write
+
+    // ── Step 4: Write gains doc ───────────────────────────────────────────────
+    try {
+      await setDoc(doc(db, 'eventGains', eventId), {
+        eventId,
+        eventTitle:  title,
+        isActive,
+        lastUpdated: now,
+        members,
+      });
+      if (!eventLastWritten[eventId]) eventLastWritten[eventId] = {};
+      for (const [id, m] of Object.entries(members)) {
+        eventLastWritten[eventId][id] = m.eventGain;
+      }
+    } catch(e) {
+      console.warn(`[${ts()}] Event gains write error for "${title}":`, e.message);
+    }
+  }
+}
+
 // ─── Main poll function ───────────────────────────────────────────────────────
 let fetchInProgress  = false;
 let lastGeneratedAt  = null;
@@ -540,6 +673,7 @@ async function poll() {
     recordMemberPeaks(roundRolledOver);
     await recordDeductionChanges();
     await updateWeeklyGains();
+    await processEvents();
 
     const newGeneratedAt = json.generated_at;
     if (newGeneratedAt !== lastGeneratedAt) {
@@ -661,3 +795,6 @@ setInterval(poll, POLL_MS);
 
 // Initialize weekly tracking (async — restores baselines from Firestore)
 initWeeklyTracking();
+
+// Load events list on startup (refreshed every 30s during polling)
+loadEventsFromFirestore();
