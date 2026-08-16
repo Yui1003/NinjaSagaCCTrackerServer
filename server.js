@@ -874,6 +874,9 @@ app.get('/', (_req, res) => {
   .row .card{flex:1}
   .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#a6e3a1;margin-right:6px;animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .btn{margin-top:10px;background:#313244;color:#cdd6f4;border:1px solid #45475a;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer}
+  .btn:hover{background:#45475a}
+  input[type=password]{width:100%;box-sizing:border-box;background:#11111a;border:1px solid #2a2a3e;border-radius:8px;padding:8px 10px;color:#cdd6f4;font-size:13px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -911,11 +914,19 @@ app.get('/', (_req, res) => {
   <div class="card">
     <div class="label">Deduction monitoring</div>
     <div class="value ${pausedState.deductions ? 'red' : 'green'}">${pausedState.deductions ? 'PAUSED' : 'LIVE'}</div>
+    <button class="btn" onclick="togglePause('deductions', ${pausedState.deductions})">${pausedState.deductions ? 'Resume' : 'Pause'}</button>
   </div>
   <div class="card">
     <div class="label">Suspect monitoring</div>
     <div class="value ${pausedState.suspects ? 'red' : 'green'}">${pausedState.suspects ? 'PAUSED' : 'LIVE'}</div>
+    <button class="btn" onclick="togglePause('suspects', ${pausedState.suspects})">${pausedState.suspects ? 'Resume' : 'Pause'}</button>
   </div>
+</div>
+
+<div class="card">
+  <div class="label">Admin token</div>
+  <input id="adminToken" type="password" placeholder="Paste ADMIN_TOKEN to enable the buttons above" autocomplete="off">
+  <div id="pauseStatus" style="font-size:12px;color:#6c7086;margin-top:8px"></div>
 </div>
 
 <div class="card">
@@ -933,6 +944,46 @@ app.get('/', (_req, res) => {
     ? `Events are reported to ${TRACKER_SERVER_URL} (/api/deductions, /api/suspects), with a direct Firestore write as fallback if that request fails.`
     : `Events are written directly to Firebase Firestore (suspectLog / deductionLog). Set TRACKER_SERVER_URL to route through the HTML tracker's own coordinated write path instead.`}
 </p>
+
+<script>
+  // Token is kept only in this browser's localStorage — never embedded in
+  // the page source, never sent anywhere except the x-admin-token header on
+  // this page's own /admin/pause calls.
+  const tokenInput = document.getElementById('adminToken');
+  const statusEl   = document.getElementById('pauseStatus');
+  tokenInput.value = localStorage.getItem('hcld_admin_token') || '';
+  tokenInput.addEventListener('input', () => {
+    localStorage.setItem('hcld_admin_token', tokenInput.value);
+  });
+
+  async function togglePause(kind, currentlyPaused) {
+    const token = tokenInput.value.trim();
+    if (!token) {
+      statusEl.textContent = 'Paste your ADMIN_TOKEN above first.';
+      statusEl.style.color = '#f38ba8';
+      return;
+    }
+    statusEl.textContent = 'Updating…';
+    statusEl.style.color = '#6c7086';
+    try {
+      const res = await fetch('/admin/pause', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ [kind]: !currentlyPaused }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        statusEl.textContent = data.error || ('HTTP ' + res.status);
+        statusEl.style.color = '#f38ba8';
+        return;
+      }
+      location.reload();
+    } catch (e) {
+      statusEl.textContent = 'Request failed: ' + e.message;
+      statusEl.style.color = '#f38ba8';
+    }
+  }
+</script>
 </body>
 </html>`);
 });
