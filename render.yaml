@@ -8,3 +8,21 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Base URL of the HTML tracker's own deployed server (HiddenCloud
+      # project). When set, this poller reports deduction/suspect events
+      # through that server's /api/deductions + /api/suspects endpoints
+      # instead of writing to Firestore directly. If that server is down or
+      # suspended, this poller automatically falls back to a direct
+      # Firestore write per-event — no code change needed either way.
+      - key: TRACKER_SERVER_URL
+        value: https://hiddencloudapp.onrender.com
+      # Shared secret required by the live /admin/pause endpoint. Leave
+      # unset to disable that endpoint (env-var pause flags below still work).
+      - key: ADMIN_TOKEN
+        sync: false
+      # Set-and-forget defaults for the two write-path pause switches.
+      # Either can also be flipped live via POST /admin/pause.
+      - key: DEDUCTIONS_PAUSED
+        value: "false"
+      - key: SUSPECTS_PAUSED
+        value: "false"
