@@ -32,6 +32,24 @@ const API_URL    = 'https://static.ninjasaga.cc/data/clan_rankings.json';
 const POLL_MS    = 5000;   // poll every 5 seconds (same as browser)
 const PORT       = process.env.PORT || 5000;
 
+// How many consecutive polls a new clan.deduction value must hold before it's
+// treated as an official event (filters single-tick read noise, ~5-10s @ 2).
+const DEDUCTION_DEBOUNCE_POLLS = 2;
+
+// Bound on the in-memory dedup Sets so long-running (weeks+) uptime doesn't leak.
+const SEEN_KEYS_MAX = 5000;
+
+// Base URL of the HTML tracker's own server (HiddenCloud project), which owns
+// the coordinated write path (/api/deductions, /api/suspects) already used by
+// browser clients. When set, this poller reports through that same path
+// instead of writing to Firestore directly, so there's a single writer.
+// Falls back to direct Firestore writes (old behavior) when unset.
+const TRACKER_SERVER_URL = (process.env.TRACKER_SERVER_URL || '').replace(/\/+$/, '');
+
+// Shared-secret token for the live pause-control endpoint. Leave unset to
+// disable the endpoint entirely (env-var pause flags below still work).
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || null;
+
 const FIREBASE_CONFIG = {
   apiKey:            'AIzaSyBt1VtMUsUd_pVOG6sKbCJTHS2bka8kVpo',
   authDomain:        'clantracker-22435.firebaseapp.com',
@@ -67,15 +85,44 @@ let clanActivity     = {};
 // Current 30-min round
 let round = { id: null, startTs: null, startSnap: null };
 
-// Already-written dedupKeys (prevents double-writes across polls)
+// Already-written dedupKeys (prevents double-writes). Bounded FIFO — see
+// addSeen() below — so these can't grow forever across weeks of uptime.
 const suspectKeysSeen   = new Set();
 // Already-written deductionLog keys
 const deductionKeysSeen = new Set();
 
+// Add a key to a bounded Set, evicting the oldest entry (insertion order)
+// once it grows past SEEN_KEYS_MAX. Keeps recent-dedup protection without
+// an unbounded memory leak on a process meant to run 24/7 indefinitely.
+function addSeen(set, key) {
+  set.add(key);
+  if (set.size > SEEN_KEYS_MAX) set.delete(set.values().next().value);
+}
+
+// Per-clan "official" deduction state — replaces the old adjacent-poll diff.
+// confirmed = last value we've actually logged as an event (or the first
+// value seen, if nothing has been logged yet). pendingValue/pendingCount
+// implement the debounce: a new value must repeat for
+// DEDUCTION_DEBOUNCE_POLLS consecutive polls before it's promoted to
+// `confirmed` and written. Key: clanId
+let deductionState = {};
+
+// Two independent pause switches. Defaults come from env vars (set-and-forget
+// at deploy time); either can also be flipped live via the /admin/pause
+// endpoint below (protected by ADMIN_TOKEN). Polling, round tracking, weekly
+// gains, and events processing are NEVER gated by these — only the two
+// Firestore/HTTP write paths are.
+let pausedState = {
+  deductions: String(process.env.DEDUCTIONS_PAUSED).toLowerCase() === 'true',
+  suspects:   String(process.env.SUSPECTS_PAUSED).toLowerCase()   === 'true',
+};
+
 // Counters for the status log
 let totalSuspectsWritten   = 0;
 let totalDeductionsWritten = 0;
-let pollCount              = 0;
+let totalSuspectsSkipped   = 0;   // skipped because deductions/suspects were paused
+let totalDeductionsSkipped = 0;
+let pollCount               = 0;
 
 // ─── Events tracking state ────────────────────────────────────────────────────
 let cachedEvents      = [];   // array of event docs from Firestore
@@ -103,6 +150,29 @@ let weeklyState = {
 // ─── Firebase init ────────────────────────────────────────────────────────────
 const firebaseApp = initializeApp(FIREBASE_CONFIG);
 const db          = getFirestore(firebaseApp);
+
+// ─── Coordinated write path ───────────────────────────────────────────────────
+// When TRACKER_SERVER_URL is configured, report through the HTML tracker's own
+// server instead of writing to Firestore directly — that server already
+// dedupes + fans out over SSE, so this collapses two independent writers into
+// one. If the request fails (or the URL isn't configured), fall back to a
+// direct Firestore write so an event is never silently dropped.
+async function reportEvent(path, entry) {
+  if (TRACKER_SERVER_URL) {
+    try {
+      const res = await fetch(`${TRACKER_SERVER_URL}${path}`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(entry),
+      });
+      if (res.ok) return { ok: true, via: 'http' };
+      console.warn(`[${ts()}] ${path} HTTP write failed: HTTP ${res.status} — falling back to direct Firestore write`);
+    } catch (e) {
+      console.warn(`[${ts()}] ${path} HTTP write error: ${e.message} — falling back to direct Firestore write`);
+    }
+  }
+  return { ok: false, via: 'firestore' }; // caller does the direct Firestore write
+}
 
 // ─── Weekly gains helpers ─────────────────────────────────────────────────────
 
@@ -436,31 +506,60 @@ function recordMemberPeaks(roundRolledOver) {
 }
 
 // ─── Deduction change tracking + official suspect capture ────────────────────
-// This is the ONLY place Firestore writes happen.
-// When clan.deduction changes in the API, that is the "official" ACP event —
-// both the clan penalty and the individual member penalty are now confirmed.
-// At that exact moment we:
-//   1. Write the deduction entry to deductionLog
+// When clan.deduction changes in the API AND the new value holds for
+// DEDUCTION_DEBOUNCE_POLLS consecutive polls, that's treated as the "official"
+// ACP event — both the clan penalty and the individual member penalty are now
+// confirmed. At that point we:
+//   1. Report the deduction entry (deductionLog)
 //   2. Look at every member of that clan in memory — anyone with a dropAmount > 0
-//      is a confirmed suspect for this event — write them to suspectLog
+//      is a confirmed suspect for this event — report them (suspectLog)
+//
+// NOTE on the debounce: `deductionState[clanId].confirmed` — not the previous
+// poll's raw value — is the baseline for "did this change". That's what makes
+// a single noisy tick harmless: a value that blips up and immediately back
+// down never reaches pendingCount >= DEDUCTION_DEBOUNCE_POLLS, so `confirmed`
+// never moves and nothing is written.
 async function recordDeductionChanges() {
-  if (!currentData || !prevData) return;
+  if (!currentData) return;
   const now = Date.now();
 
   for (const clan of currentData.clans) {
-    const prev    = prevData.clans.find(c => c.id === clan.id);
-    if (!prev) continue;
-
-    const prevDed = prev.deduction || 0;
     const currDed = clan.deduction || 0;
-    if (currDed === prevDed) continue;
+    let st = deductionState[clan.id];
 
+    // First time seeing this clan — seed baseline, don't fire an event for it.
+    if (!st) {
+      deductionState[clan.id] = { confirmed: currDed, pendingValue: null, pendingCount: 0 };
+      continue;
+    }
+
+    if (currDed === st.confirmed) {
+      // Back at (or still at) the confirmed baseline — clear any in-progress debounce.
+      if (st.pendingValue !== null) { st.pendingValue = null; st.pendingCount = 0; }
+      continue;
+    }
+
+    // Differs from the confirmed baseline — advance (or start) the debounce.
+    if (st.pendingValue === currDed) {
+      st.pendingCount++;
+    } else {
+      st.pendingValue = currDed;
+      st.pendingCount = 1;
+    }
+    if (st.pendingCount < DEDUCTION_DEBOUNCE_POLLS) continue; // not stable yet — wait
+
+    // Stable for the required number of consecutive polls — this is official.
+    const prevDed = st.confirmed;
     const deductionChange = currDed - prevDed; // positive = penalty grew
-    const docKey          = `${clan.id}_${now}`;
-    if (deductionKeysSeen.has(docKey)) continue;
-    deductionKeysSeen.add(docKey);
+    st.confirmed     = currDed;
+    st.pendingValue  = null;
+    st.pendingCount  = 0;
 
-    // ── 1. Write deduction entry ──────────────────────────────────────────────
+    const docKey = `${clan.id}_${prevDed}_${currDed}`; // value-based — a real repeat
+    if (deductionKeysSeen.has(docKey)) continue;         // transition still gets its own key
+    addSeen(deductionKeysSeen, docKey);
+
+    // ── 1. Report deduction entry ─────────────────────────────────────────────
     const deductionEntry = {
       clanId:        clan.id,
       clanName:      clan.name,
@@ -472,13 +571,21 @@ async function recordDeductionChanges() {
       capturedBy:    'server-poller',
     };
 
-    try {
-      await setDoc(doc(collection(db, 'deductionLog'), docKey), deductionEntry);
-      totalDeductionsWritten++;
+    if (pausedState.deductions) {
+      totalDeductionsSkipped++;
+      console.log(`[${ts()}] ⏸ DEDUCTION (paused, not written) ${clan.name} | ${fmtNum(prevDed)} → ${fmtNum(currDed)}`);
+    } else {
       const sign = deductionChange > 0 ? '+' : '';
-      console.log(`[${ts()}] 📊 DEDUCTION ${clan.name} (rank ${clan.rank}) | ${fmtNum(prevDed)} → ${fmtNum(currDed)} (${sign}${fmtNum(deductionChange)})`);
-    } catch (e) {
-      console.error(`[${ts()}] Firestore deduction write error:`, e.message);
+      try {
+        const routed = await reportEvent('/api/deductions', deductionEntry);
+        if (!routed.ok) {
+          await setDoc(doc(collection(db, 'deductionLog'), docKey), deductionEntry);
+        }
+        totalDeductionsWritten++;
+        console.log(`[${ts()}] 📊 DEDUCTION ${clan.name} (rank ${clan.rank}) | ${fmtNum(prevDed)} → ${fmtNum(currDed)} (${sign}${fmtNum(deductionChange)}) [${routed.via}]`);
+      } catch (e) {
+        console.error(`[${ts()}] Deduction write error:`, e.message);
+      }
     }
 
     // ── 2. Capture suspects from memory at the moment of official deduction ───
@@ -491,7 +598,7 @@ async function recordDeductionChanges() {
 
       const dedupKey = `${clan.id}_${m.id}_${entry.peak}`;
       if (suspectKeysSeen.has(dedupKey)) continue; // already written from a previous deduction
-      suspectKeysSeen.add(dedupKey);
+      addSeen(suspectKeysSeen, dedupKey);
 
       // HIGH if this member's drop amount exactly matches the clan deduction change
       const suspLvl = (deductionChange > 0 && entry.dropAmount === deductionChange) ? 'HIGH' : 'MEDIUM';
@@ -517,12 +624,21 @@ async function recordDeductionChanges() {
         capturedBy:      'server-poller',
       };
 
+      if (pausedState.suspects) {
+        totalSuspectsSkipped++;
+        console.log(`[${ts()}] ⏸ SUSPECT (paused, not written) ${clan.name} · ${m.name}`);
+        continue;
+      }
+
       try {
-        await setDoc(doc(collection(db, 'suspectLog'), dedupKey), suspectEntry);
+        const routed = await reportEvent('/api/suspects', suspectEntry);
+        if (!routed.ok) {
+          await setDoc(doc(collection(db, 'suspectLog'), dedupKey), suspectEntry);
+        }
         totalSuspectsWritten++;
-        console.log(`[${ts()}] 🚨 SUSPECT  ${clan.name} · ${m.name} (Lv${m.level}) | peak ${fmtNum(entry.peak)} → drop -${fmtNum(entry.dropAmount)} | ${suspLvl}`);
+        console.log(`[${ts()}] 🚨 SUSPECT  ${clan.name} · ${m.name} (Lv${m.level}) | peak ${fmtNum(entry.peak)} → drop -${fmtNum(entry.dropAmount)} | ${suspLvl} [${routed.via}]`);
       } catch (e) {
-        console.error(`[${ts()}] Firestore suspect write error:`, e.message);
+        console.error(`[${ts()}] Suspect write error:`, e.message);
       }
     }
   }
@@ -696,6 +812,37 @@ async function poll() {
 
 // ─── Express health check / status page ───────────────────────────────────────
 const app = express();
+app.use(express.json({ limit: '8kb' }));
+
+// Protected live pause-control endpoint. Two independent switches — either
+// can be flipped without a redeploy. Requires ADMIN_TOKEN to be set; if it
+// isn't, the endpoint is disabled (env-var defaults from startup still apply).
+function checkAdminToken(req, res) {
+  if (!ADMIN_TOKEN) {
+    res.status(503).json({ error: 'ADMIN_TOKEN is not configured on this server.' });
+    return false;
+  }
+  const token = req.get('x-admin-token') || req.query.token;
+  if (token !== ADMIN_TOKEN) {
+    res.status(401).json({ error: 'Invalid or missing admin token.' });
+    return false;
+  }
+  return true;
+}
+
+app.get('/admin/pause', (req, res) => {
+  if (!checkAdminToken(req, res)) return;
+  res.json({ paused: pausedState });
+});
+
+app.post('/admin/pause', (req, res) => {
+  if (!checkAdminToken(req, res)) return;
+  const { deductions, suspects } = req.body || {};
+  if (typeof deductions === 'boolean') pausedState.deductions = deductions;
+  if (typeof suspects === 'boolean') pausedState.suspects = suspects;
+  console.log(`[${ts()}] 🔧 Pause state updated via admin endpoint: ${JSON.stringify(pausedState)}`);
+  res.json({ ok: true, paused: pausedState });
+});
 
 app.get('/', (_req, res) => {
   const uptime  = process.uptime();
@@ -752,11 +899,22 @@ app.get('/', (_req, res) => {
 <div class="row">
   <div class="card">
     <div class="label">🚨 Suspects caught</div>
-    <div class="value red">${totalSuspectsWritten}</div>
+    <div class="value red">${totalSuspectsWritten}${totalSuspectsSkipped ? ` <span style="font-size:12px;color:#6c7086">(+${totalSuspectsSkipped} skipped)</span>` : ''}</div>
   </div>
   <div class="card">
     <div class="label">📊 Deductions logged</div>
-    <div class="value amber">${totalDeductionsWritten}</div>
+    <div class="value amber">${totalDeductionsWritten}${totalDeductionsSkipped ? ` <span style="font-size:12px;color:#6c7086">(+${totalDeductionsSkipped} skipped)</span>` : ''}</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <div class="label">Deduction monitoring</div>
+    <div class="value ${pausedState.deductions ? 'red' : 'green'}">${pausedState.deductions ? 'PAUSED' : 'LIVE'}</div>
+  </div>
+  <div class="card">
+    <div class="label">Suspect monitoring</div>
+    <div class="value ${pausedState.suspects ? 'red' : 'green'}">${pausedState.suspects ? 'PAUSED' : 'LIVE'}</div>
   </div>
 </div>
 
@@ -771,8 +929,9 @@ app.get('/', (_req, res) => {
 </div>
 
 <p style="color:#45475a;font-size:11px;margin-top:20px">
-  Events are written to Firebase Firestore (suspectLog / deductionLog) — 
-  the HTML tracker picks them up automatically via its real-time listener.
+  ${TRACKER_SERVER_URL
+    ? `Events are reported to ${TRACKER_SERVER_URL} (/api/deductions, /api/suspects), with a direct Firestore write as fallback if that request fails.`
+    : `Events are written directly to Firebase Firestore (suspectLog / deductionLog). Set TRACKER_SERVER_URL to route through the HTML tracker's own coordinated write path instead.`}
 </p>
 </body>
 </html>`);
